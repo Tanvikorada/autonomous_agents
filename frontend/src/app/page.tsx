@@ -53,6 +53,9 @@ export default function Home() {
           }
         } catch (e) {
           console.error("Polling error:", e);
+          setError("Lost connection to the backend. The server may have crashed or stopped.");
+          stopPolling();
+          setIsLoading(false);
         }
       }, POLL_INTERVAL_MS);
     },

@@ -36,6 +36,8 @@ def get_llm(temperature: float = 0.3) -> BaseChatModel:
             api_key=settings.groq_api_key,
             model_name=settings.groq_model,
             temperature=temperature,
+            max_retries=2,
+            timeout=45,
         )
 
     elif provider == "openai":
@@ -50,6 +52,8 @@ def get_llm(temperature: float = 0.3) -> BaseChatModel:
             api_key=settings.openai_api_key,
             model=settings.openai_model,
             temperature=temperature,
+            max_retries=2,
+            timeout=45,
         )
 
     else:
