@@ -24,7 +24,7 @@ Problem Statement
 
 **Stack:**
 - **Backend**: FastAPI + LangGraph (Python)
-- **LLM**: Groq (`llama3-70b-8192`) or OpenAI (`gpt-4o-mini`)
+- **LLM**: Groq (`llama-3.3-70b-versatile`) or OpenAI (`gpt-4o-mini`)
 - **Frontend**: Next.js 14 (dark glassmorphism dashboard)
 - **Storage**: In-memory job store (no DB needed)
 
@@ -181,7 +181,7 @@ Edit `.env` to switch providers:
 # Use Groq (free, fast — recommended)
 LLM_PROVIDER=groq
 GROQ_API_KEY=gsk_...
-GROQ_MODEL=llama3-70b-8192
+GROQ_MODEL=llama-3.3-70b-versatile
 
 # OR use OpenAI
 LLM_PROVIDER=openai

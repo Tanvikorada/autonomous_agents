@@ -22,7 +22,7 @@ class Settings(BaseSettings):
     openai_api_key: str = ""
 
     # Model names
-    groq_model: str = "llama3-70b-8192"
+    groq_model: str = "llama-3.3-70b-versatile"
     openai_model: str = "gpt-4o-mini"
 
     # App
