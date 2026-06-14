@@ -1,343 +1,305 @@
-/* globals.css — SVZ Editorial Design System for Autonomous Agents */
+/* globals.css — Autonomous Agents: Vivid+Co × SVZ Fusion */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&family=Playfair+Display:ital@1&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* ── SVZ Design Tokens ──────────────────────────────────────────── */
+/* ── Design Tokens ──────────────────────────────────────────────── */
 :root {
-  /* Colors */
-  --color-void-canvas:    #080808;
-  --color-absolute-black: #000000;
-  --color-charcoal-plate: #171617;
-  --color-smoke-plate:    #262525;
-  --color-graphite-lift:  #393939;
-  --color-bone-white:     #fcfcfc;
-  --color-linen:          #f3efef;
-  --color-ash:            #d4d2d2;
-  --color-pebble:         #b5b2b2;
-  --color-iron:           #525252;
-  --color-arterial-red:   #fe1e34;
-  --color-crimson-pure:   #ff0000;
+  /* Vivid+Co canvas palette */
+  --bone-white:    #fffdf9;
+  --slate-veil:    #495764;
+  --carbon:        #101010;
+  --obsidian:      #000000;
+  --graphite:      #403f3f;
+  --gunmetal-blue: #6f879c;
 
-  /* Typography */
-  --font-primary: 'Inter', 'Neue Haas Grotesk Display', ui-sans-serif, system-ui, -apple-system, sans-serif;
-  --font-serif:   'Playfair Display', 'Editorial Old', 'Canela', Georgia, serif;
+  /* SVZ arterial red — the sole chromatic heartbeat */
+  --arterial-red:  #fe1e34;
 
-  /* Type Scale */
-  --text-caption:     10px;
-  --text-body:        14px;
-  --text-subheading:  24px;
-  --text-heading-sm:  32px;
-  --text-heading:     42px;
-  --text-heading-lg:  64px;
-  --text-display:     80px;
-  --text-display-xl:  160px;
+  /* Fonts */
+  --font-primary: 'Inter', 'Neue Montreal', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-serif:   'Playfair Display', 'Editorial New', Georgia, serif;
 
-  /* Letter Spacing */
-  --tracking-out-lg:   0.308em;
-  --tracking-out-sm:   0.071em;
-  --tracking-in-body: -0.017em;
-  --tracking-in-sm:   -0.038em;
-  --tracking-in-md:   -0.050em;
-  --tracking-in-lg:   -0.075em;
-  --tracking-in-xl:   -0.080em;
+  /* Type scale — Vivid+Co */
+  --text-caption:     14px;
+  --text-body:        17px;
+  --text-body-lg:     20px;
+  --text-sub:         22px;
+  --text-heading-sm:  36px;
+  --text-heading:     56px;
+  --text-display:     105px;
+  --text-display-xl:  136px;
 
   /* Spacing */
-  --spacing-8:   8px;
-  --spacing-16:  16px;
-  --spacing-24:  24px;
-  --spacing-32:  32px;
-  --spacing-48:  48px;
-  --spacing-56:  56px;
-  --spacing-80:  80px;
-  --spacing-112: 112px;
-  --spacing-128: 128px;
-  --spacing-184: 184px;
+  --sp-16:  16px;
+  --sp-20:  20px;
+  --sp-40:  40px;
+  --sp-56:  56px;
+  --sp-64:  64px;
+  --sp-72:  72px;
+  --sp-108: 108px;
 
-  /* Radius */
-  --radius-nav:       3px;
-  --radius-cards:     8px;
-  --radius-buttons:   8px;
-  --radius-lg:        14.4px;
-
-  /* Shadows */
-  --shadow-inset: rgba(255, 255, 255, 0.2) 0px 2px 5px 0px inset;
+  /* Radii — Vivid+Co: 0px buttons, 5px nav */
+  --r-nav:  5px;
+  --r-xl:   15px;
 }
 
 /* ── Reset ──────────────────────────────────────────────────────── */
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
-html {
-  scroll-behavior: smooth;
-}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
 
 body {
-  background-color: var(--color-void-canvas);
-  color: var(--color-bone-white);
+  background: var(--slate-veil);
+  color: var(--bone-white);
   font-family: var(--font-primary);
   font-size: var(--text-body);
   font-weight: 400;
   line-height: 1.5;
-  letter-spacing: var(--tracking-in-body);
   min-height: 100vh;
+  overflow-x: hidden;
 }
 
-/* ── Typography Utilities ───────────────────────────────────────── */
-.svz-display-xl {
-  font-family: var(--font-primary);
-  font-size: clamp(64px, 10vw, var(--text-display-xl));
-  font-weight: 700;
-  line-height: 0.9;
-  letter-spacing: -12.8px;
-  color: var(--color-bone-white);
-  text-transform: uppercase;
+/* ── Grain overlay — CSS SVG noise for darkroom texture ─────────── */
+.grain::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.04;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 200px 200px;
 }
 
-.svz-display {
-  font-family: var(--font-primary);
-  font-size: clamp(48px, 7vw, var(--text-display));
-  font-weight: 700;
-  line-height: 0.9;
-  letter-spacing: -6px;
-  color: var(--color-bone-white);
-  text-transform: uppercase;
+/* ── Motion: Word reveal ────────────────────────────────────────── */
+@keyframes revealUp {
+  from {
+    clip-path: inset(100% 0 0 0);
+    opacity: 0;
+  }
+  to {
+    clip-path: inset(0% 0 0 0);
+    opacity: 1;
+  }
 }
 
-.svz-heading-lg {
-  font-family: var(--font-primary);
-  font-size: clamp(36px, 5.5vw, var(--text-heading-lg));
-  font-weight: 700;
-  line-height: 1;
-  letter-spacing: -4.8px;
-  color: var(--color-bone-white);
-  text-transform: uppercase;
+/* ── Motion: Float ──────────────────────────────────────────────── */
+@keyframes floatPrism {
+  0%,100% { transform: translateY(0px) rotate(0deg); }
+  25%     { transform: translateY(-22px) rotate(0.6deg); }
+  60%     { transform: translateY(-10px) rotate(-0.4deg); }
 }
 
-.svz-heading {
-  font-family: var(--font-primary);
-  font-size: var(--text-heading);
-  font-weight: 700;
-  line-height: 1.05;
-  letter-spacing: -2px;
-  color: var(--color-bone-white);
-  text-transform: uppercase;
+/* ── Motion: Pulse red dot ──────────────────────────────────────── */
+@keyframes pulseRed {
+  0%,100% { opacity:1; transform: scale(1); }
+  50%     { opacity:0.5; transform: scale(0.75); }
 }
 
-.svz-heading-sm {
-  font-family: var(--font-primary);
-  font-size: var(--text-heading-sm);
-  font-weight: 700;
-  line-height: 1.05;
-  letter-spacing: -1.6px;
-  color: var(--color-bone-white);
-  text-transform: uppercase;
+/* ── Motion: Fade up ────────────────────────────────────────────── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
-.svz-label {
+/* ── Motion: Slide in nav ───────────────────────────────────────── */
+@keyframes slideDownNav {
+  from { opacity: 0; transform: translateY(-16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Motion: Scan line across headline ─────────────────────────── */
+@keyframes scanLine {
+  from { transform: scaleX(0); transform-origin: left; }
+  to   { transform: scaleX(1); transform-origin: left; }
+}
+
+/* ── Motion: Breathe ────────────────────────────────────────────── */
+@keyframes breathe {
+  0%,100% { opacity: 0.5; }
+  50%     { opacity: 1; }
+}
+
+/* ── Typography utilities ───────────────────────────────────────── */
+.display-xl {
   font-family: var(--font-primary);
-  font-size: var(--text-caption);
+  font-size: clamp(64px, 9.5vw, var(--text-display-xl));
   font-weight: 400;
-  line-height: 1.2;
-  letter-spacing: var(--tracking-out-sm);
-  color: var(--color-ash);
-  text-transform: uppercase;
+  line-height: 1.0;
+  letter-spacing: -0.02em;
+  color: var(--bone-white);
 }
+.display-xl strong { font-weight: 700; }
 
-.svz-label-bone {
+.display {
   font-family: var(--font-primary);
-  font-size: var(--text-caption);
+  font-size: clamp(52px, 7.5vw, var(--text-display));
   font-weight: 400;
-  line-height: 1.2;
-  letter-spacing: var(--tracking-out-sm);
-  color: var(--color-bone-white);
-  text-transform: uppercase;
+  line-height: 1.0;
+  letter-spacing: -0.02em;
+  color: var(--bone-white);
 }
 
-.svz-body {
+.heading {
   font-family: var(--font-primary);
-  font-size: var(--text-body);
+  font-size: clamp(36px, 5vw, var(--text-heading));
+  font-weight: 400;
+  line-height: 1.13;
+  letter-spacing: -0.02em;
+  color: var(--bone-white);
+}
+
+.heading-sm {
+  font-family: var(--font-primary);
+  font-size: clamp(24px, 3.5vw, var(--text-heading-sm));
+  font-weight: 400;
+  line-height: 1.17;
+  letter-spacing: -0.01em;
+  color: var(--bone-white);
+}
+
+.body-lg {
+  font-family: var(--font-primary);
+  font-size: var(--text-body-lg);
   font-weight: 400;
   line-height: 1.5;
-  letter-spacing: var(--tracking-in-body);
-  color: var(--color-ash);
+  color: rgba(255, 253, 249, 0.65);
 }
 
-.svz-serif-italic {
-  font-family: var(--font-serif);
-  font-style: italic;
+.caption {
+  font-family: var(--font-primary);
+  font-size: var(--text-caption);
   font-weight: 400;
+  line-height: 1.5;
+  letter-spacing: 0.02em;
+  color: rgba(255, 253, 249, 0.45);
+  text-transform: uppercase;
 }
 
-/* ── Card Surfaces ──────────────────────────────────────────────── */
-.svz-card {
-  background: var(--color-void-canvas);
-  border: 1px solid var(--color-iron);
-  border-radius: var(--radius-cards);
-  box-shadow: var(--shadow-inset);
-}
-
-.svz-card-smoke {
-  background: var(--color-smoke-plate);
-  border: 1px solid var(--color-iron);
-  border-radius: var(--radius-cards);
-  box-shadow: var(--shadow-inset);
-}
-
-.svz-card-red {
-  background: var(--color-void-canvas);
-  border: 1px solid var(--color-arterial-red);
-  border-radius: var(--radius-cards);
-}
-
-/* ── Ghost Button / CTA ─────────────────────────────────────────── */
-.svz-ghost-btn {
+/* ── Ghost button — 0px radius, rectangular (Vivid+Co) ─────────── */
+.ghost-btn {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   background: transparent;
-  border: 1px solid var(--color-ash);
-  border-radius: var(--radius-buttons);
-  padding: 12px 24px;
-  color: var(--color-bone-white);
+  border: 1px solid var(--bone-white);
+  border-radius: 0;
+  padding: 10px 20px;
+  color: var(--bone-white);
   font-family: var(--font-primary);
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 400;
-  letter-spacing: var(--tracking-out-sm);
+  letter-spacing: 0.05em;
   text-transform: uppercase;
   cursor: pointer;
-  transition: border-color 0.2s, color 0.2s;
+  transition: border-color 0.2s, color 0.2s, background 0.2s;
+  text-decoration: none;
 }
-.svz-ghost-btn:hover:not(:disabled) {
-  border-color: var(--color-bone-white);
+.ghost-btn:hover:not(:disabled) {
+  background: rgba(255,253,249,0.06);
+  border-color: var(--gunmetal-blue);
 }
-.svz-ghost-btn:disabled {
-  opacity: 0.35;
+.ghost-btn:disabled {
+  opacity: 0.3;
   cursor: not-allowed;
 }
 
-.svz-ghost-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  background: transparent;
+/* Ghost btn — gunmetal accent variant */
+.ghost-btn-accent {
+  border-color: var(--gunmetal-blue);
+  color: rgba(255,253,249,0.7);
+}
+.ghost-btn-accent:hover:not(:disabled) {
+  border-color: var(--bone-white);
+  color: var(--bone-white);
+}
+
+/* ── Hairline ────────────────────────────────────────────────────── */
+.hairline {
   border: none;
-  padding: 0;
-  color: var(--color-ash);
-  font-family: var(--font-primary);
-  font-size: 12px;
-  font-weight: 400;
-  letter-spacing: var(--tracking-out-sm);
-  text-transform: uppercase;
-  cursor: pointer;
-  text-decoration: underline;
-  text-decoration-color: var(--color-iron);
-  text-underline-offset: 3px;
-  transition: color 0.15s;
-}
-.svz-ghost-link:hover {
-  color: var(--color-bone-white);
+  border-top: 1px solid rgba(111, 135, 156, 0.3);
 }
 
-/* ── Hairline Separator ─────────────────────────────────────────── */
-.svz-hairline {
-  border: none;
-  border-top: 1px solid var(--color-iron);
+/* ── Red accent dot — SVZ heartbeat ─────────────────────────────── */
+.red-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--arterial-red);
+  animation: pulseRed 2.4s ease-in-out infinite;
+  flex-shrink: 0;
 }
 
-/* ── Tab Row ────────────────────────────────────────────────────── */
-.svz-tab-row {
-  display: flex;
-  gap: 0;
-  border-bottom: 1px solid var(--color-iron);
+/* ── Spinner ────────────────────────────────────────────────────── */
+@keyframes spin { to { transform: rotate(360deg); } }
+.spinner {
+  width: 14px; height: 14px;
+  border: 1px solid rgba(255,253,249,0.2);
+  border-top-color: var(--bone-white);
+  border-radius: 50%;
+  animation: spin 0.9s linear infinite;
+  flex-shrink: 0;
 }
 
-.svz-tab {
-  background: transparent;
-  border: none;
-  border-bottom: 2px solid transparent;
-  margin-bottom: -1px;
-  padding: 12px 24px;
-  color: var(--color-iron);
-  font-family: var(--font-primary);
-  font-size: 10px;
-  font-weight: 400;
-  letter-spacing: var(--tracking-out-sm);
-  text-transform: uppercase;
-  cursor: pointer;
-  transition: color 0.15s, border-color 0.15s;
-}
-.svz-tab:hover {
-  color: var(--color-ash);
-}
-.svz-tab.active {
-  color: var(--color-bone-white);
-  font-weight: 700;
-  border-bottom-color: var(--color-bone-white);
-}
-
-/* ── Code Block ─────────────────────────────────────────────────── */
-.svz-code-block {
-  background: var(--color-smoke-plate);
-  border: 1px solid var(--color-iron);
-  border-radius: var(--radius-cards);
-  padding: 20px;
-  font-family: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+/* ── Code block ─────────────────────────────────────────────────── */
+.code-block {
+  background: var(--carbon);
+  border: 1px solid rgba(111,135,156,0.25);
+  border-radius: 4px;
+  padding: 24px;
+  font-family: 'JetBrains Mono', 'Courier New', monospace;
   font-size: 13px;
   line-height: 1.7;
-  color: var(--color-bone-white);
+  color: var(--bone-white);
   overflow-x: auto;
   white-space: pre-wrap;
   word-break: break-word;
 }
 
-/* ── Status Indicator ───────────────────────────────────────────── */
-.svz-status {
+/* ── Tab row ────────────────────────────────────────────────────── */
+.tab-row {
+  display: flex;
+  border-bottom: 1px solid rgba(111,135,156,0.25);
+}
+.tab-btn {
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid transparent;
+  margin-bottom: -1px;
+  padding: 14px 28px;
+  color: rgba(255,253,249,0.35);
   font-family: var(--font-primary);
-  font-size: 10px;
+  font-size: 13px;
   font-weight: 400;
-  letter-spacing: var(--tracking-out-sm);
+  letter-spacing: 0.05em;
   text-transform: uppercase;
-  color: var(--color-ash);
+  cursor: pointer;
+  transition: color 0.2s, border-color 0.2s;
+}
+.tab-btn:hover { color: rgba(255,253,249,0.65); }
+.tab-btn.active {
+  color: var(--bone-white);
+  border-bottom-color: var(--arterial-red);
 }
 
-/* ── Accent Dot ─────────────────────────────────────────────────── */
-.svz-accent-dot {
-  display: inline-block;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--color-arterial-red);
-  flex-shrink: 0;
+/* ── Vignette ───────────────────────────────────────────────────── */
+.vignette::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at center, transparent 40%, rgba(30,35,42,0.7) 100%);
+  pointer-events: none;
+  z-index: 2;
 }
 
-/* ── Spinner (minimal hairline) ─────────────────────────────────── */
-@keyframes svz-spin { to { transform: rotate(360deg); } }
-.svz-spinner {
-  width: 14px;
-  height: 14px;
-  border: 1px solid var(--color-iron);
-  border-top-color: var(--color-bone-white);
-  border-radius: 50%;
-  animation: svz-spin 0.9s linear infinite;
-  display: inline-block;
-  flex-shrink: 0;
-}
-
-/* ── Fade In ────────────────────────────────────────────────────── */
-@keyframes svzFadeUp {
-  from { opacity: 0; transform: translateY(12px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-.svz-fade-in { animation: svzFadeUp 0.5s ease-out forwards; }
+/* ── Fade in utility ────────────────────────────────────────────── */
+.fade-in { animation: fadeUp 0.6s ease-out both; }
 
 /* ── Scrollbar ──────────────────────────────────────────────────── */
-::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--color-iron); border-radius: 2px; }
-::-webkit-scrollbar-thumb:hover { background: var(--color-ash); }
+::-webkit-scrollbar-thumb { background: rgba(111,135,156,0.4); border-radius: 2px; }

@@ -1,5 +1,5 @@
 "use client";
-// components/AgentPipeline.tsx — SVZ editorial, dramatic step display
+// components/AgentPipeline.tsx — Vivid+Co × SVZ Fusion
 
 import { JobStatus } from "@/lib/api";
 
@@ -30,40 +30,30 @@ export default function AgentPipeline({ status, currentAgent, completedSteps }: 
   };
 
   return (
-    <div className="svz-card svz-fade-in" style={{ padding: "48px" }}>
-
+    <div className="fade-in" style={{ position: "relative" }}>
+      
       {/* Header */}
       <div style={{
         display: "flex", alignItems: "center", justifyContent: "space-between",
-        paddingBottom: "32px", borderBottom: "1px solid var(--color-iron)", marginBottom: "40px",
+        paddingBottom: "32px", borderBottom: "1px solid rgba(111,135,156,0.3)", marginBottom: "32px",
       }}>
-        <p style={{
-          fontFamily: "var(--font-primary)", fontSize: "clamp(28px, 4vw, 42px)",
-          fontWeight: 700, lineHeight: 0.95, letterSpacing: "-1.5px",
-          color: "var(--color-bone-white)", textTransform: "uppercase",
-        }}>
-          Running<br />
-          <span style={{
-            fontFamily: "'Playfair Display', Georgia, serif",
-            fontStyle: "italic", fontWeight: 400,
-            fontSize: "clamp(20px, 2.8vw, 30px)",
-            letterSpacing: "-0.5px", textTransform: "none",
-            color: "var(--color-ash)",
+        <div style={{ overflow: "hidden" }}>
+          <p style={{
+            fontFamily: "var(--font-primary)", fontSize: "clamp(32px, 5vw, 56px)",
+            fontWeight: 400, lineHeight: 1.0, letterSpacing: "-0.02em",
+            color: "var(--bone-white)",
           }}>
-            the pipeline
-          </span>
-        </p>
-        <div style={{ textAlign: "right" }}>
+            Pipeline <span style={{ fontStyle: "italic", fontFamily: "var(--font-serif)", color: "rgba(255,253,249,0.5)" }}>execution</span>
+          </p>
+        </div>
+        <div style={{ display: "flex", alignItems: "center", gap: "12px", textAlign: "right" }}>
           {status !== "done" && status !== "pending" && status !== "error" && (
-            <span className="svz-spinner" style={{ display: "block", marginBottom: "8px", marginLeft: "auto" }} />
+            <span className="spinner" />
           )}
           {status === "done" && (
-            <span style={{
-              display: "block", width: "12px", height: "12px", borderRadius: "50%",
-              background: "var(--color-arterial-red)", marginLeft: "auto", marginBottom: "8px",
-            }} />
+            <span className="red-dot" />
           )}
-          <p className="svz-status">{STATUS_LABELS[status]}</p>
+          <p className="caption" style={{ color: "var(--bone-white)" }}>{STATUS_LABELS[status]}</p>
         </div>
       </div>
 
@@ -79,65 +69,69 @@ export default function AgentPipeline({ status, currentAgent, completedSteps }: 
               key={agent.name}
               style={{
                 display: "flex", alignItems: "center", justifyContent: "space-between",
-                padding: "20px 0",
-                borderBottom: i < AGENTS.length - 1 ? "1px solid var(--color-iron)" : "none",
-                transition: "all 0.3s",
+                padding: "24px 0",
+                borderBottom: i < AGENTS.length - 1 ? "1px solid rgba(111,135,156,0.15)" : "none",
+                transition: "background 0.3s",
               }}
             >
               {/* Index + Name */}
-              <div style={{ display: "flex", alignItems: "baseline", gap: "24px" }}>
-                <p style={{
-                  fontFamily: "var(--font-primary)", fontSize: "10px", fontWeight: 400,
-                  letterSpacing: "0.15em", color: "var(--color-iron)",
-                  textTransform: "uppercase", minWidth: "24px",
+              <div style={{ display: "flex", alignItems: "flex-start", gap: "40px" }}>
+                <p className="caption" style={{
+                  color: isActive ? "var(--bone-white)" : "rgba(255,253,249,0.3)",
+                  transition: "color 0.3s",
+                  marginTop: "6px",
                 }}>
                   0{i + 1}
                 </p>
                 <div>
                   <p style={{
                     fontFamily: "var(--font-primary)",
-                    fontSize: isActive ? "24px" : "18px",
-                    fontWeight: isActive ? 700 : isDone ? 400 : 400,
-                    letterSpacing: isActive ? "-0.5px" : "-0.3px",
+                    fontSize: isActive ? "clamp(32px, 4.5vw, 48px)" : "clamp(24px, 3.5vw, 36px)",
+                    fontWeight: 400,
+                    letterSpacing: "-0.02em",
                     color: isActive
-                      ? "var(--color-bone-white)"
-                      : isDone ? "var(--color-iron)"
-                      : "var(--color-iron)",
-                    textTransform: "uppercase",
-                    transition: "all 0.3s",
-                    lineHeight: 1.1,
+                      ? "var(--bone-white)"
+                      : isDone ? "rgba(255,253,249,0.4)"
+                      : "rgba(255,253,249,0.2)",
+                    transition: "all 0.4s cubic-bezier(0.16, 1, 0.3, 1)",
+                    lineHeight: 1.0,
                   }}>
                     {agent.label}
                   </p>
-                  <p style={{
-                    fontFamily: "var(--font-primary)", fontSize: "12px", fontWeight: 300,
-                    color: isActive ? "var(--color-ash)" : "var(--color-iron)",
-                    lineHeight: 1.5, marginTop: "2px", transition: "color 0.3s",
+                  <div style={{
+                    height: isActive ? "auto" : "0",
+                    overflow: "hidden",
+                    opacity: isActive ? 1 : 0,
+                    transition: "all 0.4s ease",
                   }}>
-                    {agent.desc}
-                  </p>
+                    <p className="body-lg" style={{ marginTop: "12px", color: "rgba(255,253,249,0.6)" }}>
+                      {agent.desc}
+                    </p>
+                  </div>
                 </div>
               </div>
 
-              {/* State indicator */}
-              <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-                {isActive && (
-                  <p style={{
-                    fontFamily: "var(--font-primary)", fontSize: "10px", fontWeight: 400,
-                    letterSpacing: "0.15em", color: "var(--color-ash)", textTransform: "uppercase",
-                  }}>
-                    Active
-                  </p>
-                )}
-                {/* Red underline bar for active */}
+              {/* State indicator — scanning bar */}
+              <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
                 <div style={{
-                  width: "40px", height: "1px",
+                  width: isActive ? "80px" : "40px",
+                  height: "1px",
                   background: isActive
-                    ? "var(--color-arterial-red)"
-                    : isDone ? "var(--color-bone-white)"
-                    : "var(--color-iron)",
-                  transition: "background 0.4s",
-                }} />
+                    ? "var(--arterial-red)"
+                    : isDone ? "var(--bone-white)"
+                    : "rgba(111,135,156,0.3)",
+                  transition: "all 0.4s ease",
+                  position: "relative",
+                  overflow: "hidden",
+                }}>
+                  {isActive && (
+                    <div style={{
+                      position: "absolute", top: 0, left: 0, bottom: 0, right: 0,
+                      background: "rgba(255,255,255,0.8)",
+                      animation: "scanLine 1.5s ease-in-out infinite alternate",
+                    }} />
+                  )}
+                </div>
               </div>
             </div>
           );
