@@ -1,5 +1,4 @@
 "use client";
-// components/ProblemInput.tsx — Vivid+Co × SVZ Fusion
 
 import { useState } from "react";
 
@@ -23,105 +22,79 @@ export default function ProblemInput({ onSubmit, isLoading }: Props) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="fade-in">
-      {/* Textarea — minimal slate canvas */}
-      <div style={{ position: "relative", marginBottom: "32px" }}>
-        <textarea
-          id="problem-input"
-          value={problem}
-          onChange={(e) => setProblem(e.target.value)}
-          placeholder="e.g. Build a Python REST API for a todo list with CRUD operations and JWT authentication..."
-          disabled={isLoading}
-          rows={6}
-          style={{
-            width: "100%",
-            background: "rgba(16, 16, 16, 0.4)", // slight carbon recess
-            border: `1px solid ${problem.length > 0 ? "var(--arterial-red)" : "rgba(111,135,156,0.3)"}`,
-            borderRadius: "0px",
-            padding: "32px 40px",
-            color: "var(--bone-white)",
-            fontFamily: "var(--font-primary)",
-            fontSize: "20px",
-            fontWeight: 400,
-            lineHeight: 1.6,
-            letterSpacing: "-0.01em",
-            resize: "vertical",
-            outline: "none",
-            transition: "border-color 0.3s ease",
-          }}
-        />
-        {/* Inside char count */}
-        <p className="caption" style={{
-          position: "absolute", bottom: "16px", right: "24px",
-          color: problem.length > 0 ? "var(--bone-white)" : "rgba(255,253,249,0.3)",
-          transition: "color 0.3s ease",
-        }}>
-          {String(problem.length).padStart(2, "0")} / MIN 10
-        </p>
-      </div>
+    <div className="glass-panel" style={{ padding: 40, position: "relative", overflow: "hidden" }}>
+      {/* Background glow accent inside the panel */}
+      <div style={{
+        position: "absolute", top: -50, right: -50, width: 200, height: 200,
+        background: "radial-gradient(circle, var(--accent-3) 0%, transparent 70%)",
+        opacity: 0.2, pointerEvents: "none"
+      }} />
 
-      {/* Examples & Action Row */}
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: "32px" }}>
-        
-        {/* Quick Examples */}
-        <div style={{ maxWidth: "500px" }}>
-          <p className="caption" style={{ marginBottom: "16px", color: "rgba(255,253,249,0.4)" }}>
-            Quick Examples
-          </p>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: "12px" }}>
-            {EXAMPLES.map((ex, i) => (
-              <button
-                key={i}
-                type="button"
-                onClick={() => setProblem(ex)}
-                disabled={isLoading}
-                style={{
-                  background: "transparent",
-                  border: "1px solid rgba(111,135,156,0.3)",
-                  borderRadius: "0px",
-                  padding: "8px 16px",
-                  cursor: "pointer",
-                  fontFamily: "var(--font-primary)",
-                  fontSize: "12px",
-                  fontWeight: 400,
-                  letterSpacing: "0.05em",
-                  textTransform: "uppercase",
-                  color: "rgba(255,253,249,0.6)",
-                  transition: "all 0.2s ease",
-                }}
-                onMouseEnter={(e) => {
-                  (e.currentTarget).style.color = "var(--bone-white)";
-                  (e.currentTarget).style.borderColor = "var(--bone-white)";
-                }}
-                onMouseLeave={(e) => {
-                  (e.currentTarget).style.color = "rgba(255,253,249,0.6)";
-                  (e.currentTarget).style.borderColor = "rgba(111,135,156,0.3)";
-                }}
-              >
-                Ex. 0{i + 1} ↗
-              </button>
-            ))}
-          </div>
+      <form onSubmit={handleSubmit}>
+        <div style={{ marginBottom: 32 }}>
+          <textarea
+            value={problem}
+            onChange={(e) => setProblem(e.target.value)}
+            placeholder="Describe the software you want to build..."
+            disabled={isLoading}
+            className="glass-input"
+            rows={5}
+            style={{
+              width: "100%", padding: 24, borderRadius: 16, fontSize: 18,
+              lineHeight: 1.6, resize: "vertical"
+            }}
+          />
         </div>
 
-        {/* Submit Action */}
-        <button
-          id="submit-btn"
-          type="submit"
-          className="ghost-btn"
-          disabled={isLoading || problem.trim().length < 10}
-          style={{ padding: "16px 32px", fontSize: "14px" }}
-        >
-          {isLoading ? (
-            <>
-              <span className="spinner" />
-              Initializing...
-            </>
-          ) : (
-            "Run Pipeline ↗"
-          )}
-        </button>
-      </div>
-    </form>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 24 }}>
+          <div style={{ flex: 1, minWidth: 300 }}>
+            <div style={{ fontSize: 12, textTransform: "uppercase", letterSpacing: 2, color: "var(--text-secondary)", marginBottom: 12 }}>
+              Quick Prompts
+            </div>
+            <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+              {EXAMPLES.map((ex, i) => (
+                <button
+                  key={i}
+                  type="button"
+                  onClick={() => setProblem(ex)}
+                  disabled={isLoading}
+                  style={{
+                    background: "rgba(255,255,255,0.05)", border: "1px solid var(--glass-border)",
+                    borderRadius: 100, padding: "8px 16px", fontSize: 12, color: "var(--text-secondary)",
+                    cursor: "pointer", transition: "all 0.2s"
+                  }}
+                  onMouseEnter={(e) => {
+                    (e.currentTarget as HTMLButtonElement).style.background = "rgba(255,255,255,0.1)";
+                    (e.currentTarget as HTMLButtonElement).style.color = "#fff";
+                  }}
+                  onMouseLeave={(e) => {
+                    (e.currentTarget as HTMLButtonElement).style.background = "rgba(255,255,255,0.05)";
+                    (e.currentTarget as HTMLButtonElement).style.color = "var(--text-secondary)";
+                  }}
+                >
+                  Prompt 0{i + 1}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <button
+            type="submit"
+            className="glow-btn"
+            disabled={isLoading || problem.trim().length < 10}
+            style={{ minWidth: 200, display: "flex", justifyContent: "center", alignItems: "center", gap: 12 }}
+          >
+            {isLoading ? (
+              <>
+                <span className="loader-ring" />
+                Initializing
+              </>
+            ) : (
+              "Deploy Agents"
+            )}
+          </button>
+        </div>
+      </form>
+    </div>
   );
 }
