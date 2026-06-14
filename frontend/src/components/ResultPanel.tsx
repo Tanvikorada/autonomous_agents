@@ -1,5 +1,5 @@
 "use client";
-// components/ResultPanel.tsx — Tabbed output panel for plan/code/tests/review
+// components/ResultPanel.tsx — SVZ editorial output panel
 
 import { useState } from "react";
 import { PipelineResult } from "@/lib/api";
@@ -10,11 +10,11 @@ interface Props {
 
 type Tab = "plan" | "code" | "tests" | "review";
 
-const TABS: { id: Tab; label: string; icon: string }[] = [
-  { id: "plan",   label: "Plan",   icon: "📋" },
-  { id: "code",   label: "Code",   icon: "💻" },
-  { id: "tests",  label: "Tests",  icon: "🧪" },
-  { id: "review", label: "Review", icon: "🔍" },
+const TABS: { id: Tab; label: string }[] = [
+  { id: "plan",   label: "Plan" },
+  { id: "code",   label: "Code" },
+  { id: "tests",  label: "Tests" },
+  { id: "review", label: "Review" },
 ];
 
 function CopyButton({ text }: { text: string }) {
@@ -28,59 +28,42 @@ function CopyButton({ text }: { text: string }) {
   return (
     <button
       onClick={copy}
+      className="svz-ghost-link"
       style={{
-        background: copied ? "rgba(16,185,129,0.2)" : "rgba(255,255,255,0.06)",
-        border: `1px solid ${copied ? "rgba(16,185,129,0.4)" : "var(--border)"}`,
-        color: copied ? "#34d399" : "var(--text-secondary)",
-        borderRadius: 8,
-        padding: "5px 14px",
-        fontSize: 12,
-        cursor: "pointer",
-        transition: "all 0.2s",
-        fontFamily: "'Inter', sans-serif",
-        fontWeight: 500,
+        color: copied ? "var(--color-bone-white)" : "var(--color-iron)",
+        fontSize: "10px",
       }}
     >
-      {copied ? "✓ Copied!" : "Copy"}
+      {copied ? "Copied" : "Copy ↗"}
     </button>
   );
 }
 
 function PlanView({ plan }: { plan: string[] | null }) {
-  if (!plan || plan.length === 0) return <p style={{ color: "var(--text-muted)" }}>No plan generated.</p>;
+  if (!plan || plan.length === 0)
+    return <p className="svz-body">No plan generated.</p>;
+
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
       {plan.map((step, i) => (
         <div
           key={i}
-          className="fade-in"
+          className="svz-fade-in"
           style={{
             display: "flex",
-            gap: 14,
+            gap: "20px",
             alignItems: "flex-start",
-            animationDelay: `${i * 60}ms`,
+            animationDelay: `${i * 50}ms`,
+            paddingLeft: "12px",
+            borderLeft: "1px solid var(--color-arterial-red)",
           }}
         >
-          <div
-            style={{
-              minWidth: 28,
-              height: 28,
-              borderRadius: "50%",
-              background: "rgba(99,102,241,0.2)",
-              border: "1px solid rgba(99,102,241,0.4)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontSize: 12,
-              fontWeight: 700,
-              color: "#818cf8",
-              flexShrink: 0,
-              marginTop: 1,
-            }}
-          >
-            {i + 1}
-          </div>
-          <p style={{ color: "var(--text-primary)", lineHeight: 1.6, fontSize: 14 }}>{step}</p>
+          <span className="svz-label" style={{ flexShrink: 0, minWidth: "20px" }}>
+            {String(i + 1).padStart(2, "0")}
+          </span>
+          <p className="svz-body" style={{ color: "var(--color-bone-white)", lineHeight: 1.6 }}>
+            {step}
+          </p>
         </div>
       ))}
     </div>
@@ -88,13 +71,15 @@ function PlanView({ plan }: { plan: string[] | null }) {
 }
 
 function CodeView({ code, label }: { code: string | null; label: string }) {
-  if (!code) return <p style={{ color: "var(--text-muted)" }}>No {label} generated.</p>;
+  if (!code)
+    return <p className="svz-body">No {label} generated.</p>;
+
   return (
     <div style={{ position: "relative" }}>
-      <div style={{ position: "absolute", top: 12, right: 12, zIndex: 10 }}>
+      <div style={{ position: "absolute", top: "12px", right: "12px", zIndex: 10 }}>
         <CopyButton text={code} />
       </div>
-      <pre className="code-block" style={{ paddingTop: 44 }}>
+      <pre className="svz-code-block" style={{ paddingTop: "40px" }}>
         <code>{code}</code>
       </pre>
     </div>
@@ -102,34 +87,42 @@ function CodeView({ code, label }: { code: string | null; label: string }) {
 }
 
 function ReviewView({ review }: { review: string | null }) {
-  if (!review) return <p style={{ color: "var(--text-muted)" }}>No review generated.</p>;
+  if (!review)
+    return <p className="svz-body">No review generated.</p>;
 
-  // Simple markdown-like rendering for the review
   const lines = review.split("\n");
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
       {lines.map((line, i) => {
-        if (line.startsWith("## ")) {
+        if (line.startsWith("## "))
           return (
-            <h3 key={i} style={{ fontSize: 16, fontWeight: 700, marginTop: 20, marginBottom: 8, color: "var(--text-primary)" }}>
+            <p
+              key={i}
+              style={{
+                fontFamily: "var(--font-primary)",
+                fontSize: "14px",
+                fontWeight: 700,
+                letterSpacing: "var(--tracking-out-sm)",
+                textTransform: "uppercase",
+                color: "var(--color-bone-white)",
+                marginTop: "24px",
+                marginBottom: "8px",
+              }}
+            >
               {line.replace("## ", "")}
-            </h3>
+            </p>
           );
-        }
-        if (line.startsWith("- ") || line.startsWith("* ")) {
+        if (line.startsWith("- ") || line.startsWith("* "))
           return (
-            <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start", paddingLeft: 8 }}>
-              <span style={{ color: "var(--accent)", marginTop: 2 }}>▸</span>
-              <p style={{ color: "var(--text-secondary)", fontSize: 14, lineHeight: 1.6 }}>
-                {line.replace(/^[-*] /, "")}
-              </p>
+            <div key={i} style={{ display: "flex", gap: "12px", paddingLeft: "8px" }}>
+              <span style={{ color: "var(--color-iron)", marginTop: "3px", flexShrink: 0 }}>—</span>
+              <p className="svz-body">{line.replace(/^[-*] /, "")}</p>
             </div>
           );
-        }
         if (line.startsWith("```")) return null;
-        if (line.trim() === "") return <div key={i} style={{ height: 4 }} />;
+        if (line.trim() === "") return <div key={i} style={{ height: "6px" }} />;
         return (
-          <p key={i} style={{ color: "var(--text-secondary)", fontSize: 14, lineHeight: 1.7 }}>
+          <p key={i} className="svz-body" style={{ lineHeight: 1.7 }}>
             {line}
           </p>
         );
@@ -142,40 +135,42 @@ export default function ResultPanel({ result }: Props) {
   const [activeTab, setActiveTab] = useState<Tab>("plan");
 
   return (
-    <div className="glass-card p-6 fade-in">
+    <div className="svz-card svz-fade-in" style={{ padding: "40px" }}>
       {/* Header */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
-        <h3 style={{ fontWeight: 600, fontSize: 16 }}>
-          Pipeline Results
-          <span className="status-badge status-done" style={{ marginLeft: 12 }}>✅ Complete</span>
-        </h3>
-        <p style={{ color: "var(--text-muted)", fontSize: 12 }}>
-          Job: <code style={{ color: "var(--text-secondary)" }}>{result.job_id.slice(0, 8)}...</code>
+      <div
+        style={{
+          display: "flex",
+          alignItems: "flex-end",
+          justifyContent: "space-between",
+          marginBottom: "32px",
+          paddingBottom: "24px",
+          borderBottom: "1px solid var(--color-iron)",
+        }}
+      >
+        <div>
+          <h3 className="svz-heading-sm" style={{ marginBottom: "6px" }}>
+            Pipeline Results
+          </h3>
+          <p className="svz-label" style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+            <span className="svz-accent-dot" />
+            Complete
+          </p>
+        </div>
+        <p className="svz-label">
+          Job {result.job_id.slice(0, 8).toUpperCase()}
         </p>
       </div>
 
       {/* Tabs */}
-      <div
-        style={{
-          display: "flex",
-          gap: 6,
-          marginBottom: 20,
-          background: "rgba(0,0,0,0.2)",
-          borderRadius: 10,
-          padding: 4,
-          border: "1px solid var(--border)",
-        }}
-      >
+      <div className="svz-tab-row" style={{ marginBottom: "32px" }}>
         {TABS.map((tab) => (
           <button
             key={tab.id}
             id={`tab-${tab.id}`}
-            className={`tab-btn ${activeTab === tab.id ? "active" : ""}`}
+            className={`svz-tab ${activeTab === tab.id ? "active" : ""}`}
             onClick={() => setActiveTab(tab.id)}
-            style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}
           >
-            <span>{tab.icon}</span>
-            <span>{tab.label}</span>
+            {tab.label}
           </button>
         ))}
       </div>

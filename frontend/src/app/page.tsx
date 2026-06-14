@@ -1,5 +1,5 @@
 "use client";
-// app/page.tsx — Main dashboard page
+// app/page.tsx — SVZ Editorial layout for Autonomous Agents
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import ProblemInput from "@/components/ProblemInput";
@@ -62,11 +62,9 @@ export default function Home() {
     [stopPolling]
   );
 
-  // Clean up on unmount
   useEffect(() => () => stopPolling(), [stopPolling]);
 
   const handleSubmit = async (problem: string) => {
-    // Reset state
     setError(null);
     setResult(null);
     setStatusData(null);
@@ -100,93 +98,76 @@ export default function Home() {
   };
 
   return (
-    <main style={{ minHeight: "100vh", padding: "0 0 80px" }}>
-      {/* ── Hero header ───────────────────────────────────────────────── */}
+    <div
+      style={{
+        minHeight: "100vh",
+        background: "var(--color-void-canvas)",
+        display: "flex",
+        flexDirection: "column",
+      }}
+    >
+      {/* ── Navigation ─────────────────────────────────────────────── */}
       <header
         style={{
-          borderBottom: "1px solid var(--border)",
-          background: "rgba(0,0,0,0.3)",
-          backdropFilter: "blur(20px)",
           position: "sticky",
           top: 0,
           zIndex: 50,
+          background: "transparent",
+          borderBottom: "1px solid var(--color-iron)",
+          backdropFilter: "blur(8px)",
+          WebkitBackdropFilter: "blur(8px)",
         }}
       >
         <div
           style={{
             maxWidth: 1100,
             margin: "0 auto",
-            padding: "16px 24px",
+            padding: "16px 40px",
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
           }}
         >
-          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-            <div
+          {/* Logo */}
+          <div>
+            <p
               style={{
-                width: 36,
-                height: 36,
-                borderRadius: 10,
-                background: "linear-gradient(135deg, #6366f1, #8b5cf6)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontSize: 18,
-                boxShadow: "0 4px 16px rgba(99,102,241,0.4)",
+                fontFamily: "var(--font-primary)",
+                fontSize: "16px",
+                fontWeight: 700,
+                letterSpacing: "-0.5px",
+                color: "var(--color-bone-white)",
+                textTransform: "uppercase",
+                lineHeight: 1,
               }}
             >
-              🤖
-            </div>
-            <div>
-              <h1 style={{ fontSize: 17, fontWeight: 700, letterSpacing: "-0.02em" }}>
-                Autonomous Agents
-              </h1>
-              <p style={{ fontSize: 11, color: "var(--text-muted)" }}>
-                Multi-Agent Software Engineering System
-              </p>
-            </div>
+              Autonomous Agents
+            </p>
+            <p className="svz-label" style={{ marginTop: "3px" }}>
+              Multi-Agent Software Engineering
+            </p>
           </div>
 
-          <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+          {/* Right: status + actions */}
+          <div style={{ display: "flex", alignItems: "center", gap: "24px" }}>
             {jobId && statusData && (
-              <span
-                className={`status-badge status-${statusData.status}`}
-                style={{ fontSize: 11 }}
-              >
-                {statusData.status.toUpperCase()}
-              </span>
+              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                {statusData.status === "done" && <span className="svz-accent-dot" />}
+                <span className="svz-status">{statusData.status.toUpperCase()}</span>
+              </div>
             )}
+
             {(result || error) && (
-              <button
-                onClick={handleReset}
-                style={{
-                  background: "rgba(255,255,255,0.06)",
-                  border: "1px solid var(--border)",
-                  borderRadius: 8,
-                  padding: "6px 14px",
-                  color: "var(--text-secondary)",
-                  cursor: "pointer",
-                  fontSize: 13,
-                  fontFamily: "'Inter', sans-serif",
-                  transition: "all 0.15s",
-                }}
-              >
-                ↩ New Problem
+              <button onClick={handleReset} className="svz-ghost-btn" style={{ padding: "8px 20px" }}>
+                New Problem ↗
               </button>
             )}
+
             <a
               href="http://localhost:8000/docs"
               target="_blank"
               rel="noopener noreferrer"
-              style={{
-                color: "var(--text-muted)",
-                fontSize: 12,
-                textDecoration: "none",
-                display: "flex",
-                alignItems: "center",
-                gap: 4,
-              }}
+              className="svz-ghost-link"
             >
               API Docs ↗
             </a>
@@ -194,136 +175,247 @@ export default function Home() {
         </div>
       </header>
 
-      {/* ── Page content ──────────────────────────────────────────────── */}
-      <div style={{ maxWidth: 1100, margin: "0 auto", padding: "40px 24px" }}>
-
-        {/* ── Title block ────────────────────────────────────────────── */}
-        <div style={{ textAlign: "center", marginBottom: 48 }} className="fade-in">
-          <h2
+      {/* ── Hero ───────────────────────────────────────────────────── */}
+      <section
+        style={{
+          maxWidth: 1100,
+          margin: "0 auto",
+          padding: "80px 40px 64px",
+          width: "100%",
+        }}
+      >
+        {/* Display headline */}
+        <div style={{ marginBottom: "40px" }}>
+          <h1
             style={{
-              fontSize: "clamp(28px, 5vw, 48px)",
-              fontWeight: 800,
-              letterSpacing: "-0.03em",
-              lineHeight: 1.1,
-              marginBottom: 16,
+              fontFamily: "var(--font-primary)",
+              fontSize: "clamp(52px, 7vw, 80px)",
+              fontWeight: 700,
+              lineHeight: 0.92,
+              letterSpacing: "-5px",
+              color: "var(--color-bone-white)",
+              textTransform: "uppercase",
+              marginBottom: "8px",
             }}
           >
-            <span className="gradient-text">AI Agents That</span>
-            <br />
-            <span style={{ color: "var(--text-primary)" }}>Write, Test & Review Code</span>
-          </h2>
-          <p style={{ color: "var(--text-secondary)", fontSize: 17, maxWidth: 540, margin: "0 auto" }}>
-            Submit any software problem. Four specialized AI agents collaborate to
-            plan, build, test, and review a complete solution.
-          </p>
-
-          {/* Agent flow pills */}
-          <div
+            AI Agents That
+          </h1>
+          <h1
             style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: 8,
-              marginTop: 24,
-              flexWrap: "wrap",
+              fontFamily: "'Playfair Display', Georgia, serif",
+              fontStyle: "italic",
+              fontWeight: 400,
+              fontSize: "clamp(40px, 5.5vw, 64px)",
+              lineHeight: 1,
+              letterSpacing: "-2px",
+              color: "var(--color-bone-white)",
             }}
           >
-            {["🧠 Planner", "💻 Coder", "🧪 Tester", "🔍 Reviewer"].map((label, i, arr) => (
-              <span key={label} style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <span
-                  style={{
-                    background: "rgba(255,255,255,0.05)",
-                    border: "1px solid var(--border)",
-                    borderRadius: 999,
-                    padding: "4px 14px",
-                    fontSize: 13,
-                    fontWeight: 500,
-                    color: "var(--text-secondary)",
-                  }}
-                >
-                  {label}
-                </span>
-                {i < arr.length - 1 && (
-                  <span style={{ color: "var(--text-muted)", fontSize: 16 }}>→</span>
-                )}
-              </span>
-            ))}
-          </div>
+            write, test &amp; review code
+          </h1>
         </div>
 
-        {/* ── Main grid ──────────────────────────────────────────────── */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
+        {/* Subtitle */}
+        <p
+          className="svz-body"
+          style={{ maxWidth: "480px", marginBottom: "40px" }}
+        >
+          Submit any software problem. Four specialized agents collaborate to
+          plan, build, test, and deliver a complete solution.
+        </p>
 
-          {/* Problem input (hide after result is ready) */}
-          {!result && (
-            <ProblemInput onSubmit={handleSubmit} isLoading={isLoading} />
-          )}
+        {/* Agent flow — editorial strip */}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "12px",
+            flexWrap: "wrap",
+          }}
+        >
+          {["Planner", "Coder", "Tester", "Reviewer"].map((name, i, arr) => (
+            <span key={name} style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+              <span className="svz-label-bone">{name}</span>
+              {i < arr.length - 1 && (
+                <span style={{ color: "var(--color-iron)", fontSize: "10px" }}>—</span>
+              )}
+            </span>
+          ))}
+        </div>
+      </section>
 
-          {/* Pipeline tracker (show while running or after done) */}
-          {statusData && (
-            <AgentPipeline
-              status={statusData.status}
-              currentAgent={statusData.current_agent}
-              completedSteps={statusData.completed_steps}
-            />
-          )}
+      {/* ── Divider ─────────────────────────────────────────────────── */}
+      <div style={{ maxWidth: 1100, margin: "0 auto", width: "100%", padding: "0 40px" }}>
+        <hr className="svz-hairline" />
+      </div>
 
-          {/* Error state */}
-          {error && (
-            <div
-              className="glass-card fade-in"
+      {/* ── Main content ────────────────────────────────────────────── */}
+      <main
+        style={{
+          maxWidth: 1100,
+          margin: "0 auto",
+          padding: "64px 40px 80px",
+          width: "100%",
+          flex: 1,
+          display: "flex",
+          flexDirection: "column",
+          gap: "32px",
+        }}
+      >
+        {/* Problem input — hide after result ready */}
+        {!result && (
+          <ProblemInput onSubmit={handleSubmit} isLoading={isLoading} />
+        )}
+
+        {/* Agent pipeline tracker */}
+        {statusData && (
+          <AgentPipeline
+            status={statusData.status}
+            currentAgent={statusData.current_agent}
+            completedSteps={statusData.completed_steps}
+          />
+        )}
+
+        {/* Error */}
+        {error && (
+          <div className="svz-card-red svz-fade-in" style={{ padding: "32px 40px" }}>
+            <p
               style={{
-                padding: 24,
-                borderColor: "rgba(239,68,68,0.4)",
-                background: "rgba(239,68,68,0.06)",
+                fontFamily: "var(--font-primary)",
+                fontSize: "10px",
+                fontWeight: 400,
+                letterSpacing: "var(--tracking-out-sm)",
+                textTransform: "uppercase",
+                color: "var(--color-arterial-red)",
+                marginBottom: "16px",
               }}
             >
-              <p style={{ fontWeight: 600, color: "#f87171", marginBottom: 8 }}>
-                ❌ Pipeline Error
-              </p>
-              <p style={{ color: "var(--text-secondary)", fontSize: 14 }}>{error}</p>
-              <div style={{ marginTop: 16 }}>
-                <p style={{ color: "var(--text-muted)", fontSize: 12 }}>Common fixes:</p>
-                <ul style={{ marginTop: 6, paddingLeft: 20, color: "var(--text-muted)", fontSize: 12, lineHeight: 1.8 }}>
-                  <li>Check your <code>.env</code> file has a valid <code>GROQ_API_KEY</code></li>
-                  <li>Make sure the backend is running on port 8000</li>
-                  <li>Check backend terminal for detailed error logs</li>
-                </ul>
+              Pipeline Error
+            </p>
+            <p className="svz-body" style={{ color: "var(--color-bone-white)", marginBottom: "20px" }}>
+              {error}
+            </p>
+            <div style={{ borderTop: "1px solid var(--color-iron)", paddingTop: "16px" }}>
+              <p className="svz-label" style={{ marginBottom: "8px" }}>Common fixes</p>
+              <div style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+                {[
+                  "Check your .env file has a valid GROQ_API_KEY",
+                  "Make sure the backend is running on port 8000",
+                  "Check backend terminal for detailed error logs",
+                ].map((fix, i) => (
+                  <div key={i} style={{ display: "flex", gap: "12px", alignItems: "flex-start" }}>
+                    <span style={{ color: "var(--color-iron)", fontSize: "10px", marginTop: "2px" }}>—</span>
+                    <p className="svz-body">{fix}</p>
+                  </div>
+                ))}
               </div>
             </div>
-          )}
+          </div>
+        )}
 
-          {/* Results */}
-          {result && <ResultPanel result={result} />}
+        {/* Results */}
+        {result && <ResultPanel result={result} />}
 
-          {/* Stats bar (show after result) */}
-          {result && (
-            <div
-              className="glass-card fade-in"
+        {/* Stats bar */}
+        {result && (
+          <div
+            className="svz-card svz-fade-in"
+            style={{
+              padding: "32px 40px",
+              display: "grid",
+              gridTemplateColumns: "repeat(4, 1fr)",
+              gap: "0",
+            }}
+          >
+            {[
+              { label: "Plan Steps",    value: result.plan?.length ?? 0 },
+              { label: "Code Lines",    value: result.code?.split("\n").length ?? 0 },
+              { label: "Test Lines",    value: result.tests?.split("\n").length ?? 0 },
+              { label: "Review Length", value: `${Math.round((result.review?.length ?? 0) / 100) / 10}k` },
+            ].map((stat, i, arr) => (
+              <div
+                key={stat.label}
+                style={{
+                  paddingRight: i < arr.length - 1 ? "40px" : 0,
+                  paddingLeft: i > 0 ? "40px" : 0,
+                  borderLeft: i > 0 ? "1px solid var(--color-iron)" : "none",
+                }}
+              >
+                <p
+                  style={{
+                    fontFamily: "var(--font-primary)",
+                    fontSize: "clamp(28px, 3vw, 42px)",
+                    fontWeight: 700,
+                    lineHeight: 1.05,
+                    letterSpacing: "-2px",
+                    color: "var(--color-bone-white)",
+                    marginBottom: "6px",
+                  }}
+                >
+                  {stat.value}
+                </p>
+                <p className="svz-label">{stat.label}</p>
+              </div>
+            ))}
+          </div>
+        )}
+      </main>
+
+      {/* ── Footer ──────────────────────────────────────────────────── */}
+      <footer
+        style={{
+          background: "var(--color-charcoal-plate)",
+          borderTop: "1px solid var(--color-iron)",
+        }}
+      >
+        <div
+          style={{
+            maxWidth: 1100,
+            margin: "0 auto",
+            padding: "48px 40px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            flexWrap: "wrap",
+            gap: "16px",
+          }}
+        >
+          <div>
+            <p
               style={{
-                padding: "16px 24px",
-                display: "flex",
-                gap: 32,
-                flexWrap: "wrap",
+                fontFamily: "var(--font-primary)",
+                fontSize: "14px",
+                fontWeight: 700,
+                letterSpacing: "-0.3px",
+                color: "var(--color-bone-white)",
+                textTransform: "uppercase",
+                marginBottom: "4px",
               }}
             >
-              {[
-                { label: "Plan Steps", value: result.plan?.length ?? 0 },
-                { label: "Code Lines", value: result.code?.split("\n").length ?? 0 },
-                { label: "Test Lines", value: result.tests?.split("\n").length ?? 0 },
-                { label: "Review Length", value: `${Math.round((result.review?.length ?? 0) / 100) / 10}k chars` },
-              ].map((stat) => (
-                <div key={stat.label}>
-                  <p style={{ fontSize: 22, fontWeight: 700, color: "var(--text-primary)" }}>
-                    {stat.value}
-                  </p>
-                  <p style={{ fontSize: 12, color: "var(--text-muted)" }}>{stat.label}</p>
-                </div>
-              ))}
-            </div>
-          )}
+              Autonomous Agents
+            </p>
+            <p className="svz-label">Multi-Agent Software Engineering System</p>
+          </div>
+          <div style={{ display: "flex", gap: "32px", alignItems: "center" }}>
+            <a
+              href="http://localhost:8000/docs"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="svz-ghost-link"
+            >
+              API Docs ↗
+            </a>
+            <a
+              href="https://github.com/Tanvikorada/autonomous_agents"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="svz-ghost-link"
+            >
+              GitHub ↗
+            </a>
+          </div>
         </div>
-      </div>
-    </main>
+      </footer>
+    </div>
   );
 }

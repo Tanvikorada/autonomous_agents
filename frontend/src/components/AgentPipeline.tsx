@@ -1,5 +1,5 @@
 "use client";
-// components/AgentPipeline.tsx — Visual step-by-step pipeline tracker
+// components/AgentPipeline.tsx — SVZ editorial step tracker
 
 import { JobStatus } from "@/lib/api";
 
@@ -12,122 +12,159 @@ interface Props {
 const AGENTS = [
   {
     name: "Planner",
-    icon: "🧠",
+    label: "PLANNER",
     description: "Breaks problem into steps",
-    color: "var(--agent-planner)",
     activeStatus: "planning",
   },
   {
     name: "Coder",
-    icon: "💻",
-    description: "Writes implementation code",
-    color: "var(--agent-coder)",
+    label: "CODER",
+    description: "Writes implementation",
     activeStatus: "coding",
   },
   {
     name: "Tester",
-    icon: "🧪",
+    label: "TESTER",
     description: "Generates test cases",
-    color: "var(--agent-tester)",
     activeStatus: "testing",
   },
   {
     name: "Reviewer",
-    icon: "🔍",
+    label: "REVIEWER",
     description: "Reviews & suggests fixes",
-    color: "var(--agent-reviewer)",
     activeStatus: "reviewing",
   },
 ];
 
-function AgentCard({
+const STATUS_LABELS: Record<JobStatus, string> = {
+  pending:   "Pending",
+  planning:  "Planning",
+  coding:    "Coding",
+  testing:   "Testing",
+  reviewing: "Reviewing",
+  done:      "Complete",
+  error:     "Error",
+};
+
+function AgentStep({
   agent,
   state,
+  isLast,
 }: {
   agent: (typeof AGENTS)[0];
   state: "idle" | "active" | "done";
+  isLast: boolean;
 }) {
+  const isActive = state === "active";
+  const isDone   = state === "done";
+
   return (
     <div
       style={{
         display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        gap: 10,
+        alignItems: "stretch",
         flex: 1,
         minWidth: 0,
       }}
     >
-      {/* Icon circle */}
       <div
         style={{
-          width: 64,
-          height: 64,
-          borderRadius: "50%",
           display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          fontSize: 28,
-          background:
-            state === "done"
-              ? `${agent.color}22`
-              : state === "active"
-              ? `${agent.color}33`
-              : "rgba(255,255,255,0.04)",
-          border: `2px solid ${
-            state === "done"
-              ? `${agent.color}88`
-              : state === "active"
-              ? agent.color
-              : "var(--border)"
-          }`,
-          boxShadow:
-            state === "active"
-              ? `0 0 20px ${agent.color}55, 0 0 40px ${agent.color}22`
-              : "none",
-          transition: "all 0.4s ease",
-          position: "relative",
+          flexDirection: "column",
+          flex: 1,
+          minWidth: 0,
+          paddingBottom: "16px",
         }}
-        className={state === "active" ? "pulse-glow" : ""}
       >
-        {state === "done" ? "✅" : agent.icon}
-
-        {/* Active spinner ring */}
-        {state === "active" && (
-          <div
+        {/* Agent name — weight and underline carry the state */}
+        <div style={{ position: "relative", display: "inline-block", marginBottom: "6px" }}>
+          <p
             style={{
-              position: "absolute",
-              inset: -4,
-              borderRadius: "50%",
-              border: `2px solid transparent`,
-              borderTopColor: agent.color,
-              animation: "spin 1s linear infinite",
+              fontFamily: "var(--font-primary)",
+              fontSize: "12px",
+              fontWeight: isActive ? 700 : isDone ? 400 : 400,
+              letterSpacing: "var(--tracking-out-sm)",
+              textTransform: "uppercase",
+              color: isActive
+                ? "var(--color-bone-white)"
+                : isDone
+                ? "var(--color-iron)"
+                : "var(--color-iron)",
+              transition: "all 0.3s",
+              lineHeight: 1.4,
+              whiteSpace: "nowrap",
             }}
-          />
+          >
+            {agent.label}
+          </p>
+          {/* Active indicator: 1px arterial-red underline */}
+          {isActive && (
+            <div
+              style={{
+                position: "absolute",
+                bottom: -2,
+                left: 0,
+                right: 0,
+                height: "1px",
+                background: "var(--color-arterial-red)",
+              }}
+            />
+          )}
+          {/* Done indicator: strikethrough in Iron */}
+          {isDone && (
+            <div
+              style={{
+                position: "absolute",
+                bottom: -2,
+                left: 0,
+                right: 0,
+                height: "1px",
+                background: "var(--color-iron)",
+              }}
+            />
+          )}
+        </div>
+
+        {/* Description */}
+        <p
+          className="svz-label"
+          style={{ color: isActive ? "var(--color-ash)" : "var(--color-iron)" }}
+        >
+          {agent.description}
+        </p>
+
+        {/* Active spinner */}
+        {isActive && (
+          <div style={{ marginTop: "10px" }}>
+            <span className="svz-spinner" />
+          </div>
         )}
       </div>
 
-      {/* Label */}
-      <div style={{ textAlign: "center" }}>
-        <p
+      {/* Connector line */}
+      {!isLast && (
+        <div
           style={{
-            fontWeight: 600,
-            fontSize: 14,
-            color:
-              state === "active"
-                ? agent.color
-                : state === "done"
-                ? "var(--text-primary)"
-                : "var(--text-muted)",
-            transition: "color 0.3s",
+            display: "flex",
+            alignItems: "flex-start",
+            paddingTop: "6px",
+            flexShrink: 0,
+            width: "40px",
+            justifyContent: "center",
           }}
         >
-          {agent.name}
-        </p>
-        <p style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 2 }}>
-          {agent.description}
-        </p>
-      </div>
+          <div
+            style={{
+              width: "100%",
+              height: "1px",
+              background: isDone
+                ? "var(--color-bone-white)"
+                : "var(--color-iron)",
+              transition: "background 0.5s",
+            }}
+          />
+        </div>
+      )}
     </div>
   );
 }
@@ -135,83 +172,42 @@ function AgentCard({
 export default function AgentPipeline({ status, currentAgent, completedSteps }: Props) {
   const getAgentState = (agent: (typeof AGENTS)[0]): "idle" | "active" | "done" => {
     if (completedSteps.includes(agent.name)) return "done";
-    if (status === "done" && agent.name === "Reviewer") return "done"; // reviewer completes on done
+    if (status === "done" && agent.name === "Reviewer") return "done";
     if (currentAgent === agent.name || status === agent.activeStatus) return "active";
     return "idle";
   };
 
   return (
-    <div className="glass-card p-6 fade-in">
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24 }}>
-        <h3 style={{ fontWeight: 600, fontSize: 16 }}>Agent Pipeline</h3>
-        <StatusBadgeInline status={status} />
+    <div className="svz-card svz-fade-in" style={{ padding: "32px 40px" }}>
+      {/* Header */}
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          marginBottom: "24px",
+          paddingBottom: "20px",
+          borderBottom: "1px solid var(--color-iron)",
+        }}
+      >
+        <p className="svz-label">Agent Pipeline</p>
+        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+          {status === "done" && <span className="svz-accent-dot" />}
+          <span className="svz-status">{STATUS_LABELS[status]}</span>
+        </div>
       </div>
 
-      {/* Pipeline row */}
-      <div style={{ display: "flex", alignItems: "flex-start", gap: 0 }}>
+      {/* Pipeline strip */}
+      <div style={{ display: "flex", alignItems: "flex-start" }}>
         {AGENTS.map((agent, i) => (
-          <div key={agent.name} style={{ display: "flex", alignItems: "flex-start", flex: 1 }}>
-            <AgentCard agent={agent} state={getAgentState(agent)} />
-
-            {/* Arrow connector */}
-            {i < AGENTS.length - 1 && (
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  paddingTop: 20,
-                  flexShrink: 0,
-                }}
-              >
-                <div
-                  style={{
-                    width: 32,
-                    height: 2,
-                    background:
-                      completedSteps.includes(AGENTS[i + 1].name) ||
-                      status === AGENTS[i + 1].activeStatus
-                        ? `linear-gradient(90deg, ${agent.color}, ${AGENTS[i + 1].color})`
-                        : "var(--border)",
-                    transition: "background 0.5s",
-                  }}
-                />
-                <div
-                  style={{
-                    width: 0,
-                    height: 0,
-                    borderLeft: "6px solid",
-                    borderLeftColor:
-                      completedSteps.includes(AGENTS[i + 1].name) ||
-                      status === AGENTS[i + 1].activeStatus
-                        ? AGENTS[i + 1].color
-                        : "var(--border)",
-                    borderTop: "4px solid transparent",
-                    borderBottom: "4px solid transparent",
-                    transition: "border-color 0.5s",
-                  }}
-                />
-              </div>
-            )}
-          </div>
+          <AgentStep
+            key={agent.name}
+            agent={agent}
+            state={getAgentState(agent)}
+            isLast={i === AGENTS.length - 1}
+          />
         ))}
       </div>
     </div>
-  );
-}
-
-function StatusBadgeInline({ status }: { status: JobStatus }) {
-  const labels: Record<JobStatus, string> = {
-    pending: "⏳ Pending",
-    planning: "🧠 Planning",
-    coding: "💻 Coding",
-    testing: "🧪 Testing",
-    reviewing: "🔍 Reviewing",
-    done: "✅ Done",
-    error: "❌ Error",
-  };
-  return (
-    <span className={`status-badge status-${status}`}>
-      {labels[status] ?? status}
-    </span>
   );
 }

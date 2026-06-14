@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Autonomous Multi-Agent System | AI Software Engineering",
+  title: "Autonomous Agents — Multi-Agent Software Engineering System",
   description:
-    "An AI system powered by 4 specialized agents (Planner, Coder, Tester, Reviewer) that automatically writes, tests, and reviews code from a problem statement.",
+    "Four specialized AI agents — Planner, Coder, Tester, Reviewer — that autonomously write, test, and review production code from a single problem statement.",
   keywords: ["AI agents", "code generation", "autonomous coding", "LangGraph", "FastAPI"],
 };
 

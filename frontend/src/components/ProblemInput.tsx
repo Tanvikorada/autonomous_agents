@@ -1,5 +1,5 @@
 "use client";
-// components/ProblemInput.tsx — Problem statement input form
+// components/ProblemInput.tsx — SVZ Editorial redesign
 
 import { useState } from "react";
 
@@ -23,101 +23,103 @@ export default function ProblemInput({ onSubmit, isLoading }: Props) {
   };
 
   return (
-    <div className="glass-card p-8 fade-in">
-      {/* Header */}
-      <div className="mb-6">
-        <h2 className="text-xl font-semibold text-white mb-1">
-          Describe Your Problem
+    <div className="svz-card svz-fade-in" style={{ padding: "48px" }}>
+      {/* Section heading */}
+      <div style={{ marginBottom: "32px" }}>
+        <h2 className="svz-heading-lg" style={{ marginBottom: "16px" }}>
+          Describe<br />
+          <span className="svz-serif-italic" style={{ fontSize: "clamp(28px, 4vw, 48px)", letterSpacing: "-1.6px", textTransform: "none" }}>
+            the problem
+          </span>
         </h2>
-        <p style={{ color: "var(--text-secondary)", fontSize: 14 }}>
-          The AI pipeline will plan, code, test, and review a solution automatically.
+        <p className="svz-body">
+          The AI pipeline will plan, write, test, and review a complete solution automatically.
         </p>
       </div>
 
-      {/* Textarea */}
       <form onSubmit={handleSubmit}>
-        <textarea
-          id="problem-input"
-          value={problem}
-          onChange={(e) => setProblem(e.target.value)}
-          placeholder="e.g. Build a Python REST API for a todo list with CRUD operations..."
-          disabled={isLoading}
-          rows={5}
-          style={{
-            width: "100%",
-            background: "rgba(0,0,0,0.3)",
-            border: `1px solid ${problem.length > 0 ? "rgba(99,102,241,0.5)" : "var(--border)"}`,
-            borderRadius: 12,
-            padding: "16px 18px",
-            color: "var(--text-primary)",
-            fontFamily: "'Inter', sans-serif",
-            fontSize: 15,
-            lineHeight: 1.6,
-            resize: "vertical",
-            outline: "none",
-            transition: "border-color 0.2s",
-          }}
-        />
-        <p style={{ color: "var(--text-muted)", fontSize: 12, marginTop: 6 }}>
-          {problem.length} characters (min 10)
+        {/* Textarea */}
+        <div style={{ position: "relative", marginBottom: "8px" }}>
+          <textarea
+            id="problem-input"
+            value={problem}
+            onChange={(e) => setProblem(e.target.value)}
+            placeholder="e.g. Build a Python REST API for a todo list with CRUD operations..."
+            disabled={isLoading}
+            rows={6}
+            style={{
+              width: "100%",
+              background: "transparent",
+              border: `1px solid ${problem.length > 0 ? "var(--color-arterial-red)" : "var(--color-iron)"}`,
+              borderRadius: "var(--radius-cards)",
+              padding: "20px 24px",
+              color: "var(--color-bone-white)",
+              fontFamily: "var(--font-primary)",
+              fontSize: "14px",
+              fontWeight: 300,
+              lineHeight: 1.7,
+              letterSpacing: "var(--tracking-in-body)",
+              resize: "vertical",
+              outline: "none",
+              transition: "border-color 0.2s",
+            }}
+          />
+        </div>
+
+        {/* Char count */}
+        <p className="svz-label" style={{ marginBottom: "24px" }}>
+          {problem.length} characters — min 10
         </p>
 
-        {/* Example buttons */}
-        <div className="mt-4 mb-6">
-          <p style={{ color: "var(--text-muted)", fontSize: 12, marginBottom: 8 }}>
-            QUICK EXAMPLES
+        {/* Quick examples */}
+        <div style={{ marginBottom: "32px" }}>
+          <p className="svz-label" style={{ marginBottom: "12px" }}>
+            Quick examples
           </p>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
             {EXAMPLES.map((ex, i) => (
               <button
                 key={i}
                 type="button"
                 onClick={() => setProblem(ex)}
                 disabled={isLoading}
+                className="svz-label-bone"
                 style={{
-                  background: "rgba(255,255,255,0.04)",
-                  border: "1px solid var(--border)",
-                  borderRadius: 8,
-                  padding: "6px 14px",
-                  color: "var(--text-secondary)",
-                  fontSize: 12,
+                  background: "transparent",
+                  border: "1px solid var(--color-iron)",
+                  borderRadius: "var(--radius-buttons)",
+                  padding: "8px 16px",
                   cursor: "pointer",
-                  transition: "all 0.15s",
-                  fontFamily: "'Inter', sans-serif",
+                  transition: "border-color 0.15s, color 0.15s",
+                  fontSize: "10px",
                 }}
                 onMouseEnter={(e) => {
-                  (e.target as HTMLButtonElement).style.color = "var(--text-primary)";
-                  (e.target as HTMLButtonElement).style.borderColor = "rgba(99,102,241,0.4)";
+                  (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--color-bone-white)";
                 }}
                 onMouseLeave={(e) => {
-                  (e.target as HTMLButtonElement).style.color = "var(--text-secondary)";
-                  (e.target as HTMLButtonElement).style.borderColor = "var(--border)";
+                  (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--color-iron)";
                 }}
               >
-                Example {i + 1}
+                Example {i + 1} ↗
               </button>
             ))}
           </div>
         </div>
 
-        {/* Submit button */}
+        {/* Submit CTA */}
         <button
           id="submit-btn"
           type="submit"
-          className="btn-primary"
+          className="svz-ghost-btn"
           disabled={isLoading || problem.trim().length < 10}
-          style={{ display: "flex", alignItems: "center", gap: 10 }}
         >
           {isLoading ? (
             <>
-              <span className="spinner" />
-              Running Pipeline...
+              <span className="svz-spinner" />
+              Running Pipeline
             </>
           ) : (
-            <>
-              <span>🚀</span>
-              Run AI Pipeline
-            </>
+            "Run Pipeline ↗"
           )}
         </button>
       </form>
