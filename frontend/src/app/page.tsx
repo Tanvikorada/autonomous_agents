@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { startPipeline, getJobStatus, getJobResult, PipelineResult, JobStatusResponse } from "@/lib/api";
 import ProblemInput from "@/components/ProblemInput";
 import AgentPipeline from "@/components/AgentPipeline";
@@ -63,88 +64,108 @@ export default function Home() {
         height: "80px", display: "flex", justifyContent: "space-between", alignItems: "center", 
         padding: "0 var(--spacing-44)", zIndex: 10 
       }}>
-        <div style={{ fontFamily: "var(--font-canvasans)", fontWeight: 700, fontSize: "16px", letterSpacing: "1px" }}>
+        <div style={{ fontFamily: "var(--font-canvasans)", fontWeight: 700, fontSize: "16px", letterSpacing: "1px", color: "var(--color-bone-white)" }}>
           SWARM_OS.
         </div>
         <div style={{ display: "flex", gap: "var(--spacing-20)" }}>
           <button className="ghost-cta">Developer API</button>
-          <button className="primary-cta">Log in</button>
+          <button className="primary-cta" style={{ padding: "7px 14px", fontSize: "14px" }}>Log in</button>
         </div>
       </nav>
 
       {/* Hero Section */}
       <section style={{ 
-        height: "100vh", width: "100%", display: "flex", flexDirection: "column", 
-        justifyContent: "center", alignItems: "center", position: "relative",
-        overflow: "hidden"
+        minHeight: "80vh", width: "100%", display: "flex", flexDirection: "column", 
+        justifyContent: "center", alignItems: "center", paddingTop: "120px", position: "relative"
       }}>
-        <div className="hero-3d-wordmark display-xl animate-fade-in-up" style={{ textAlign: "center", zIndex: 1 }}>
-          SWARM_OS
-        </div>
-        <div className="hero-3d-wordmark display-xl animate-fade-in-up stagger-1" style={{ 
-          textAlign: "center", position: "absolute", opacity: 0.1, top: "20%", left: "5%", zIndex: 0, transform: "scale(1.5)" 
-        }}>
-          SWARM_OS
-        </div>
-        <h1 className="heading-sm animate-fade-in-up stagger-2" style={{ marginTop: "var(--spacing-41)", zIndex: 2 }}>
-          THE AUTONOMOUS SOFTWARE ENGINEERING PLATFORM
-        </h1>
-        <p className="body-text animate-fade-in-up stagger-3" style={{ marginTop: "var(--spacing-20)", textAlign: "center", maxWidth: "600px", zIndex: 2 }}>
-          An organic, self-orchestrating swarm of specialized AI agents. Design plans, synthesize source code, validate tests, and audit security on an infinite black canvas.
-        </p>
-        <div className="animate-fade-in-up stagger-4" style={{ marginTop: "var(--spacing-44)", zIndex: 2 }}>
-          <button className="primary-cta" onClick={() => workspaceRef.current?.scrollIntoView({ behavior: "smooth" })}>
-            Initialize Swarm
-          </button>
-        </div>
+        <motion.div 
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
+          style={{ display: "flex", flexDirection: "column", alignItems: "center" }}
+        >
+          <div className="display-xl" style={{ color: "var(--color-leonardo-violet)", zIndex: 1, position: "relative" }}>
+            SWARM
+          </div>
+          <div className="display-xl" style={{ color: "var(--color-leonardo-violet)", marginTop: "-0.2em", zIndex: 2, position: "relative" }}>
+            OS
+          </div>
+        </motion.div>
+        
+        <motion.h1 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 1.5, delay: 0.4, ease: "easeOut" }}
+          className="heading-sm" 
+          style={{ marginTop: "var(--spacing-41)", zIndex: 2, textAlign: "center" }}
+        >
+          THE AUTONOMOUS MULTI-AGENT SYSTEM
+        </motion.h1>
+
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1, delay: 0.6, ease: [0.16, 1, 0.3, 1] }}
+          style={{ marginTop: "var(--spacing-68)", width: "100%", maxWidth: "800px", padding: "0 var(--spacing-20)" }}
+        >
+          <ProblemInput onSubmit={handleSubmit} isLoading={isLoading} />
+        </motion.div>
       </section>
 
-      {/* Workspace App Layout */}
-      <section ref={workspaceRef} style={{ maxWidth: "var(--page-max-width)", margin: "0 auto", padding: "var(--spacing-80) var(--spacing-44)" }}>
-        
-        {error && (
-          <div className="charcoal-card" style={{ borderLeft: "4px solid var(--color-ember-coral)", marginBottom: "var(--spacing-41)" }}>
-            <span style={{ color: "var(--color-ember-coral)", fontWeight: 500 }}>Error: {error}</span>
-          </div>
-        )}
-
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 3fr", gap: "var(--spacing-20)", alignItems: "start" }}>
-          
-          {/* Left Column: Telemetry */}
-          <div className="charcoal-card" style={{ display: "flex", flexDirection: "column", gap: "var(--spacing-20)", position: "sticky", top: "var(--spacing-41)" }}>
-            <h3 className="editorial-accent" style={{ color: "var(--color-leonardo-violet)", fontSize: "24px" }}>Telemetry</h3>
-            <p className="body-text">Real-time pipeline analysis.</p>
+      {/* Pipeline / Telemetry Area */}
+      <AnimatePresence>
+        {(isLoading || statusData) && (
+          <motion.section 
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+            style={{ maxWidth: "var(--page-max-width)", margin: "0 auto", padding: "var(--spacing-80) var(--spacing-44)", display: "flex", justifyContent: "center", overflow: "hidden" }}
+          >
             <AgentPipeline 
               status={statusData?.status ?? "pending"} 
               currentAgent={statusData?.current_agent ?? null} 
               completedSteps={statusData?.completed_steps ?? []} 
               isIdle={!isLoading} 
             />
-          </div>
+          </motion.section>
+        )}
+      </AnimatePresence>
 
-          {/* Right Column: Input & Results */}
-          <div style={{ display: "flex", flexDirection: "column", gap: "var(--spacing-41)" }}>
-            <div className="charcoal-card">
-              <ProblemInput onSubmit={handleSubmit} isLoading={isLoading} />
+      {/* Results Gallery Area */}
+      <AnimatePresence>
+        {error && (
+          <motion.section 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            style={{ maxWidth: "var(--page-max-width)", margin: "0 auto", padding: "0 var(--spacing-44) var(--spacing-80)" }}
+          >
+            <div className="charcoal-card" style={{ borderLeft: "4px solid var(--color-ember-coral)" }}>
+              <span style={{ color: "var(--color-ember-coral)", fontWeight: 500 }}>Error: {error}</span>
             </div>
+          </motion.section>
+        )}
 
-            {result && (
-              <div className="charcoal-card animate-fade-in-up">
-                <ResultPanel result={result} />
-              </div>
-            )}
-          </div>
-
-        </div>
-      </section>
+        {result && (
+          <motion.section 
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+            style={{ maxWidth: "var(--page-max-width)", margin: "0 auto", padding: "0 var(--spacing-44) var(--spacing-80)" }}
+          >
+            <ResultPanel result={result} />
+          </motion.section>
+        )}
+      </AnimatePresence>
 
       {/* Footer */}
-      <footer style={{ padding: "var(--spacing-80) var(--spacing-44)", borderTop: "1px solid var(--color-obsidian-surface)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <div style={{ fontFamily: "var(--font-canvasans)", fontWeight: 700, fontSize: "16px", color: "var(--color-ash-text)" }}>SWARM_OS</div>
+      <footer style={{ padding: "var(--spacing-80) var(--spacing-44)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <div style={{ fontFamily: "var(--font-canvasans)", fontWeight: 700, fontSize: "14px", color: "var(--color-ash-text)" }}>SWARM_OS</div>
         <div style={{ display: "flex", gap: "var(--spacing-20)" }}>
-          <span className="body-text" style={{ cursor: "pointer" }}>Documentation</span>
-          <span className="body-text" style={{ cursor: "pointer" }}>Privacy Policy</span>
-          <span className="body-text" style={{ cursor: "pointer" }}>Terms of Service</span>
+          <span className="body-text" style={{ cursor: "pointer", fontSize: "14px" }}>Documentation</span>
+          <span className="body-text" style={{ cursor: "pointer", fontSize: "14px" }}>Privacy Policy</span>
+          <span className="body-text" style={{ cursor: "pointer", fontSize: "14px" }}>Terms of Service</span>
         </div>
       </footer>
     </div>
