@@ -5,6 +5,7 @@ const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 export type JobStatus =
   | "pending"
   | "planning"
+  | "awaiting_approval"
   | "coding"
   | "testing"
   | "reviewing"
@@ -19,7 +20,7 @@ export interface JobCreatedResponse {
 
 export interface JobStatusResponse {
   job_id: string;
-  status: string;
+  status: JobStatus;
   current_agent?: string;
   completed_steps: string[];
   error?: string;
@@ -30,7 +31,7 @@ export interface JobStatusResponse {
 
 export interface PipelineResult {
   job_id: string;
-  status: string;
+  status: JobStatus;
   problem: string;
   plan?: string[];
   code?: string;
