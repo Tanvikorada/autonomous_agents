@@ -91,7 +91,7 @@ export default function TerminalLog({ statusData }: Props) {
           </span>
         </div>
         <div className="flex items-center gap-[6px]">
-          {statusData?.status === "running" ? (
+          {!["pending", "done", "error"].includes(statusData?.status ?? "pending") ? (
             <span className="w-[8px] h-[8px] bg-[var(--color-mint-pulse)] rounded-full animate-pulse" />
           ) : (
             <span className="w-[8px] h-[8px] bg-[var(--color-surface-mist)] rounded-full" />
@@ -131,7 +131,7 @@ export default function TerminalLog({ statusData }: Props) {
         ))}
         
         {/* Blinking Cursor */}
-        {statusData?.status === "running" && (
+        {!["pending", "done", "error"].includes(statusData?.status ?? "pending") && (
           <div className="flex gap-[16px]">
             <div className="text-[var(--color-surface-mist)] shrink-0">--:--:--</div>
             <div className="cursor-blink"></div>
