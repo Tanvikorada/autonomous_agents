@@ -3,17 +3,20 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { startPipeline, getJobStatus, getJobResult, PipelineResult, JobStatusResponse } from "@/lib/api";
-import ProblemInput from "@/components/ProblemInput";
 import AgentPipeline from "@/components/AgentPipeline";
 import ResultPanel from "@/components/ResultPanel";
+import TerminalLog from "@/components/TerminalLog";
 
 export default function Home() {
   const [jobId, setJobId] = useState<string | null>(null);
   const [statusData, setStatusData] = useState<JobStatusResponse | null>(null);
   const [result, setResult] = useState<PipelineResult | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [problem, setProblem] = useState("");
 
-  const handleSubmit = async (problem: string) => {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (problem.trim().length < 5) return;
     try {
       setError(null);
       setResult(null);
@@ -54,105 +57,88 @@ export default function Home() {
   const isLoading = !!jobId;
 
   return (
-    <div className="min-h-screen text-[#ededed] font-sans selection:bg-white/20">
-      
-      {/* Clean Navbar */}
-      <header className="sticky top-0 z-50 w-full border-b border-[#111] bg-black/80 backdrop-blur-md">
-        <div className="container mx-auto flex h-14 max-w-6xl items-center justify-between px-6">
-          <div className="flex items-center gap-2 font-medium tracking-tight text-white">
-            <div className="h-4 w-4 bg-white rounded-sm"></div>
-            SWARM
+    <div className="min-h-screen flex flex-col font-sans relative">
+      <div className="ambient-grid"></div>
+
+      {/* Top Bar */}
+      <header className="sticky top-0 z-50 w-full border-b border-[#1C1C24] bg-[#0A0A0F]/90 backdrop-blur-md">
+        <div className="w-full flex h-16 items-center px-6 gap-6">
+          <div className="flex items-center gap-3 font-medium tracking-tight text-white min-w-[200px]">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[#7C3AED]"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+            <span>SWARM<span className="text-[#7C3AED]">_</span>OS</span>
           </div>
-          <nav className="flex items-center gap-6">
-            <a href="#" className="text-sm font-medium text-[#888] hover:text-white transition-colors">Docs</a>
-            <button className="text-sm font-medium text-black bg-white px-3 py-1 rounded-sm hover:bg-[#ccc] transition-colors">
-              Deploy
+          
+          <form onSubmit={handleSubmit} className="flex-1 flex justify-center max-w-3xl mx-auto relative">
+            <input
+              type="text"
+              value={problem}
+              onChange={e => setProblem(e.target.value)}
+              disabled={isLoading}
+              placeholder="Enter problem statement... (e.g. Build an autonomous trading bot in Python)"
+              className="w-full cc-input rounded-full py-2.5 px-6 pr-24 text-sm transition-all"
+            />
+            <button
+              type="submit"
+              disabled={isLoading || problem.trim().length < 5}
+              className="absolute right-1 top-1 bottom-1 px-5 rounded-full text-sm font-medium cc-btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isLoading ? "Running..." : "Run"}
             </button>
-          </nav>
+          </form>
+
+          <div className="min-w-[200px] flex justify-end">
+            {isLoading && (
+              <div className="flex items-center gap-2 text-xs text-[#06B6D4]">
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#06B6D4] opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-[#06B6D4]"></span>
+                </span>
+                PIPELINE ACTIVE
+              </div>
+            )}
+          </div>
         </div>
       </header>
 
-      <main className="container mx-auto max-w-5xl px-6 py-24 lg:py-32">
+      <main className="flex-1 flex flex-col w-full px-6 py-6 pb-20 gap-6 max-w-[1600px] mx-auto">
         
-        {/* Brutalist Hero */}
-        <motion.div 
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, ease: "easeOut" }}
-          className="flex flex-col space-y-6 mb-24 max-w-3xl"
-        >
-          <div className="flex items-center gap-2">
-            <span className="flex h-1.5 w-1.5 rounded-full bg-white"></span>
-            <span className="text-[11px] font-medium tracking-widest uppercase text-[#888]">Infrastructure</span>
-          </div>
-          <h1 className="text-5xl lg:text-7xl font-semibold tracking-tight text-white leading-[1.1]">
-            Build software <br/> at the speed of thought.
-          </h1>
-          <p className="text-lg text-[#888] leading-relaxed max-w-xl font-normal">
-            Orchestrate a swarm of autonomous AI agents. Describe your architecture, and the swarm will synthesize, test, and deploy the source code.
-          </p>
-        </motion.div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
-          
-          {/* Main Input & Results Area */}
-          <div className="lg:col-span-8 space-y-10">
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
-            >
-              <ProblemInput onSubmit={handleSubmit} isLoading={isLoading} />
-            </motion.div>
-            
-            <AnimatePresence mode="popLayout">
-              {error && (
-                <motion.div 
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  className="panel p-4 border-red-500/20 bg-red-500/5"
-                >
-                  <p className="text-sm text-red-400 font-medium">Error: {error}</p>
-                </motion.div>
-              )}
-
-              {result && (
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, ease: "easeOut" }}
-                >
-                  <ResultPanel result={result} />
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-
-          {/* Telemetry Sidebar */}
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-            className="lg:col-span-4 sticky top-24"
-          >
-            <div className="panel p-6 space-y-8">
-              <div className="flex items-center justify-between border-b border-[#1a1a1a] pb-4">
-                <h3 className="text-sm font-semibold text-white tracking-wide">Execution State</h3>
-                {isLoading && (
-                  <div className="h-2 w-2 rounded-full bg-white animate-pulse"></div>
-                )}
-              </div>
-              <AgentPipeline 
-                status={statusData?.status ?? "pending"} 
-                currentAgent={statusData?.current_agent ?? null} 
-                completedSteps={statusData?.completed_steps ?? []} 
-                isIdle={!isLoading} 
-              />
+        {/* Horizontal Agent Pipeline Hero */}
+        <section className="w-full cc-panel p-6 flex flex-col items-center justify-center min-h-[160px]">
+          {(!isLoading && !result && !error) ? (
+            <div className="text-center space-y-2 opacity-50">
+              <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="mx-auto"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><line x1="3" x2="21" y1="9" y2="9"/><line x1="9" x2="9" y1="21" y2="9"/></svg>
+              <p className="text-sm">Awaiting problem statement...</p>
             </div>
-          </motion.div>
+          ) : (
+            <AgentPipeline 
+              status={statusData?.status ?? "pending"} 
+              currentAgent={statusData?.current_agent ?? null} 
+              completedSteps={statusData?.completed_steps ?? []} 
+            />
+          )}
+        </section>
 
-        </div>
+        {error && (
+          <div className="cc-panel p-4 border-[#ef4444] bg-[#ef4444]/10 text-[#ef4444] text-sm">
+            [SYS_ERR] {error}
+          </div>
+        )}
+
+        {/* Split View: Results & Terminal */}
+        {(isLoading || result) && (
+          <section className="flex flex-col lg:flex-row gap-6 flex-1 min-h-[500px]">
+            {/* Results Tabbed Panel */}
+            <div className="flex-[2] flex flex-col min-w-0">
+              <ResultPanel result={result} isLoading={isLoading} currentAgent={statusData?.current_agent} />
+            </div>
+
+            {/* Terminal Log Panel */}
+            <div className="flex-1 min-w-[300px] flex flex-col">
+              <TerminalLog statusData={statusData} />
+            </div>
+          </section>
+        )}
+
       </main>
     </div>
   );

@@ -1,78 +1,121 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    --background: 0 0% 0%; /* Pure pitch black */
-    --foreground: 0 0% 98%;
-    
-    --border: 0 0% 10%; /* Very subtle gray */
-    --radius: 0.5rem;
+    --bg-navy: #0A0A0F;
+    --accent-violet: #7C3AED;
+    --accent-cyan: #06B6D4;
+    --border-dim: #1C1C24;
+    --border-glow: rgba(124, 58, 237, 0.5);
   }
 }
 
 @layer base {
-  * {
-    border-color: hsl(var(--border));
-  }
   body {
-    background-color: hsl(var(--background));
-    color: hsl(var(--foreground));
-    font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+    background-color: var(--bg-navy);
+    color: #F8FAFC; /* slate-50 */
+    font-family: var(--font-space), ui-sans-serif, system-ui, sans-serif;
     overflow-x: hidden;
   }
 }
 
-/* Minimalist Background Grid */
-body::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
+/* Typography Overrides */
+.font-mono {
+  font-family: var(--font-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+/* Faint Animated Grid Atmosphere */
+.ambient-grid {
+  position: fixed;
+  inset: 0;
   z-index: -1;
-  background-size: 32px 32px;
+  background-size: 40px 40px;
   background-image: 
-    linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-  mask-image: linear-gradient(to bottom, black 20%, transparent 80%);
-  -webkit-mask-image: linear-gradient(to bottom, black 20%, transparent 80%);
+    linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+  mask-image: linear-gradient(to bottom, black 40%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, black 40%, transparent 100%);
   pointer-events: none;
+  animation: gridMove 20s linear infinite;
 }
 
-/* Brutalist Button */
-.btn-primary {
-  background: white;
-  color: black;
-  font-weight: 600;
-  border-radius: var(--radius);
-  padding: 0.6rem 1.25rem;
-  transition: opacity 0.2s;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  border: 1px solid transparent;
+@keyframes gridMove {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(40px); }
 }
 
-.btn-primary:hover:not(:disabled) {
-  opacity: 0.9;
+/* Command Center UI Components */
+.cc-panel {
+  background: rgba(15, 15, 20, 0.6);
+  border: 1px solid var(--border-dim);
+  border-radius: 0.5rem;
+  backdrop-filter: blur(8px);
 }
 
-.btn-primary:disabled {
-  background: #111;
-  color: #555;
-  border-color: #222;
-  cursor: not-allowed;
+.cc-input {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--border-dim);
+  color: #F8FAFC;
 }
 
-/* Flat minimalist panels */
-.panel {
-  background: #050505;
-  border: 1px solid #1a1a1a;
-  border-radius: var(--radius);
+.cc-input:focus {
+  outline: none;
+  border-color: var(--accent-violet);
+  box-shadow: 0 0 15px rgba(124, 58, 237, 0.2);
+}
+
+.cc-btn {
+  background: transparent;
+  color: #fff;
+  border: 1px solid var(--border-dim);
+  border-radius: 0.375rem;
+  transition: all 0.2s ease-in-out;
+}
+
+.cc-btn:hover:not(:disabled) {
+  border-color: var(--accent-violet);
+  box-shadow: 0 0 12px var(--border-glow);
+  color: var(--accent-violet);
+}
+
+.cc-btn-primary {
+  background: var(--accent-violet);
+  color: white;
+  border: none;
+}
+.cc-btn-primary:hover:not(:disabled) {
+  box-shadow: 0 0 20px var(--border-glow);
+}
+
+/* Typewriter Cursor */
+.cursor-blink {
+  display: inline-block;
+  width: 8px;
+  height: 1.2em;
+  background-color: var(--accent-cyan);
+  vertical-align: middle;
+  animation: blink 1s step-end infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+/* Custom Scrollbar for Terminals */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #2D2D3A;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #3D3D4A;
 }
