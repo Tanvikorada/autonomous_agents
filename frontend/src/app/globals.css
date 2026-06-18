@@ -134,22 +134,25 @@
 
 /* ── Perplexity AI Components ────────────────────────────────────────────────── */
 
-.ghost-nav {
+.nav-pill {
   background-color: transparent;
   color: var(--color-aged-sepia);
   border: 1px solid transparent;
   border-radius: var(--radius-buttons);
-  padding: 8px 16px;
+  padding: 20px 24px;
   font-family: var(--font-pplxsans);
   font-size: var(--text-body);
-  font-weight: 500;
+  font-weight: 400;
   cursor: pointer;
   transition: background-color 0.2s ease, border-color 0.2s ease;
   letter-spacing: -0.028em;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.ghost-nav:hover {
-  background-color: rgba(39, 26, 0, 0.05);
+.nav-pill:hover, .nav-pill:active {
+  background-color: rgba(15, 54, 57, 0.1);
 }
 
 .pill-cta {
@@ -204,8 +207,7 @@
 
 .serif-headline {
   font-family: var(--font-pplxserif);
-  font-size: 48px;
-  font-weight: 400;
+  font-weight: 300;
   line-height: 1.12;
   color: var(--color-aged-sepia);
 }
@@ -230,22 +232,24 @@
 
 .botanical-hero {
   width: 100vw;
+  min-height: 100vh;
   position: relative;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 .botanical-hero::before {
   content: "";
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  top: -5%;
+  left: -5%;
+  right: -5%;
+  bottom: -5%;
   background-image: url('/images/botanical.png');
   background-size: cover;
   background-position: center;
   filter: blur(20px);
-  transform: scale(1.1);
   z-index: -1;
 }
 
@@ -256,6 +260,42 @@
   left: 0;
   right: 0;
   height: 200px;
-  background: linear-gradient(to top, var(--surface-parchment-canvas) 0%, transparent 100%);
+  background: linear-gradient(to top, rgba(250, 248, 245, 1) 0%, rgba(250, 248, 245, 0) 100%);
   z-index: -1;
+}
+
+.botanical-section {
+  width: 100vw;
+  position: relative;
+  overflow: hidden;
+  margin-left: calc(-50vw + 50%); /* For full bleed from a container */
+  padding: var(--spacing-80) 0;
+}
+
+.botanical-section::before {
+  content: "";
+  position: absolute;
+  top: -5%;
+  left: -5%;
+  right: -5%;
+  bottom: -5%;
+  background-image: url('/images/botanical.png');
+  background-size: cover;
+  background-position: center;
+  filter: blur(20px);
+  z-index: -1;
+}
+
+.botanical-section::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: 
+    linear-gradient(to bottom, rgba(250, 248, 245, 1) 0%, rgba(250, 248, 245, 0) 100px),
+    linear-gradient(to top, rgba(250, 248, 245, 1) 0%, rgba(250, 248, 245, 0) 100px);
+  z-index: -1;
+  pointer-events: none;
 }

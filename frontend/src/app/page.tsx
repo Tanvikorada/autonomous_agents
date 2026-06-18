@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { startPipeline, getJobStatus, getJobResult, PipelineResult, JobStatusResponse } from "@/lib/api";
 import ProblemInput from "@/components/ProblemInput";
 import AgentPipeline from "@/components/AgentPipeline";
@@ -11,6 +11,8 @@ export default function Home() {
   const [statusData, setStatusData] = useState<JobStatusResponse | null>(null);
   const [result, setResult] = useState<PipelineResult | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  const workspaceRef = useRef<HTMLDivElement>(null);
 
   const handleSubmit = async (problem: string) => {
     try {
@@ -54,8 +56,8 @@ export default function Home() {
 
   return (
     <div>
-      {/* Botanical Hero Section */}
-      <section className="botanical-hero" style={{ minHeight: "80vh", display: "flex", flexDirection: "column", padding: "var(--spacing-28) var(--spacing-40)" }}>
+      {/* 100vh Botanical Hero Section */}
+      <section className="botanical-hero" style={{ padding: "var(--spacing-28) var(--spacing-40)" }}>
         
         {/* Navigation */}
         <nav style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
@@ -64,57 +66,72 @@ export default function Home() {
             <span style={{ fontFamily: "var(--font-pplxsans)", fontWeight: 500, fontSize: "16px" }}>AUTONOMOUS</span>
           </div>
           <div style={{ display: "flex", gap: "var(--spacing-8)" }}>
-            <button className="ghost-nav">Library</button>
-            <button className="ghost-nav">Discover</button>
+            <button className="nav-pill">Library</button>
+            <button className="nav-pill">Discover</button>
             <button className="pill-cta" style={{ marginLeft: "var(--spacing-12)" }}>Sign In</button>
           </div>
         </nav>
 
         {/* Hero Content */}
-        <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", textAlign: "center" }}>
+        <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", textAlign: "center", paddingBottom: "10vh" }}>
           <h1 className="sans-hero">Computer</h1>
-          <p className="body-stack" style={{ maxWidth: 600, marginTop: "var(--spacing-20)", color: "var(--color-moss-shadow)" }}>
+          <p className="body-stack" style={{ maxWidth: 600, marginTop: "var(--spacing-20)", color: "var(--color-moss-shadow)", fontSize: "16px" }}>
             A natural language interface to orchestrate a swarm of specialized autonomous agents. Describe the system you need, and the computer will build it.
           </p>
+          <button 
+            className="pill-cta" 
+            style={{ marginTop: "var(--spacing-40)" }}
+            onClick={() => workspaceRef.current?.scrollIntoView({ behavior: "smooth" })}
+          >
+            Try Computer
+          </button>
         </div>
       </section>
 
-      {/* Main Workspace Strip */}
-      <section style={{ 
-        maxWidth: "1200px", 
-        margin: "0 auto", 
-        padding: "0 var(--spacing-40) var(--spacing-80) var(--spacing-40)",
-        display: "flex",
-        flexDirection: "column",
-        gap: "var(--spacing-28)",
-        position: "relative",
-        marginTop: "-10vh" // Overlaps the hero gradient slightly
-      }}>
-        
+      {/* Main Workspace Strip (Parchment) */}
+      <section 
+        ref={workspaceRef}
+        style={{ 
+          maxWidth: "800px", 
+          margin: "0 auto", 
+          padding: "var(--spacing-80) var(--spacing-40)",
+          display: "flex",
+          flexDirection: "column",
+          gap: "var(--spacing-40)",
+          position: "relative",
+        }}
+      >
+        <div style={{ textAlign: "center", marginBottom: "var(--spacing-20)" }}>
+          <h2 className="serif-headline" style={{ fontSize: "48px", marginBottom: "var(--spacing-12)" }}>Initialize System</h2>
+          <p className="body-stack" style={{ color: "var(--color-moss-shadow)" }}>Describe your requirements. The agents will handle the rest.</p>
+        </div>
+
         {error && (
           <div className="white-card" style={{ color: "#b62b1a", fontWeight: 500 }}>
             {error}
           </div>
         )}
 
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 300px", gap: "var(--spacing-24)" }}>
-          {/* Left Column: Input and Results */}
-          <div style={{ display: "flex", flexDirection: "column", gap: "var(--spacing-24)" }}>
-            <div className="white-card">
-              <h2 className="serif-headline" style={{ fontSize: "32px", marginBottom: "var(--spacing-24)" }}>Initialize</h2>
-              <ProblemInput onSubmit={handleSubmit} isLoading={isLoading} />
-            </div>
-            
-            {result && (
-              <div className="white-card">
-                 <ResultPanel result={result} />
-              </div>
-            )}
+        <div className="white-card">
+          <ProblemInput onSubmit={handleSubmit} isLoading={isLoading} />
+        </div>
+        
+        {result && (
+          <div className="white-card" style={{ marginTop: "var(--spacing-40)" }}>
+            <ResultPanel result={result} />
           </div>
+        )}
+      </section>
 
-          {/* Right Column: Telemetry */}
-          <div className="white-card" style={{ alignSelf: "start" }}>
-            <h2 className="serif-headline" style={{ fontSize: "24px", marginBottom: "var(--spacing-20)" }}>Workflow</h2>
+      {/* Agent Pipeline Telemetry (Botanical Floating) */}
+      <section className="botanical-section" style={{ display: "flex", justifyContent: "center", padding: "var(--spacing-180) var(--spacing-40)" }}>
+        <div style={{ maxWidth: "600px", width: "100%", display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center" }}>
+          <h2 className="serif-headline" style={{ fontSize: "32px", marginBottom: "var(--spacing-8)" }}>Workflow Telemetry</h2>
+          <p className="body-stack" style={{ color: "var(--color-moss-shadow)", marginBottom: "var(--spacing-40)" }}>
+            Live status of the autonomous agent swarm processing your request.
+          </p>
+          
+          <div style={{ width: "100%", maxWidth: "400px", textAlign: "left" }}>
             <AgentPipeline 
               status={statusData?.status ?? "pending"} 
               currentAgent={statusData?.current_agent ?? null} 
