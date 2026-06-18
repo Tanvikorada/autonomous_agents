@@ -108,12 +108,12 @@ export default function Home() {
                   <span className="flex h-2 w-2 rounded-full bg-purple-500 mr-2 animate-pulse"></span>
                   Agent Swarm Active
                 </div>
-                <h1 className="text-5xl lg:text-7xl font-black tracking-tighter text-white">
-                  Design. Build. <br/>
-                  <span className="shiny-text">Deploy.</span>
+                <h1 className="text-5xl lg:text-7xl font-black tracking-tighter text-white drop-shadow-2xl">
+                  Let's build something <br/>
+                  <span className="shiny-text">incredible.</span>
                 </h1>
-                <p className="max-w-2xl text-lg text-white/50 leading-relaxed font-light">
-                  Orchestrate a swarm of autonomous AI agents to plan, write, and validate your software architecture in real-time.
+                <p className="max-w-2xl text-lg text-white/70 leading-relaxed font-light">
+                  Meet your new engineering team. Simply describe what you want to build, and Alex, Nova, Kai, and Zara will design, write, and audit the software for you.
                 </p>
               </motion.div>
 

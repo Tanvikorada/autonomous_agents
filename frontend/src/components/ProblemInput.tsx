@@ -44,9 +44,9 @@ export default function ProblemInput({ onSubmit, isLoading }: Props) {
       <form onSubmit={handleSubmit} className="magic-border-content p-6 flex flex-col gap-4">
         
         <div className="flex flex-col gap-1.5 z-10">
-          <label className="text-sm font-semibold tracking-wide text-white/90 uppercase text-xs tracking-widest">Initialize Swarm Matrix</label>
-          <p className="text-xs text-white/50">
-            Describe the architecture, features, and functionality you require.
+          <label className="text-sm font-semibold tracking-wide text-white/90 uppercase text-xs tracking-widest">What are we building today?</label>
+          <p className="text-xs text-white/60">
+            Tell the team what you need. They will handle the architecture, code, and testing.
           </p>
         </div>
         
@@ -55,9 +55,9 @@ export default function ProblemInput({ onSubmit, isLoading }: Props) {
             value={problem}
             onChange={e => setProblem(e.target.value)}
             disabled={isLoading}
-            placeholder="e.g. Build an autonomous trading bot in Python that checks Binance API..."
+            placeholder="Hey team, I need a Python trading bot that connects to the Binance API..."
             rows={5}
-            className="w-full bg-transparent border-none text-white/90 placeholder:text-white/20 focus:outline-none resize-none text-[15px] leading-relaxed"
+            className="w-full bg-transparent border-none text-white/90 placeholder:text-white/30 focus:outline-none resize-none text-[16px] leading-relaxed"
           />
         </div>
         

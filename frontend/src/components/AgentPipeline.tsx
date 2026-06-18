@@ -3,6 +3,7 @@
 import { JobStatus } from "@/lib/api";
 import { motion } from "framer-motion";
 import Tilt from "react-parallax-tilt";
+import Image from "next/image";
 
 interface Props {
   status: JobStatus | "pending";
@@ -12,10 +13,10 @@ interface Props {
 }
 
 const AGENTS = [
-  { name: "Planner", label: "Architecture Planner", activeStatus: "planning", id: "01" },
-  { name: "Coder", label: "Software Engineer", activeStatus: "coding", id: "02" },
-  { name: "Tester", label: "QA Automation", activeStatus: "testing", id: "03" },
-  { name: "Reviewer", label: "Security Auditor", activeStatus: "reviewing", id: "04" },
+  { name: "Planner", label: "Alex (Architect)", activeStatus: "planning", id: "01", avatar: "/avatars/planner.png" },
+  { name: "Coder", label: "Nova (Engineer)", activeStatus: "coding", id: "02", avatar: "/avatars/coder.png" },
+  { name: "Tester", label: "Kai (QA Testing)", activeStatus: "testing", id: "03", avatar: "/avatars/tester.png" },
+  { name: "Reviewer", label: "Zara (Security)", activeStatus: "reviewing", id: "04", avatar: "/avatars/reviewer.png" },
 ] as const;
 
 export default function AgentPipeline({ status, currentAgent, completedSteps, isIdle }: Props) {
@@ -36,8 +37,8 @@ export default function AgentPipeline({ status, currentAgent, completedSteps, is
         return (
           <Tilt
             key={agent.name}
-            tiltMaxAngleX={10}
-            tiltMaxAngleY={10}
+            tiltMaxAngleX={5}
+            tiltMaxAngleY={5}
             glareEnable={true}
             glareMaxOpacity={0.1}
             glareColor="#ffffff"
@@ -49,12 +50,12 @@ export default function AgentPipeline({ status, currentAgent, completedSteps, is
           >
             <motion.div 
               className="flex gap-4 relative w-full"
-              animate={{ opacity: isActive || isDone ? 1 : 0.4 }}
+              animate={{ opacity: isActive || isDone ? 1 : 0.5 }}
               transition={{ duration: 0.5 }}
             >
-              {/* Animated Laser Pulse Line */}
+              {/* Animated Connection Line */}
               {index !== AGENTS.length - 1 && (
-                <div className="absolute left-[11px] top-[30px] w-[2px] h-[calc(100%+8px)] bg-white/10 overflow-hidden">
+                <div className="absolute left-[20px] top-[48px] w-[2px] h-[calc(100%-4px)] bg-white/5 overflow-hidden rounded-full">
                   {isActive && (
                     <motion.div 
                       className="w-full h-8 bg-gradient-to-b from-transparent via-purple-500 to-transparent"
@@ -63,43 +64,40 @@ export default function AgentPipeline({ status, currentAgent, completedSteps, is
                     />
                   )}
                   {isDone && (
-                    <div className="w-full h-full bg-gradient-to-b from-[hsl(262,83%,58%)] to-[#33d0ff]" />
+                    <div className="w-full h-full bg-gradient-to-b from-purple-500 to-purple-500/50" />
                   )}
                 </div>
               )}
               
-              {/* Glowing Orb Indicator */}
-              <div className="z-10 flex items-center justify-center mt-1">
+              {/* Avatar Indicator */}
+              <div className="z-10 flex flex-col items-center">
                 <div 
-                  className={`w-6 h-6 rounded-full flex items-center justify-center transition-all duration-500
-                    ${isActive ? "bg-purple-500 shadow-[0_0_20px_rgba(168,85,247,0.8)]" 
-                    : isDone ? "bg-gradient-to-br from-purple-500 to-[#33d0ff] shadow-[0_0_10px_rgba(51,208,255,0.4)]" 
-                    : "bg-black/50 border border-white/20"}`}
+                  className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-500 overflow-hidden
+                    ${isActive ? "ring-2 ring-purple-500 ring-offset-2 ring-offset-[#050505] shadow-[0_0_20px_rgba(168,85,247,0.6)]" 
+                    : isDone ? "ring-2 ring-[#33d0ff]/50 ring-offset-2 ring-offset-[#050505]" 
+                    : "ring-1 ring-white/10 opacity-70 grayscale"}`}
                 >
-                  {isDone ? (
-                    <svg className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                    </svg>
-                  ) : isActive ? (
-                    <div className="w-2 h-2 rounded-full bg-white animate-ping" />
-                  ) : (
-                    <div className="w-1.5 h-1.5 rounded-full bg-white/20" />
-                  )}
+                  <img src={agent.avatar} alt={agent.name} className="w-full h-full object-cover" />
                 </div>
               </div>
 
               {/* Content Card */}
-              <div className="flex flex-col gap-1.5 bg-white/[0.02] border border-white/5 p-3 rounded-lg w-full backdrop-blur-sm">
+              <div className="flex flex-col gap-2 bg-white/[0.02] border border-white/5 p-4 rounded-2xl w-full backdrop-blur-md shadow-xl">
                 <div className="flex items-center gap-3">
-                  <span className={`text-sm font-semibold tracking-wide ${isActive || isDone ? "text-white" : "text-white/50"}`}>
+                  <span className={`text-[15px] font-semibold tracking-tight ${isActive || isDone ? "text-white" : "text-white/60"}`}>
                     {agent.label}
                   </span>
-                  <span className={`glass-badge ${isActive ? "glass-badge-active" : "opacity-50"}`}>
-                    {state.toUpperCase()}
-                  </span>
+                  {isActive && (
+                    <span className="flex h-2 w-2 rounded-full bg-purple-500 animate-pulse ml-auto"></span>
+                  )}
+                  {isDone && (
+                    <svg className="w-4 h-4 text-[#33d0ff] ml-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                    </svg>
+                  )}
                 </div>
-                <p className="text-[10px] text-white/40 font-mono tracking-wider uppercase">
-                  {isActive ? "> Executing neural routines..." : isDone ? "> Sequence complete." : "> Awaiting authorization."}
+                <p className="text-xs text-white/50 leading-relaxed">
+                  {isActive ? "Currently synthesizing the solution matrix..." : isDone ? "Task successfully verified and completed." : "Awaiting upstream dependencies."}
                 </p>
               </div>
             </motion.div>
