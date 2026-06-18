@@ -1,14 +1,14 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { runPipeline, checkStatus, PipelineResult, JobStatusData } from "@/lib/api";
+import { startPipeline, getJobStatus, getJobResult, PipelineResult, JobStatusResponse } from "@/lib/api";
 import ProblemInput from "@/components/ProblemInput";
 import AgentPipeline from "@/components/AgentPipeline";
 import ResultPanel from "@/components/ResultPanel";
 
 export default function Home() {
   const [jobId, setJobId] = useState<string | null>(null);
-  const [statusData, setStatusData] = useState<JobStatusData | null>(null);
+  const [statusData, setStatusData] = useState<JobStatusResponse | null>(null);
   const [result, setResult] = useState<PipelineResult | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -17,7 +17,7 @@ export default function Home() {
       setError(null);
       setResult(null);
       setStatusData(null);
-      const res = await runPipeline(problem);
+      const res = await startPipeline(problem);
       setJobId(res.job_id);
     } catch (err: any) {
       setError(err.message || "Failed to start swarm.");
@@ -30,12 +30,13 @@ export default function Home() {
     let intervalId: NodeJS.Timeout;
     const poll = async () => {
       try {
-        const data = await checkStatus(jobId);
+        const data = await getJobStatus(jobId);
         setStatusData(data);
         if (data.status === "done") {
-          setResult(data.result || null);
+          const resultData = await getJobResult(jobId);
+          setResult(resultData);
           setJobId(null);
-        } else if (data.status === "failed") {
+        } else if (data.status === "error") {
           setError(data.error || "Job failed.");
           setJobId(null);
         }
