@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { motion } from "framer-motion";
 
 interface Props {
   onSubmit: (problem: string) => void;
@@ -82,9 +83,12 @@ export default function ProblemInput({ onSubmit, isLoading }: Props) {
           {/* Quick-prompt chips */}
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
             {EXAMPLES.map((ex, i) => (
-              <button
+              <motion.button
                 key={i}
                 type="button"
+                whileHover={{ scale: 1.05, backgroundColor: "rgba(255,255,255,0.12)", color: "#e5e2e1" }}
+                whileTap={{ scale: 0.95 }}
+                transition={{ type: "spring", stiffness: 400, damping: 17 }}
                 onClick={() => setProblem(ex)}
                 disabled={isLoading}
                 style={{
@@ -97,28 +101,23 @@ export default function ProblemInput({ onSubmit, isLoading }: Props) {
                   fontSize: 12,
                   fontFamily: "'Geist', monospace",
                   opacity: isLoading ? 0.4 : 1,
-                  transition: "background 0.2s, color 0.2s",
-                }}
-                onMouseEnter={e => {
-                  (e.currentTarget as HTMLButtonElement).style.background = "rgba(255,255,255,0.12)";
-                  (e.currentTarget as HTMLButtonElement).style.color = "#e5e2e1";
-                }}
-                onMouseLeave={e => {
-                  (e.currentTarget as HTMLButtonElement).style.background = "rgba(255,255,255,0.05)";
-                  (e.currentTarget as HTMLButtonElement).style.color = "#bbc9cf";
+                  transition: "opacity 0.2s",
                 }}
               >
                 <span className="material-symbols-outlined" style={{ fontSize: 13 }}>terminal</span>
                 Prompt 0{i + 1}
-              </button>
+              </motion.button>
             ))}
           </div>
 
           {/* Submit button */}
-          <button
+          <motion.button
             type="submit"
             disabled={!canSubmit}
             className={canSubmit ? "shimmer-btn" : ""}
+            whileHover={canSubmit ? { scale: 1.05, boxShadow: "0 0 28px rgba(142,45,226,0.55)" } : {}}
+            whileTap={canSubmit ? { scale: 0.95 } : {}}
+            transition={{ type: "spring", stiffness: 400, damping: 17 }}
             style={{
               display: "flex", alignItems: "center", gap: 8,
               padding: "12px 28px",
@@ -131,15 +130,6 @@ export default function ProblemInput({ onSubmit, isLoading }: Props) {
               fontSize: 15,
               opacity: canSubmit ? 1 : 0.45,
               whiteSpace: "nowrap",
-              transition: "box-shadow 0.3s, opacity 0.2s",
-              boxShadow: canSubmit ? "0 0 0 0 rgba(142,45,226,0)" : "none",
-            }}
-            onMouseEnter={e => {
-              if (canSubmit)
-                (e.currentTarget as HTMLButtonElement).style.boxShadow = "0 0 28px rgba(142,45,226,0.55)";
-            }}
-            onMouseLeave={e => {
-              (e.currentTarget as HTMLButtonElement).style.boxShadow = "none";
             }}
           >
             {isLoading ? (
@@ -153,7 +143,7 @@ export default function ProblemInput({ onSubmit, isLoading }: Props) {
                 <span className="material-symbols-outlined" style={{ fontSize: 20 }}>bolt</span>
               </>
             )}
-          </button>
+          </motion.button>
         </div>
       </div>
     </form>

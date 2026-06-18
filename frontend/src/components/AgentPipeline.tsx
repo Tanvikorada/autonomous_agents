@@ -1,6 +1,7 @@
 "use client";
 
 import { JobStatus } from "@/lib/api";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface Props {
   status: JobStatus | "pending";
@@ -72,14 +73,18 @@ export default function AgentPipeline({ status, currentAgent, completedSteps, is
             const dimmed   = state === "idle" && !isIdle;
 
             return (
-              <div
+              <motion.div
+                layout
                 key={agent.name}
+                initial={false}
+                animate={{
+                  opacity: dimmed ? 0.4 : isIdle ? 0.45 : 1,
+                  scale: isActive ? 1.02 : 1,
+                }}
+                transition={{ type: "spring", stiffness: 400, damping: 25 }}
                 style={{
                   position: "relative",
                   display: "flex", flexDirection: "column", gap: 6,
-                  opacity: dimmed ? 0.4 : isIdle ? 0.45 : 1,
-                  transition: "opacity 0.4s ease",
-                  transform: isActive ? "scale(1.02)" : "scale(1)",
                 }}
               >
                 {/* Node indicator */}
@@ -139,22 +144,33 @@ export default function AgentPipeline({ status, currentAgent, completedSteps, is
                 </p>
 
                 {/* Progress bar (active only) */}
-                {isActive && (
-                  <div style={{
-                    width: "100%", height: 3, borderRadius: 4,
-                    background: "rgba(255,255,255,0.06)",
-                    overflow: "hidden", marginTop: 6,
-                  }}>
-                    <div style={{
-                      height: "100%",
-                      width: "65%",
-                      background: "#47d6ff",
-                      boxShadow: "0 0 10px rgba(71,214,255,0.8)",
-                      borderRadius: 4,
-                    }} />
-                  </div>
-                )}
-              </div>
+                <AnimatePresence>
+                  {isActive && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: 3, opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      style={{
+                        width: "100%", borderRadius: 4,
+                        background: "rgba(255,255,255,0.06)",
+                        overflow: "hidden", marginTop: 6,
+                      }}
+                    >
+                      <motion.div
+                        initial={{ width: "0%" }}
+                        animate={{ width: "100%" }}
+                        transition={{ duration: 4, ease: "linear", repeat: Infinity }}
+                        style={{
+                          height: "100%",
+                          background: "#47d6ff",
+                          boxShadow: "0 0 10px rgba(71,214,255,0.8)",
+                          borderRadius: 4,
+                        }}
+                      />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </motion.div>
             );
           })}
         </div>

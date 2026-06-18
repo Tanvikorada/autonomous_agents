@@ -8,12 +8,17 @@ import {
   startPipeline, getJobStatus, getJobResult,
   JobStatus, JobStatusResponse, PipelineResult,
 } from "@/lib/api";
+import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
 
 const POLL_INTERVAL_MS = 2000;
 const TERMINAL_STATUSES: JobStatus[] = ["done", "error"];
 
 type ViewState = "Workspace" | "Agents" | "Logs";
-interface Toast { id: number; message: string; exiting?: boolean }
+interface Toast { id: number; message: string; }
+
+// Framer Motion Spring config
+const springConfig = { type: "spring", stiffness: 400, damping: 25 } as const;
+const buttonSpring = { type: "spring", stiffness: 500, damping: 15 } as const;
 
 function useRipple() {
   return (e: React.MouseEvent<HTMLElement>) => {
@@ -56,15 +61,16 @@ export default function Home() {
 
   const triggerRipple = useRipple();
 
+  // Scroll Parallax
+  const { scrollYProgress } = useScroll();
+  const bgY = useTransform(scrollYProgress, [0, 1], ["0%", "30%"]);
+  const titleY = useTransform(scrollYProgress, [0, 0.5], [0, -100]);
+  const titleOpacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
+
   const addToast = (msg: string) => {
     const id = ++toastCounter.current;
     setToasts(prev => [...prev, { id, message: msg }]);
-    setTimeout(() => {
-      setToasts(prev => prev.map(t => t.id === id ? { ...t, exiting: true } : t));
-      setTimeout(() => {
-        setToasts(prev => prev.filter(t => t.id !== id));
-      }, 300);
-    }, 3000);
+    setTimeout(() => setToasts(prev => prev.filter(t => t.id !== id)), 4000);
   };
 
   // ── WebGL Shader Background ──────────────────────────────────────────
@@ -171,16 +177,6 @@ export default function Home() {
     return () => { window.removeEventListener("mousemove", onMove); cancelAnimationFrame(rafId); };
   }, []);
 
-  useEffect(() => {
-    const trail = cursorTrailRef.current;
-    if (!trail) return;
-    const add    = () => trail.classList.add("hovering");
-    const remove = () => trail.classList.remove("hovering");
-    const els = document.querySelectorAll("button, a, textarea, .interactive-node");
-    els.forEach(el => { el.addEventListener("mouseenter", add); el.addEventListener("mouseleave", remove); });
-    return () => els.forEach(el => { el.removeEventListener("mouseenter", add); el.removeEventListener("mouseleave", remove); });
-  });
-
   // ── Pipeline polling ─────────────────────────────────────────────────
   const stopPolling = useCallback(() => {
     if (pollRef.current) { clearInterval(pollRef.current); pollRef.current = null; }
@@ -225,205 +221,258 @@ export default function Home() {
   const isIdle = !isLoading && !statusData && !result && !error;
 
   return (
-    <div style={{ minHeight: "100vh", fontFamily: "'Outfit', sans-serif", color: "#e5e2e1" }}>
-      <canvas ref={shaderCanvasRef} style={{ position: "fixed", top: 0, left: 0, width: "100%", height: "100%", zIndex: -2 }} />
+    <div style={{ minHeight: "100vh", fontFamily: "'Outfit', sans-serif", color: "#e5e2e1", overflowX: "hidden" }}>
+      <motion.div style={{ y: bgY, position: "fixed", inset: 0, zIndex: -2 }}>
+        <canvas ref={shaderCanvasRef} style={{ width: "100%", height: "100%" }} />
+      </motion.div>
       <div ref={cursorDotRef} className="custom-cursor-dot" />
       <div ref={cursorTrailRef} className="custom-cursor-trail" />
 
       {/* ── Toast Notifications ── */}
       <div style={{ position: "fixed", bottom: 24, right: 24, display: "flex", flexDirection: "column", gap: 12, zIndex: 1000 }}>
-        {toasts.map(t => (
-          <div key={t.id} className={t.exiting ? "toast-exit" : "toast-enter"} style={{
-            background: "rgba(19, 19, 19, 0.9)", backdropFilter: "blur(20px)",
-            border: "1px solid rgba(71, 214, 255, 0.3)", borderRadius: 8,
-            padding: "16px 24px", color: "#b6ebff", fontFamily: "'Geist', monospace",
-            fontSize: 13, boxShadow: "0 8px 32px rgba(0, 0, 0, 0.4)",
-            display: "flex", alignItems: "center", gap: 12
-          }}>
-            <span className="material-symbols-outlined" style={{ fontSize: 18 }}>notifications_active</span>
-            {t.message}
-          </div>
-        ))}
+        <AnimatePresence>
+          {toasts.map(t => (
+            <motion.div
+              key={t.id}
+              layout
+              initial={{ opacity: 0, y: 20, scale: 0.9 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.2 } }}
+              style={{
+                background: "rgba(19, 19, 19, 0.9)", backdropFilter: "blur(20px)",
+                border: "1px solid rgba(71, 214, 255, 0.3)", borderRadius: 8,
+                padding: "16px 24px", color: "#b6ebff", fontFamily: "'Geist', monospace",
+                fontSize: 13, boxShadow: "0 8px 32px rgba(0, 0, 0, 0.4)",
+                display: "flex", alignItems: "center", gap: 12
+              }}
+            >
+              <span className="material-symbols-outlined" style={{ fontSize: 18 }}>notifications_active</span>
+              {t.message}
+            </motion.div>
+          ))}
+        </AnimatePresence>
       </div>
 
       {/* ── Drawers ── */}
-      {showTree && (
-        <div style={{ position: "fixed", inset: 0, zIndex: 900, display: "flex", justifyContent: "flex-end" }}>
-          <div style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.4)", backdropFilter: "blur(4px)" }} onClick={() => setShowTree(false)} />
-          <div className="drawer-enter glass-panel" style={{ position: "relative", width: 360, height: "100%", borderLeft: "1px solid rgba(255,255,255,0.1)", padding: 24 }}>
-            <h2 style={{ color: "#ddb7ff", fontFamily: "'Geist', monospace", fontSize: 18, marginTop: 0, borderBottom: "1px solid rgba(255,255,255,0.1)", paddingBottom: 16 }}>Project Directory</h2>
-            <div style={{ color: "#bbc9cf", fontFamily: "'Geist', monospace", fontSize: 13, marginTop: 16 }}>
-              <div style={{ padding: "8px 0" }}>📁 root</div>
-              <div style={{ padding: "8px 0", paddingLeft: 16 }}>📁 src</div>
-              <div style={{ padding: "8px 0", paddingLeft: 32 }}>📄 index.ts</div>
-              <div style={{ padding: "8px 0", paddingLeft: 32 }}>📄 utils.ts</div>
-              <div style={{ padding: "8px 0", paddingLeft: 16 }}>📄 package.json</div>
-            </div>
-            <button className="shimmer-btn interactive-node" style={{ position: "absolute", bottom: 24, left: 24, right: 24, padding: "12px", borderRadius: 8, color: "#fff", border: "none", fontWeight: "bold" }} onClick={(e) => { triggerRipple(e); addToast("Syncing project tree..."); }}>Sync Now</button>
+      <AnimatePresence>
+        {showTree && (
+          <div style={{ position: "fixed", inset: 0, zIndex: 900, display: "flex", justifyContent: "flex-end" }}>
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.4)", backdropFilter: "blur(4px)" }} onClick={() => setShowTree(false)} />
+            <motion.div
+              initial={{ x: "100%" }} animate={{ x: 0 }} exit={{ x: "100%" }} transition={{ type: "spring", stiffness: 300, damping: 30 }}
+              className="glass-panel" style={{ position: "relative", width: 360, height: "100%", borderLeft: "1px solid rgba(255,255,255,0.1)", padding: 24 }}
+            >
+              <h2 style={{ color: "#ddb7ff", fontFamily: "'Geist', monospace", fontSize: 18, marginTop: 0, borderBottom: "1px solid rgba(255,255,255,0.1)", paddingBottom: 16 }}>Project Directory</h2>
+              <div style={{ color: "#bbc9cf", fontFamily: "'Geist', monospace", fontSize: 13, marginTop: 16 }}>
+                <div style={{ padding: "8px 0" }}>📁 root</div>
+                <div style={{ padding: "8px 0", paddingLeft: 16 }}>📁 src</div>
+                <div style={{ padding: "8px 0", paddingLeft: 32 }}>📄 index.ts</div>
+                <div style={{ padding: "8px 0", paddingLeft: 32 }}>📄 utils.ts</div>
+                <div style={{ padding: "8px 0", paddingLeft: 16 }}>📄 package.json</div>
+              </div>
+              <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="shimmer-btn" style={{ position: "absolute", bottom: 24, left: 24, right: 24, padding: "12px", borderRadius: 8, color: "#fff", border: "none", fontWeight: "bold" }} onClick={(e) => { triggerRipple(e); addToast("Syncing project tree..."); }}>Sync Now</motion.button>
+            </motion.div>
           </div>
-        </div>
-      )}
+        )}
 
-      {showSettings && (
-        <div style={{ position: "fixed", inset: 0, zIndex: 900, display: "flex", justifyContent: "flex-end" }}>
-          <div style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.4)", backdropFilter: "blur(4px)" }} onClick={() => setShowSettings(false)} />
-          <div className="drawer-enter glass-panel" style={{ position: "relative", width: 360, height: "100%", borderLeft: "1px solid rgba(255,255,255,0.1)", padding: 24 }}>
-            <h2 style={{ color: "#b6ebff", fontFamily: "'Geist', monospace", fontSize: 18, marginTop: 0, borderBottom: "1px solid rgba(255,255,255,0.1)", paddingBottom: 16 }}>System Settings</h2>
-            <div style={{ display: "flex", flexDirection: "column", gap: 16, marginTop: 24 }}>
-              {["Enable Debug Logs", "Auto-approve PRs", "Strict Mode"].map(setting => (
-                <label key={setting} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", color: "#e5e2e1", fontSize: 14, cursor: "none" }}>
-                  {setting}
-                  <div style={{ width: 40, height: 20, background: "rgba(71, 214, 255, 0.2)", borderRadius: 10, position: "relative" }}>
-                    <div style={{ width: 16, height: 16, background: "#47d6ff", borderRadius: "50%", position: "absolute", right: 2, top: 2 }} />
-                  </div>
-                </label>
-              ))}
-            </div>
+        {showSettings && (
+          <div style={{ position: "fixed", inset: 0, zIndex: 900, display: "flex", justifyContent: "flex-end" }}>
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.4)", backdropFilter: "blur(4px)" }} onClick={() => setShowSettings(false)} />
+            <motion.div
+              initial={{ x: "100%" }} animate={{ x: 0 }} exit={{ x: "100%" }} transition={{ type: "spring", stiffness: 300, damping: 30 }}
+              className="glass-panel" style={{ position: "relative", width: 360, height: "100%", borderLeft: "1px solid rgba(255,255,255,0.1)", padding: 24 }}
+            >
+              <h2 style={{ color: "#b6ebff", fontFamily: "'Geist', monospace", fontSize: 18, marginTop: 0, borderBottom: "1px solid rgba(255,255,255,0.1)", paddingBottom: 16 }}>System Settings</h2>
+              <div style={{ display: "flex", flexDirection: "column", gap: 16, marginTop: 24 }}>
+                {["Enable Debug Logs", "Auto-approve PRs", "Strict Mode"].map(setting => (
+                  <label key={setting} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", color: "#e5e2e1", fontSize: 14, cursor: "none" }}>
+                    {setting}
+                    <div style={{ width: 40, height: 20, background: "rgba(71, 214, 255, 0.2)", borderRadius: 10, position: "relative" }}>
+                      <motion.div layout transition={springConfig as any} style={{ width: 16, height: 16, background: "#47d6ff", borderRadius: "50%", position: "absolute", right: 2, top: 2 }} />
+                    </div>
+                  </label>
+                ))}
+              </div>
+            </motion.div>
           </div>
-        </div>
-      )}
+        )}
+      </AnimatePresence>
 
       {/* ── Navbar ── */}
       <nav className="sticky top-0 w-full z-50 flex flex-wrap justify-between items-center px-4 md:px-10 py-4 border-b border-white/10 shadow-[0_0_20px_rgba(71,214,255,0.08)] bg-[#131313]/60 backdrop-blur-xl gap-4">
-        <div className="glitch-hover" data-text="AUTONOMOUS_" style={{
-          fontFamily: "'Geist', monospace", color: "#b6ebff", fontSize: 16, fontWeight: 600, letterSpacing: "-0.04em",
-        }}>
+        <motion.div whileHover={{ scale: 1.05 }} className="glitch-hover" data-text="AUTONOMOUS_" style={{ fontFamily: "'Geist', monospace", color: "#b6ebff", fontSize: 16, fontWeight: 600, letterSpacing: "-0.04em" }}>
           AUTONOMOUS<span style={{ color: "#00d2ff" }}>_</span>
-        </div>
+        </motion.div>
 
-        <div className="flex items-center gap-4 md:gap-8 overflow-x-auto w-full md:w-auto order-3 md:order-2 pb-2 md:pb-0 hide-scrollbar">
+        <div className="flex items-center gap-4 md:gap-8 overflow-x-auto w-full md:w-auto order-3 md:order-2 pb-2 md:pb-0 hide-scrollbar" style={{ position: "relative" }}>
           {(["Workspace", "Agents", "Logs"] as ViewState[]).map(view => (
-            <button key={view} onClick={(e) => { triggerRipple(e); setActiveView(view); }} style={{
-              background: "transparent", border: "none",
-              fontFamily: "'Outfit', sans-serif", fontSize: 16,
-              color: activeView === view ? "#b6ebff" : "#bbc9cf",
-              borderBottom: activeView === view ? "2px solid #b6ebff" : "2px solid transparent",
-              paddingBottom: 4, transition: "color 0.2s", whiteSpace: "nowrap"
+            <motion.button key={view} onClick={(e) => { triggerRipple(e as any); setActiveView(view); }} style={{
+              background: "transparent", border: "none", fontFamily: "'Outfit', sans-serif", fontSize: 16,
+              color: activeView === view ? "#b6ebff" : "#bbc9cf", paddingBottom: 4, position: "relative", whiteSpace: "nowrap"
             }}>
               {view}
-            </button>
+              {activeView === view && (
+                <motion.div layoutId="nav-underline" style={{ position: "absolute", bottom: -2, left: 0, right: 0, height: 2, background: "#b6ebff" }} transition={springConfig as any} />
+              )}
+            </motion.button>
           ))}
         </div>
 
         <div className="flex items-center gap-4 order-2 md:order-3">
-          <button className="interactive-node" onClick={(e) => { triggerRipple(e); setShowTree(true); }} style={{ background: "none", border: "none", color: "#bbc9cf", padding: 4, lineHeight: 1 }}>
+          <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} onClick={(e) => { triggerRipple(e as any); setShowTree(true); }} style={{ background: "none", border: "none", color: "#bbc9cf", padding: 4, lineHeight: 1 }}>
             <span className="material-symbols-outlined" style={{ fontSize: 22 }}>account_tree</span>
-          </button>
-          <button className="interactive-node" onClick={(e) => { triggerRipple(e); setShowSettings(true); }} style={{ background: "none", border: "none", color: "#bbc9cf", padding: 4, lineHeight: 1 }}>
+          </motion.button>
+          <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} onClick={(e) => { triggerRipple(e as any); setShowSettings(true); }} style={{ background: "none", border: "none", color: "#bbc9cf", padding: 4, lineHeight: 1 }}>
             <span className="material-symbols-outlined" style={{ fontSize: 22 }}>settings</span>
-          </button>
-          <div style={{
-            width: 32, height: 32, borderRadius: "50%",
-            background: "linear-gradient(135deg, #47d6ff, #7900cd)",
-            border: "1px solid rgba(255,255,255,0.1)",
-          }} />
+          </motion.button>
+          <motion.div whileHover={{ scale: 1.1 }} style={{ width: 32, height: 32, borderRadius: "50%", background: "linear-gradient(135deg, #47d6ff, #7900cd)", border: "1px solid rgba(255,255,255,0.1)" }} />
         </div>
       </nav>
 
-
       {/* ── Main Grid ── */}
-      <main className="view-enter max-w-[1400px] mx-auto px-4 md:px-10 py-8 md:py-12 grid grid-cols-1 lg:grid-cols-12 gap-6 relative" key={activeView}>
-        
-        {/* Workspace View */}
-        {activeView === "Workspace" && (
-          <>
-            <section className="stagger-1" style={{ gridColumn: "1 / -1", textAlign: "center", marginBottom: 48, position: "relative" }}>
-              <div style={{ position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -50%)", width: 420, height: 420, zIndex: -1, pointerEvents: "none" }}>
-                <div style={{ width: "100%", height: "100%", borderRadius: "50%", border: "1px solid rgba(71,214,255,0.2)", boxShadow: "0 0 80px rgba(71,214,255,0.15), inset 0 0 80px rgba(71,214,255,0.05)", animation: "float 6s ease-in-out infinite" }} />
-              </div>
-              <h1 className="gradient-text" style={{ fontFamily: "'Outfit', sans-serif", fontSize: "clamp(36px, 7vw, 64px)", fontWeight: 800, lineHeight: 1.1, letterSpacing: "-0.04em", margin: 0 }}>Build Software. Without Coding.</h1>
-              <p style={{ maxWidth: 640, margin: "16px auto 0", fontSize: 16, lineHeight: 1.7, color: "#bbc9cf", opacity: 0.85 }}>Deploy a swarm of specialized autonomous agents to architect, synthesize, and audit your applications. Experience the next evolution of multi-agent software engineering.</p>
-            </section>
+      <AnimatePresence mode="wait">
+        <motion.main
+          key={activeView}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -20 }}
+          transition={{ duration: 0.3 }}
+          className="max-w-[1400px] mx-auto px-4 md:px-10 py-8 md:py-12 grid grid-cols-1 lg:grid-cols-12 gap-6 relative"
+        >
+          {activeView === "Workspace" && (
+            <>
+              <section className="col-span-full text-center mb-12 relative">
+                <motion.div style={{ y: useTransform(scrollYProgress, [0, 1], [0, 200]) }} className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[420px] h-[420px] -z-10 pointer-events-none">
+                  <div className="w-full h-full rounded-full border border-[rgba(71,214,255,0.2)] shadow-[0_0_80px_rgba(71,214,255,0.15),inset_0_0_80px_rgba(71,214,255,0.05)] animate-float" />
+                </motion.div>
+                
+                {/* Kinetic Typography */}
+                <motion.h1 style={{ y: titleY, opacity: titleOpacity }} className="gradient-text font-['Outfit'] font-extrabold text-[clamp(36px,7vw,64px)] leading-[1.1] tracking-[-0.04em] m-0">
+                  {"Build Software. Without Coding.".split(" ").map((word, i) => (
+                    <motion.span
+                      key={i}
+                      initial={{ opacity: 0, y: 30 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: i * 0.1, type: "spring", stiffness: 200, damping: 20 }}
+                      style={{ display: "inline-block", marginRight: "0.25em" }}
+                    >
+                      {word}
+                    </motion.span>
+                  ))}
+                </motion.h1>
+                <motion.p initial={{ opacity: 0 }} animate={{ opacity: 0.85 }} transition={{ delay: 0.6 }} className="max-w-[640px] mx-auto mt-4 text-[16px] leading-[1.7] color-[#bbc9cf]">
+                  Deploy a swarm of specialized autonomous agents to architect, synthesize, and audit your applications. Experience the next evolution of multi-agent software engineering.
+                </motion.p>
+              </section>
 
-            <aside className="stagger-2 col-span-1 hidden lg:flex flex-col gap-3 sticky top-32 self-start">
-              {[
-                { icon: "analytics",     action: "Analytics module" },
-                { icon: "memory",        action: "Memory cache" },
-                { icon: "shield",        action: "Security protocols" },
-                { icon: "rocket_launch", action: "Deployment config" },
-              ].map(({ icon, action }) => (
-                <button key={icon} onClick={(e) => { triggerRipple(e); addToast(`Toggled ${action}`); }} className="glass-panel interactive-node" style={{
-                  width: 48, height: 48, borderRadius: 12, display: "flex", alignItems: "center", justifyContent: "center", color: "#bbc9cf", border: "none", transition: "all 0.2s ease"
-                }}>
-                  <span className="material-symbols-outlined" style={{ fontSize: 22 }}>{icon}</span>
-                </button>
-              ))}
-            </aside>
+              <aside className="col-span-1 hidden lg:flex flex-col gap-3 sticky top-32 self-start">
+                {[
+                  { icon: "analytics",     action: "Analytics module" },
+                  { icon: "memory",        action: "Memory cache" },
+                  { icon: "shield",        action: "Security protocols" },
+                  { icon: "rocket_launch", action: "Deployment config" },
+                ].map(({ icon, action }, i) => (
+                  <motion.button
+                    key={icon}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: i * 0.1 + 0.5, type: "spring", stiffness: 500, damping: 15 }}
+                    whileHover={{ scale: 1.1, backgroundColor: "rgba(255,255,255,0.1)" }}
+                    whileTap={{ scale: 0.9 }}
+                    onClick={(e) => { triggerRipple(e as any); addToast(`Toggled ${action}`); }}
+                    className="glass-panel w-12 h-12 rounded-xl flex items-center justify-center text-[#bbc9cf] border-none"
+                  >
+                    <span className="material-symbols-outlined text-[22px]">{icon}</span>
+                  </motion.button>
+                ))}
+              </aside>
 
-            <div className="stagger-3 col-span-1 lg:col-span-8 flex flex-col gap-6">
-              <ProblemInput onSubmit={handleSubmit} isLoading={isLoading} />
-              {error && (
-                <div className="glass-panel" style={{ borderRadius: 12, padding: 24, borderLeft: "4px solid #ffb4ab" }}>
-                  <h3 style={{ color: "#ffb4ab", margin: "0 0 8px", fontSize: 18, fontWeight: 700 }}>System Fault</h3>
-                  <p style={{ margin: 0, color: "#bbc9cf", fontSize: 14 }}>{error}</p>
-                </div>
-              )}
-              {result && <ResultPanel result={result} />}
-              {isIdle && (
-                <div className="glass-panel stagger-4" style={{ borderRadius: 12, overflow: "hidden", display: "flex", flexDirection: "column", height: 560 }}>
-                  <div style={{ display: "flex", borderBottom: "1px solid rgba(255,255,255,0.08)", background: "rgba(255,255,255,0.03)", overflowX: "auto" }}>
-                    {["Implementation Plan", "Generated Code", "Test Suite", "Audit Report"].map((tab, i) => (
-                      <button key={tab} style={{ padding: "16px 20px", background: "transparent", border: "none", borderBottom: `2px solid ${i === 0 ? "#b6ebff" : "transparent"}`, color: i === 0 ? "#b6ebff" : "#bbc9cf", fontSize: 13, fontFamily: "'Geist', monospace", fontWeight: 500, whiteSpace: "nowrap" }}>{tab}</button>
-                    ))}
-                  </div>
-                  <div style={{ flex: 1, padding: 24, overflowY: "auto" }}>
-                    <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
-                      <div style={{ background: "#0a0a0a", borderRadius: 8, padding: 24, border: "1px solid rgba(255,255,255,0.06)", opacity: 0.3, fontFamily: "'Geist', monospace", fontSize: 13, lineHeight: 1.7 }}>
-                        <div style={{ color: "#bbc9cf", marginBottom: 8 }}>{"// Submit a problem above to generate code"}</div>
-                        <div><span style={{ color: "#ddb7ff" }}>interface </span><span style={{ color: "#a00034" }}>AutonomousAgent </span><span style={{ color: "#e5e2e1" }}>{"{"}</span></div>
-                        <div style={{ paddingLeft: 20 }}>{"id: "}<span style={{ color: "#ffb2b9" }}>string</span>{";"}</div>
-                        <div style={{ paddingLeft: 20 }}>{"status: "}<span style={{ color: "#00d2ff" }}>'idle'</span>{" | "}<span style={{ color: "#00d2ff" }}>'active'</span>{" | "}<span style={{ color: "#00d2ff" }}>'done'</span>{";"}</div>
-                        <div><span style={{ color: "#e5e2e1" }}>{"}"}</span></div>
+              <motion.div layoutId="main-workspace-content" className="col-span-1 lg:col-span-8 flex flex-col gap-6">
+                <ProblemInput onSubmit={handleSubmit} isLoading={isLoading} />
+                {error && (
+                  <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} className="glass-panel rounded-xl p-6 border-l-4 border-[#ffb4ab]">
+                    <h3 className="text-[#ffb4ab] m-0 mb-2 text-[18px] font-bold">System Fault</h3>
+                    <p className="m-0 text-[#bbc9cf] text-[14px]">{error}</p>
+                  </motion.div>
+                )}
+                {result && <ResultPanel result={result} />}
+                {isIdle && (
+                  <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.8 }} className="glass-panel rounded-xl overflow-hidden flex flex-col h-[560px]">
+                    <div className="flex border-b border-white/10 bg-white/5 overflow-x-auto">
+                      {["Implementation Plan", "Generated Code", "Test Suite", "Audit Report"].map((tab, i) => (
+                        <button key={tab} className="px-5 py-4 bg-transparent border-none text-[13px] font-['Geist'] font-medium whitespace-nowrap" style={{ color: i === 0 ? "#b6ebff" : "#bbc9cf", borderBottom: `2px solid ${i === 0 ? "#b6ebff" : "transparent"}` }}>{tab}</button>
+                      ))}
+                    </div>
+                    <div className="flex-1 p-6 overflow-y-auto">
+                      <div className="bg-[#0a0a0a] rounded-lg p-6 border border-white/5 opacity-30 font-['Geist'] text-[13px] leading-[1.7]">
+                        <div className="text-[#bbc9cf] mb-2">{"// Submit a problem above to generate code"}</div>
+                        <div><span className="text-[#ddb7ff]">interface </span><span className="text-[#a00034]">AutonomousAgent </span><span className="text-[#e5e2e1]">{"{"}</span></div>
+                        <div className="pl-5">{"id: "}<span className="text-[#ffb2b9]">string</span>{";"}</div>
+                        <div className="pl-5">{"status: "}<span className="text-[#00d2ff]">'idle'</span>{" | "}<span className="text-[#00d2ff]">'active'</span>{" | "}<span className="text-[#00d2ff]">'done'</span>{";"}</div>
+                        <div><span className="text-[#e5e2e1]">{"}"}</span></div>
                       </div>
                     </div>
-                  </div>
-                </div>
-              )}
-            </div>
+                  </motion.div>
+                )}
+              </motion.div>
 
-            <div className="stagger-5 col-span-1 lg:col-span-3 flex flex-col gap-6 lg:sticky top-32 self-start">
-              <AgentPipeline status={statusData?.status ?? "pending"} currentAgent={statusData?.current_agent ?? null} completedSteps={statusData?.completed_steps ?? []} isIdle={isIdle} />
-              <div className="glass-panel" style={{ borderRadius: 12, padding: 16, display: "flex", flexDirection: "column", gap: 12 }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 10 }}><div style={{ width: 8, height: 8, borderRadius: "50%", background: "#00d2ff", boxShadow: "0 0 8px #00d2ff", flexShrink: 0 }} /><span style={{ fontFamily: "'Geist', monospace", fontSize: 13, color: "#bbc9cf" }}>CPU: {isLoading ? "78%" : "12%"}</span></div>
-                <div style={{ display: "flex", alignItems: "center", gap: 10 }}><div style={{ width: 8, height: 8, borderRadius: "50%", background: "#7900cd", boxShadow: "0 0 8px #7900cd", flexShrink: 0 }} /><span style={{ fontFamily: "'Geist', monospace", fontSize: 13, color: "#bbc9cf" }}>Memory: {isLoading ? "2.1GB/4GB" : "0.4GB/4GB"}</span></div>
-                {jobId && <div style={{ display: "flex", alignItems: "center", gap: 10 }}><div style={{ width: 8, height: 8, borderRadius: "50%", background: "#ddb7ff", boxShadow: "0 0 8px #ddb7ff", flexShrink: 0 }} /><span style={{ fontFamily: "'Geist', monospace", fontSize: 11, color: "#bbc9cf", wordBreak: "break-all" }}>JOB: {jobId.slice(0, 8)}…</span></div>}
+              <div className="col-span-1 lg:col-span-3 flex flex-col gap-6 lg:sticky top-32 self-start">
+                <motion.div layoutId="agent-pipeline-container" style={{ width: "100%" }}>
+                  <AgentPipeline status={statusData?.status ?? "pending"} currentAgent={statusData?.current_agent ?? null} completedSteps={statusData?.completed_steps ?? []} isIdle={isIdle} />
+                </motion.div>
+                <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 1 }} className="glass-panel rounded-xl p-4 flex flex-col gap-3">
+                  <div className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-[#00d2ff] shadow-[0_0_8px_#00d2ff]" /><span className="font-['Geist'] text-[13px] text-[#bbc9cf]">CPU: {isLoading ? "78%" : "12%"}</span></div>
+                  <div className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-[#7900cd] shadow-[0_0_8px_#7900cd]" /><span className="font-['Geist'] text-[13px] text-[#bbc9cf]">Memory: {isLoading ? "2.1GB/4GB" : "0.4GB/4GB"}</span></div>
+                  {jobId && <div className="flex items-center gap-2"><div className="w-2 h-2 rounded-full bg-[#ddb7ff] shadow-[0_0_8px_#ddb7ff]" /><span className="font-['Geist'] text-[11px] text-[#bbc9cf] break-all">JOB: {jobId.slice(0, 8)}…</span></div>}
+                </motion.div>
               </div>
-            </div>
-          </>
-        )}
+            </>
+          )}
 
-        {/* Agents View */}
-        {activeView === "Agents" && (
-          <div style={{ gridColumn: "1 / -1" }}>
-            <h1 className="gradient-text stagger-1" style={{ fontSize: 32, fontWeight: 700, margin: "0 0 24px" }}>Configured Agents</h1>
-            <div className="stagger-2" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 24 }}>
-              {["Cognitive Planner", "Neural Synthesizer", "Validation Matrix", "Security Auditor"].map((agent, i) => (
-                <div key={agent} className="glass-panel" style={{ padding: 24, borderRadius: 12, position: "relative" }}>
-                  <div style={{ position: "absolute", top: 12, right: 12, fontSize: 12, color: "#47d6ff", background: "rgba(71,214,255,0.1)", padding: "4px 8px", borderRadius: 4, fontFamily: "'Geist', monospace" }}>ONLINE</div>
-                  <h3 style={{ color: "#ddb7ff", margin: "0 0 8px", fontSize: 18 }}>{agent}</h3>
-                  <p style={{ color: "#bbc9cf", fontSize: 14, margin: "0 0 16px" }}>Model: GPT-4o Swarm Node 0{i + 1}</p>
-                  <button className="interactive-node" onClick={(e) => { triggerRipple(e); addToast(`Re-calibrating ${agent}...`); }} style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)", color: "#fff", padding: "8px 16px", borderRadius: 6, cursor: "none" }}>Re-calibrate</button>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
+          {activeView === "Agents" && (
+            <motion.div layoutId="agent-pipeline-container" className="col-span-full">
+              <h1 className="gradient-text text-[32px] font-bold m-0 mb-6">Configured Agents</h1>
+              <div className="grid grid-cols-[repeat(auto-fit,minmax(300px,1fr))] gap-6">
+                {["Cognitive Planner", "Neural Synthesizer", "Validation Matrix", "Security Auditor"].map((agent, i) => (
+                  <motion.div
+                    key={agent}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: i * 0.1, type: "spring", stiffness: 300, damping: 20 }}
+                    whileHover={{ y: -5, boxShadow: "0 20px 40px rgba(0,0,0,0.4)" }}
+                    className="glass-panel p-6 rounded-xl relative"
+                  >
+                    <div className="absolute top-3 right-3 text-[12px] text-[#47d6ff] bg-[rgba(71,214,255,0.1)] px-2 py-1 rounded font-['Geist']">ONLINE</div>
+                    <h3 className="text-[#ddb7ff] m-0 mb-2 text-[18px]">{agent}</h3>
+                    <p className="text-[#bbc9cf] text-[14px] m-0 mb-4">Model: GPT-4o Swarm Node 0{i + 1}</p>
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={(e) => { triggerRipple(e as any); addToast(`Re-calibrating ${agent}...`); }}
+                      className="bg-white/5 border border-white/10 text-white px-4 py-2 rounded-md cursor-none"
+                    >
+                      Re-calibrate
+                    </motion.button>
+                  </motion.div>
+                ))}
+              </div>
+            </motion.div>
+          )}
 
-        {/* Logs View */}
-        {activeView === "Logs" && (
-          <div style={{ gridColumn: "1 / -1", height: "calc(100vh - 200px)" }}>
-            <h1 className="gradient-text stagger-1" style={{ fontSize: 32, fontWeight: 700, margin: "0 0 24px" }}>System Logs</h1>
-            <div className="glass-panel stagger-2" style={{ height: "100%", borderRadius: 12, padding: 24, fontFamily: "'Geist', monospace", fontSize: 13, color: "#a5e7ff", overflowY: "auto" }}>
-              <div style={{ opacity: 0.5, marginBottom: 12 }}>[SYSTEM] Swarm OS Initialized.</div>
-              <div style={{ opacity: 0.5, marginBottom: 12 }}>[NETWORK] Establishing secure connection to local runtime... OK.</div>
-              <div style={{ opacity: 0.5, marginBottom: 12 }}>[MODULES] 4/4 neural agents standing by.</div>
-              <div style={{ opacity: 0.5, marginBottom: 12, color: "#ffd2d5" }}>[WARN] Cache hit ratio suboptimal (42%). Triggering gc.</div>
-              <div style={{ opacity: 0.5 }}>[IDLE] Awaiting user instructions...</div>
-            </div>
-          </div>
-        )}
-
-      </main>
+          {activeView === "Logs" && (
+            <motion.div layoutId="main-workspace-content" className="col-span-full h-[calc(100vh-200px)]">
+              <h1 className="gradient-text text-[32px] font-bold m-0 mb-6">System Logs</h1>
+              <div className="glass-panel h-full rounded-xl p-6 font-['Geist'] text-[13px] text-[#a5e7ff] overflow-y-auto">
+                <div className="opacity-50 mb-3">[SYSTEM] Swarm OS Initialized.</div>
+                <div className="opacity-50 mb-3">[NETWORK] Establishing secure connection to local runtime... OK.</div>
+                <div className="opacity-50 mb-3">[MODULES] 4/4 neural agents standing by.</div>
+                <div className="opacity-50 mb-3 text-[#ffd2d5]">[WARN] Cache hit ratio suboptimal (42%). Triggering gc.</div>
+                <div className="opacity-50">[IDLE] Awaiting user instructions...</div>
+              </div>
+            </motion.div>
+          )}
+        </motion.main>
+      </AnimatePresence>
     </div>
   );
 }
