@@ -53,63 +53,68 @@ export default function Home() {
   const isLoading = !!jobId;
 
   return (
-    <div style={{ minHeight: "100vh", backgroundColor: "var(--color-black-void)" }}>
-      {/* 1px Hairline Top Nav */}
-      <nav className="hairline-nav">
-        <div className="logo-wordmark">
-          21<div className="bar" />TSI
-        </div>
-        <div style={{ display: "flex", gap: "38px" }}>
-          <button className="nav-link">THE SPHERE LAB</button>
-          <button className="nav-link">JOIN THE TEAM</button>
-          <button className="nav-link">INVEST</button>
-        </div>
-        <div style={{ display: "flex", gap: "10px" }}>
-          <button className="ghost-pill active">CONTACT</button>
-          <button className="ghost-pill">FR</button>
-          <button className="ghost-pill">SOUND</button>
-        </div>
-      </nav>
+    <div>
+      {/* Botanical Hero Section */}
+      <section className="botanical-hero" style={{ minHeight: "80vh", display: "flex", flexDirection: "column", padding: "var(--spacing-28) var(--spacing-40)" }}>
+        
+        {/* Navigation */}
+        <nav style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <span className="mono-badge">/os</span>
+            <span style={{ fontFamily: "var(--font-pplxsans)", fontWeight: 500, fontSize: "16px" }}>AUTONOMOUS</span>
+          </div>
+          <div style={{ display: "flex", gap: "var(--spacing-8)" }}>
+            <button className="ghost-nav">Library</button>
+            <button className="ghost-nav">Discover</button>
+            <button className="pill-cta" style={{ marginLeft: "var(--spacing-12)" }}>Sign In</button>
+          </div>
+        </nav>
 
-      {/* Full-Bleed Editorial Hero */}
-      <section className="editorial-hero">
-        <div style={{ 
-          position: "absolute", 
-          top: "30%", 
-          left: "var(--spacing-38)",
-          width: "50%",
-          zIndex: 10
-        }}>
-          <h1 className="display-headline">
-            Build Software.<br />
-            Without Coding.
-          </h1>
+        {/* Hero Content */}
+        <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", textAlign: "center" }}>
+          <h1 className="sans-hero">Computer</h1>
+          <p className="body-stack" style={{ maxWidth: 600, marginTop: "var(--spacing-20)", color: "var(--color-moss-shadow)" }}>
+            A natural language interface to orchestrate a swarm of specialized autonomous agents. Describe the system you need, and the computer will build it.
+          </p>
         </div>
       </section>
 
-      {/* Main Content Strip */}
+      {/* Main Workspace Strip */}
       <section style={{ 
-        padding: "var(--spacing-108) var(--spacing-38)",
+        maxWidth: "1200px", 
+        margin: "0 auto", 
+        padding: "0 var(--spacing-40) var(--spacing-80) var(--spacing-40)",
         display: "flex",
         flexDirection: "column",
-        gap: "var(--spacing-60)"
+        gap: "var(--spacing-28)",
+        position: "relative",
+        marginTop: "-10vh" // Overlaps the hero gradient slightly
       }}>
         
         {error && (
-          <div style={{ color: "var(--color-crimson-heat)", fontFamily: "var(--font-saans)", fontSize: "var(--text-body)" }}>
-            ERROR: {error}
+          <div className="white-card" style={{ color: "#b62b1a", fontWeight: 500 }}>
+            {error}
           </div>
         )}
 
-        <div style={{ display: "flex", gap: "var(--spacing-108)" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 300px", gap: "var(--spacing-24)" }}>
           {/* Left Column: Input and Results */}
-          <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: "var(--spacing-60)" }}>
-            <ProblemInput onSubmit={handleSubmit} isLoading={isLoading} />
-            {result && <ResultPanel result={result} />}
+          <div style={{ display: "flex", flexDirection: "column", gap: "var(--spacing-24)" }}>
+            <div className="white-card">
+              <h2 className="serif-headline" style={{ fontSize: "32px", marginBottom: "var(--spacing-24)" }}>Initialize</h2>
+              <ProblemInput onSubmit={handleSubmit} isLoading={isLoading} />
+            </div>
+            
+            {result && (
+              <div className="white-card">
+                 <ResultPanel result={result} />
+              </div>
+            )}
           </div>
 
           {/* Right Column: Telemetry */}
-          <div style={{ width: "300px" }}>
+          <div className="white-card" style={{ alignSelf: "start" }}>
+            <h2 className="serif-headline" style={{ fontSize: "24px", marginBottom: "var(--spacing-20)" }}>Workflow</h2>
             <AgentPipeline 
               status={statusData?.status ?? "pending"} 
               currentAgent={statusData?.current_agent ?? null} 
@@ -119,6 +124,11 @@ export default function Home() {
           </div>
         </div>
       </section>
+      
+      {/* Absolute Black Footer */}
+      <footer style={{ backgroundColor: "var(--color-absolute-black)", color: "var(--color-ash-mist)", padding: "var(--spacing-80) var(--spacing-40)", textAlign: "center", fontFamily: "var(--font-pplxsansmono)", fontSize: "var(--text-caption)" }}>
+        <p>TERMINAL ANCHOR // SWARM OS V1.0.0</p>
+      </footer>
     </div>
   );
 }

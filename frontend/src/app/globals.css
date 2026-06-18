@@ -4,160 +4,122 @@
 
 @theme {
   /* Colors */
-  --color-black-void: #000000;
-  --color-paper-white: #ffffff;
-  --color-smoke: #4d4d4d;
-  --color-crimson-heat: #b62b1a;
+  --color-aged-sepia: #271a00;
+  --color-parchment: #faf8f5;
+  --color-fog: #d1cfc7;
+  --color-absolute-black: #000000;
+  --color-pure-white: #ffffff;
+  --color-moss-shadow: #7c7464;
+  --color-deep-forest: #23291b;
+  --color-teal-accent: #0f3639;
+  --color-ash-mist: #e5e5e3;
+  --color-slate-edge: #121516;
 
   /* Typography */
-  --font-saans: 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-pplxsans: 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-pplxsansmono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  --font-pplxserif: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
 
   /* Typography — Scale */
-  --text-caption: 12px;
-  --leading-caption: 1.3;
-  --tracking-caption: 0.6px;
-  --text-body-sm: 14px;
-  --leading-body-sm: 1.38;
-  --tracking-body-sm: 0.7px;
-  --text-body: 16px;
-  --leading-body: 1.43;
-  --tracking-body: 0.8px;
-  --text-subheading: 20px;
-  --leading-subheading: 1.3;
-  --tracking-subheading: 1px;
-  --text-heading-sm: 47px;
-  --leading-heading-sm: 1.15;
-  --tracking-heading-sm: -1.18px;
-  --text-heading: 79px;
-  --leading-heading: 1.14;
-  --tracking-heading: -1.98px;
-  --text-heading-lg: 106px;
-  --leading-heading-lg: 1.11;
-  --tracking-heading-lg: -2.65px;
-  --text-display: 130px;
-  --leading-display: 1.08;
-  --tracking-display: -3.25px;
-  --text-display-lg: 136px;
-  --leading-display-lg: 1.05;
-  --tracking-display-lg: -3.4px;
-  --text-display-xl: 245px;
-  --leading-display-xl: 1;
-  --tracking-display-xl: -6.13px;
+  --text-caption: 11px;
+  --leading-caption: 1.2;
+  --text-body-sm: 12px;
+  --leading-body-sm: 1.2;
+  --text-body: 15px;
+  --leading-body: 1.2;
+  --text-body-lg: 16px;
+  --leading-body-lg: 1.2;
+  --text-heading-sm: 32px;
+  --leading-heading-sm: 1.2;
+  --text-heading: 96px;
+  --leading-heading: 1.2;
 
   /* Spacing */
-  --spacing-10: 10px;
-  --spacing-11: 11px;
-  --spacing-15: 15px;
-  --spacing-19: 19px;
+  --spacing-4: 4px;
+  --spacing-8: 8px;
+  --spacing-12: 12px;
+  --spacing-16: 16px;
   --spacing-20: 20px;
-  --spacing-23: 23px;
-  --spacing-27: 27px;
-  --spacing-30: 30px;
-  --spacing-36: 36px;
-  --spacing-38: 38px;
-  --spacing-60: 60px;
-  --spacing-63: 63px;
-  --spacing-108: 108px;
-  --spacing-150: 150px;
-  --spacing-172: 172px;
+  --spacing-24: 24px;
+  --spacing-28: 28px;
+  --spacing-40: 40px;
+  --spacing-80: 80px;
+  --spacing-180: 180px;
 
   /* Border Radius */
-  --radius-lg: 8px;
-  --radius-full: 70px;
-  --radius-full-2: 594px;
+  --radius-md: 4px;
+  --radius-xl: 12px;
+  --radius-3xl: 40px;
 }
 
 @layer base {
   :root {
     /* Colors */
-    --color-black-void: #000000;
-    --color-paper-white: #ffffff;
-    --color-smoke: #4d4d4d;
-    --color-crimson-heat: #b62b1a;
+    --color-aged-sepia: #271a00;
+    --color-parchment: #faf8f5;
+    --color-fog: #d1cfc7;
+    --color-absolute-black: #000000;
+    --color-pure-white: #ffffff;
+    --color-moss-shadow: #7c7464;
+    --color-deep-forest: #23291b;
+    --color-teal-accent: #0f3639;
+    --color-ash-mist: #e5e5e3;
+    --color-slate-edge: #121516;
 
-    /* Typography — Font Families */
-    --font-saans: 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    /* Typography */
+    --font-pplxsans: 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --font-pplxsansmono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    --font-pplxserif: ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
 
     /* Typography — Scale */
-    --text-caption: 12px;
-    --leading-caption: 1.3;
-    --tracking-caption: 0.6px;
-    --text-body-sm: 14px;
-    --leading-body-sm: 1.38;
-    --tracking-body-sm: 0.7px;
-    --text-body: 16px;
-    --leading-body: 1.43;
-    --tracking-body: 0.8px;
-    --text-subheading: 20px;
-    --leading-subheading: 1.3;
-    --tracking-subheading: 1px;
-    --text-heading-sm: 47px;
-    --leading-heading-sm: 1.15;
-    --tracking-heading-sm: -1.18px;
-    --text-heading: 79px;
-    --leading-heading: 1.14;
-    --tracking-heading: -1.98px;
-    --text-heading-lg: 106px;
-    --leading-heading-lg: 1.11;
-    --tracking-heading-lg: -2.65px;
-    --text-display: 130px;
-    --leading-display: 1.08;
-    --tracking-display: -3.25px;
-    --text-display-lg: 136px;
-    --leading-display-lg: 1.05;
-    --tracking-display-lg: -3.4px;
-    --text-display-xl: 245px;
-    --leading-display-xl: 1;
-    --tracking-display-xl: -6.13px;
-
-    /* Typography — Weights */
-    --font-weight-light: 300;
-    --font-weight-w380: 400;
-    --font-weight-w570: 600;
-    --font-weight-w790: 800;
+    --text-caption: 11px;
+    --leading-caption: 1.2;
+    --text-body-sm: 12px;
+    --leading-body-sm: 1.2;
+    --text-body: 15px;
+    --leading-body: 1.2;
+    --text-body-lg: 16px;
+    --leading-body-lg: 1.2;
+    --text-heading-sm: 32px;
+    --leading-heading-sm: 1.2;
+    --text-heading: 96px;
+    --leading-heading: 1.2;
 
     /* Spacing */
-    --spacing-10: 10px;
-    --spacing-11: 11px;
-    --spacing-15: 15px;
-    --spacing-19: 19px;
+    --spacing-4: 4px;
+    --spacing-8: 8px;
+    --spacing-12: 12px;
+    --spacing-16: 16px;
     --spacing-20: 20px;
-    --spacing-23: 23px;
-    --spacing-27: 27px;
-    --spacing-30: 30px;
-    --spacing-36: 36px;
-    --spacing-38: 38px;
-    --spacing-60: 60px;
-    --spacing-63: 63px;
-    --spacing-108: 108px;
-    --spacing-150: 150px;
-    --spacing-172: 172px;
+    --spacing-24: 24px;
+    --spacing-28: 28px;
+    --spacing-40: 40px;
+    --spacing-80: 80px;
+    --spacing-180: 180px;
 
     /* Layout */
-    --section-gap: 60px;
-    --card-padding: 20px;
-    --element-gap: 20px;
-
-    /* Border Radius */
-    --radius-lg: 8px;
-    --radius-full: 70px;
-    --radius-full-2: 594px;
+    --section-gap: 28px;
+    --card-padding: 40px;
+    --element-gap: 8px;
 
     /* Named Radii */
-    --radius-bodies: 8px;
-    --radius-buttons: 70px;
-    --radius-circular: 594px;
+    --radius-cards: 12px;
+    --radius-other: 4px;
+    --radius-badges: 4px;
+    --radius-inputs: 4px;
+    --radius-buttons: 40px;
 
     /* Surfaces */
-    --surface-page-canvas: #000000;
-    --surface-hairline-rule: #ffffff;
-    --surface-photographic-surface: #b62b1a;
+    --surface-parchment-canvas: #faf8f5;
+    --surface-pure-white-card: #ffffff;
+    --surface-fog-divider: #d1cfc7;
+    --surface-deep-forest-overlay: #23291b;
   }
 
   body {
-    background-color: var(--surface-page-canvas);
-    color: var(--color-paper-white);
-    font-family: var(--font-saans);
+    background-color: var(--surface-parchment-canvas);
+    color: var(--color-aged-sepia);
+    font-family: var(--font-pplxsans);
     margin: 0;
     padding: 0;
     overflow-x: hidden;
@@ -170,113 +132,130 @@
   }
 }
 
-/* ── 21 TSI Components ──────────────────────────────────────────────────────── */
+/* ── Perplexity AI Components ────────────────────────────────────────────────── */
 
-.hairline-nav {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  border-top: 1px solid var(--surface-hairline-rule);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0 var(--spacing-38);
-  height: 80px;
-  z-index: 100;
-  background: transparent;
+.ghost-nav {
+  background-color: transparent;
+  color: var(--color-aged-sepia);
+  border: 1px solid transparent;
+  border-radius: var(--radius-buttons);
+  padding: 8px 16px;
+  font-family: var(--font-pplxsans);
+  font-size: var(--text-body);
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+  letter-spacing: -0.028em;
 }
 
-.ghost-pill {
-  border: 1px solid var(--color-paper-white);
+.ghost-nav:hover {
+  background-color: rgba(39, 26, 0, 0.05);
+}
+
+.pill-cta {
+  background-color: var(--color-fog);
+  color: #171615;
+  border: 1px solid #171615;
   border-radius: var(--radius-buttons);
-  background: transparent;
-  padding: var(--spacing-10) var(--spacing-20);
-  font-family: var(--font-saans);
-  font-size: var(--text-caption);
-  font-weight: var(--font-weight-w380);
-  text-transform: uppercase;
-  letter-spacing: var(--tracking-caption);
-  color: var(--color-paper-white);
+  padding: 12px 24px;
+  font-family: var(--font-pplxsans);
+  font-size: var(--text-body);
+  font-weight: 500;
   cursor: pointer;
+  letter-spacing: -0.028em;
   transition: opacity 0.2s ease;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
 }
 
-.ghost-pill:hover {
-  opacity: 0.6;
+.pill-cta:hover {
+  opacity: 0.8;
 }
 
-.ghost-pill.active::before {
-  content: "";
-  display: block;
-  width: 4px;
-  height: 4px;
-  background-color: var(--color-paper-white);
-  border-radius: 50%;
+.pill-cta:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
 }
 
-.nav-link {
-  font-family: var(--font-saans);
+.white-card {
+  background-color: var(--surface-pure-white-card);
+  border-radius: var(--radius-cards);
+  padding: var(--card-padding);
+  box-shadow: none;
+}
+
+.transparent-task-card {
+  background-color: transparent;
+  border-radius: var(--radius-other);
+  padding: 10px 12px;
+}
+
+.mono-badge {
+  font-family: var(--font-pplxsansmono);
   font-size: var(--text-caption);
-  font-weight: var(--font-weight-w380);
-  text-transform: uppercase;
-  letter-spacing: var(--tracking-caption);
-  color: var(--color-paper-white);
-  text-decoration: none;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  transition: opacity 0.2s ease;
+  font-weight: 500;
+  color: var(--color-aged-sepia);
+  background-color: rgba(39, 26, 0, 0.05);
+  border-radius: var(--radius-badges);
+  padding: 2px 6px;
 }
 
-.nav-link:hover {
-  opacity: 0.6;
+.serif-headline {
+  font-family: var(--font-pplxserif);
+  font-size: 48px;
+  font-weight: 400;
+  line-height: 1.12;
+  color: var(--color-aged-sepia);
 }
 
-.logo-wordmark {
-  font-family: var(--font-saans);
-  font-size: var(--text-caption);
-  font-weight: var(--font-weight-w380);
-  text-transform: uppercase;
-  letter-spacing: var(--tracking-caption);
-  color: var(--color-paper-white);
-  display: flex;
-  align-items: center;
-  gap: 6px;
+.sans-hero {
+  font-family: var(--font-pplxsans);
+  font-size: var(--text-heading);
+  font-weight: 300;
+  line-height: 1.0;
+  letter-spacing: -2.69px;
+  color: var(--color-aged-sepia);
 }
 
-.logo-wordmark .bar {
-  width: 1px;
-  height: 12px;
-  background-color: var(--color-paper-white);
+.body-stack {
+  font-family: var(--font-pplxsans);
+  font-size: var(--text-body);
+  font-weight: 400;
+  line-height: 1.5;
+  letter-spacing: -0.028em;
+  color: var(--color-aged-sepia);
 }
 
-.display-headline {
-  font-family: var(--font-saans);
-  font-size: var(--text-display);
-  font-weight: var(--font-weight-light);
-  line-height: var(--leading-display);
-  letter-spacing: var(--tracking-display);
-  color: var(--color-paper-white);
-}
-
-.editorial-hero {
+.botanical-hero {
   width: 100vw;
-  height: 100vh;
-  background-image: url('/images/hero.png');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
   position: relative;
   overflow: hidden;
 }
 
-.body-card {
-  border-radius: var(--radius-bodies);
-  border: 1px solid var(--color-smoke);
-  background: transparent;
-  padding: var(--card-padding);
+.botanical-hero::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: url('/images/botanical.png');
+  background-size: cover;
+  background-position: center;
+  filter: blur(20px);
+  transform: scale(1.1);
+  z-index: -1;
+}
+
+.botanical-hero::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 200px;
+  background: linear-gradient(to top, var(--surface-parchment-canvas) 0%, transparent 100%);
+  z-index: -1;
 }

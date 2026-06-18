@@ -10,10 +10,10 @@ interface Props {
 }
 
 const AGENTS = [
-  { name: "Planner", label: "COGNITIVE PLANNER", activeStatus: "planning" },
-  { name: "Coder", label: "NEURAL SYNTHESIZER", activeStatus: "coding" },
-  { name: "Tester", label: "VALIDATION MATRIX", activeStatus: "testing" },
-  { name: "Reviewer", label: "SECURITY AUDITOR", activeStatus: "reviewing" },
+  { name: "Planner", label: "Cognitive Planner", activeStatus: "planning", id: "01" },
+  { name: "Coder", label: "Neural Synthesizer", activeStatus: "coding", id: "02" },
+  { name: "Tester", label: "Validation Matrix", activeStatus: "testing", id: "03" },
+  { name: "Reviewer", label: "Security Auditor", activeStatus: "reviewing", id: "04" },
 ] as const;
 
 export default function AgentPipeline({ status, currentAgent, completedSteps, isIdle }: Props) {
@@ -25,34 +25,47 @@ export default function AgentPipeline({ status, currentAgent, completedSteps, is
   };
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: 15 }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: "var(--spacing-8)" }}>
       {AGENTS.map(agent => {
         const state = isIdle ? "idle" : getState(agent);
         const isActive = state === "active";
         const isDone = state === "done";
         
-        let color = "var(--color-smoke)";
-        if (isActive) color = "var(--color-paper-white)";
-        if (isDone) color = "var(--color-paper-white)";
-
         return (
-          <div key={agent.name} style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <span style={{
-              display: "inline-block",
-              width: 4, height: 4,
-              borderRadius: "50%",
-              backgroundColor: isActive ? "var(--color-paper-white)" : "transparent",
-              border: isActive ? "none" : `1px solid ${color}`
-            }} />
-            <span style={{
-              fontFamily: "var(--font-saans)",
-              fontSize: "var(--text-caption)",
-              letterSpacing: "var(--tracking-caption)",
-              color: color,
-              opacity: isActive ? 1 : isDone ? 0.7 : 0.4
+          <div key={agent.name} className="transparent-task-card" style={{ 
+            display: "flex", 
+            alignItems: "flex-start", 
+            gap: 12,
+            opacity: isActive ? 1 : isDone ? 0.7 : 0.4,
+            transition: "opacity 0.2s ease"
+          }}>
+            <div style={{ 
+              fontFamily: "var(--font-pplxsansmono)", 
+              fontSize: "10px", 
+              fontWeight: 600, 
+              color: isActive ? "var(--color-teal-accent)" : "var(--color-moss-shadow)",
+              marginTop: 4 
             }}>
-              {agent.label}
-            </span>
+              {agent.id}
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+              <span style={{
+                fontFamily: "var(--font-pplxsans)",
+                fontSize: "var(--text-body)",
+                fontWeight: 500,
+                color: "var(--color-aged-sepia)",
+                letterSpacing: "-0.028em"
+              }}>
+                {agent.label}
+              </span>
+              <span style={{
+                fontFamily: "var(--font-pplxsans)",
+                fontSize: "var(--text-body-sm)",
+                color: "var(--color-moss-shadow)",
+              }}>
+                {isActive ? "Processing..." : isDone ? "Complete" : "Queued"}
+              </span>
+            </div>
           </div>
         );
       })}
