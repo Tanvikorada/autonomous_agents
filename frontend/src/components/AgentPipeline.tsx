@@ -63,18 +63,18 @@ export default function AgentPipeline({ status, currentAgent, completedSteps }: 
               
               {/* Node */}
               <motion.div 
-                className="relative flex flex-col items-center gap-[12px] z-10"
+                className="relative flex flex-col items-center gap-[16px] z-10"
                 animate={{
-                  scale: isActive ? 1.1 : 1,
+                  scale: isActive ? 1.05 : 1,
                 }}
                 transition={{ duration: 0.3 }}
               >
-                {/* Hexagon/Square Shape container */}
+                {/* Square Shape container */}
                 <div 
-                  className={`w-14 h-14 rounded-[12px] flex items-center justify-center transition-all duration-500 font-jetbrains-mono
-                    ${isActive ? "bg-[var(--color-deep-slate)] border-2 border-[var(--color-portal-blue)] text-[var(--color-portal-blue)] shadow-[var(--shadow-sm)]" 
-                    : isDone ? "bg-[var(--color-abyssal-blue)] border border-[var(--color-fog)]/20 text-[var(--color-specimen-green)]" 
-                    : "bg-[var(--color-cosmic-void)] border border-[var(--color-ash)] text-[var(--color-ash)]"}`}
+                  className={`w-[64px] h-[64px] rounded-[16px] flex items-center justify-center transition-all duration-500
+                    ${isActive ? "bg-[var(--color-mint-pulse)] text-[var(--color-ink-black)]" 
+                    : isDone ? "bg-[var(--color-ink-black)] text-[var(--color-pure-white)]" 
+                    : "bg-[var(--color-surface-mist)] text-[var(--color-steel-gray)]"}`}
                 >
                   {isDone ? (
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
@@ -84,9 +84,9 @@ export default function AgentPipeline({ status, currentAgent, completedSteps }: 
                 </div>
 
                 {/* Label */}
-                <div className="absolute top-[64px] whitespace-nowrap text-center">
-                  <span className={`text-[14px] font-normal tracking-wide transition-colors font-jetbrains-mono
-                    ${isActive ? "text-[var(--color-mist)]" : isDone ? "text-[var(--color-mist)]/70" : "text-[var(--color-ash)]"}`}>
+                <div className="absolute top-[80px] whitespace-nowrap text-center">
+                  <span className={`text-[12px] font-suisseintlmono uppercase tracking-wide transition-colors
+                    ${isActive ? "text-[var(--color-ink-black)] font-bold" : isDone ? "text-[var(--color-ink-black)]" : "text-[var(--color-steel-gray)]"}`}>
                     {agent.label}
                   </span>
                 </div>
@@ -94,10 +94,10 @@ export default function AgentPipeline({ status, currentAgent, completedSteps }: 
 
               {/* Connecting Line (except for last item) */}
               {index !== AGENTS.length - 1 && (
-                <div className="flex-1 mx-[16px] h-[2px] bg-[var(--color-ash)] relative overflow-hidden">
+                <div className="flex-1 mx-[16px] h-[2px] bg-[var(--color-surface-mist)] relative overflow-hidden">
                   {(isDone || isActive) && (
                     <motion.div
-                      className={`absolute top-0 bottom-0 left-0 w-full ${isDone ? "bg-[var(--color-specimen-green)]" : "bg-gradient-to-r from-transparent via-[var(--color-portal-blue)] to-transparent"}`}
+                      className={`absolute top-0 bottom-0 left-0 w-full ${isDone ? "bg-[var(--color-ink-black)]" : "bg-[var(--color-mint-pulse)]"}`}
                       initial={isActive ? { x: "-100%" } : { x: 0 }}
                       animate={isActive ? { x: "100%" } : { x: 0 }}
                       transition={isActive ? { duration: 1.5, repeat: Infinity, ease: "linear" } : {}}

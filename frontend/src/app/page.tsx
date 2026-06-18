@@ -55,81 +55,95 @@ export default function Home() {
   const isLoading = !!jobId;
 
   return (
-    <div className="min-h-screen flex flex-col font-jetbrains-mono relative">
-      {/* Top Bar */}
-      <header className="sticky top-0 z-50 w-full bg-[var(--color-steel-navy)] border-b border-[var(--border-dim)]">
-        <div className="w-full flex h-[64px] items-center px-[24px] gap-[24px]">
-          <div className="flex items-center gap-[8px] font-normal tracking-wide text-[var(--color-ghost-white)] text-[16px] min-w-[200px]">
-            <span className="text-[var(--color-warning-amber)]">ℹ</span>
-            <span>SWARM_OS</span>
+    <div className="min-h-screen flex flex-col font-suisseintl relative bg-[var(--color-canvas-mist)] text-[var(--color-ink-black)]">
+      
+      {/* Navigation Pill */}
+      <div className="w-full max-w-[1280px] mx-auto px-[24px] pt-[24px] z-50 sticky top-0">
+        <header className="w-full bg-[var(--color-pure-white)] rounded-[48px] h-[64px] flex items-center px-[24px] justify-between shadow-sm">
+          <div className="flex items-center gap-[8px] font-medium tracking-tight text-[16px]">
+            <span className="text-[var(--color-electric-yellow)]">✦</span>
+            <span>dayos</span>
           </div>
           
-          <form onSubmit={handleSubmit} className="flex-1 flex justify-center max-w-[800px] mx-auto relative">
+          <form onSubmit={handleSubmit} className="flex-1 flex justify-center max-w-[600px] mx-auto relative px-[24px]">
             <input
               type="text"
               value={problem}
               onChange={e => setProblem(e.target.value)}
               disabled={isLoading}
-              placeholder="Enter problem statement... (e.g. Build an autonomous trading bot in Python)"
-              className="w-full cc-input rounded-[8px] py-[8px] px-[16px] pr-24 text-[16px] transition-all"
+              placeholder="Enter problem statement... (e.g. Build an autonomous trading bot)"
+              className="w-full cc-input rounded-[20px] py-[10px] px-[20px] pr-[100px] text-[14px] transition-all"
             />
             <button
               type="submit"
               disabled={isLoading || problem.trim().length < 5}
-              className="absolute right-1 top-1 bottom-1 px-[20px] rounded-full text-[14px] font-normal cc-btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
+              className="absolute right-[30px] top-[4px] bottom-[4px] cc-btn-primary disabled:opacity-50 disabled:cursor-not-allowed text-[14px]"
             >
               {isLoading ? "Running" : "Run"}
             </button>
           </form>
 
-          <div className="min-w-[200px] flex justify-end">
+          <div className="min-w-[120px] flex justify-end">
             {isLoading && (
-              <div className="flex items-center gap-2 text-[14px] text-[var(--color-specimen-green)]">
-                <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[var(--color-specimen-green)] opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-[var(--color-specimen-green)]"></span>
+              <div className="flex items-center gap-[8px] text-[12px] font-suisseintlmono text-[var(--color-ink-black)]">
+                <span className="relative flex h-[8px] w-[8px]">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[var(--color-mint-pulse)] opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-[8px] w-[8px] bg-[var(--color-mint-pulse)]"></span>
                 </span>
-                PIPELINE ACTIVE
+                ACTIVE
               </div>
             )}
           </div>
-        </div>
-      </header>
+        </header>
+      </div>
 
-      <main className="flex-1 flex flex-col w-full px-[24px] py-[24px] pb-[64px] gap-[24px] max-w-[1600px] mx-auto">
+      <main className="flex-1 flex flex-col w-full px-[24px] py-[80px] gap-[80px] max-w-[1280px] mx-auto">
         
-        {/* Horizontal Agent Pipeline Hero */}
-        <section className="w-full cc-panel p-[32px] flex flex-col items-center justify-center min-h-[160px]">
-          {(!isLoading && !result && !error) ? (
-            <div className="text-center space-y-[8px] opacity-50">
-              <span className="text-[var(--color-warning-amber)] text-[24px]">⚙</span>
-              <p className="text-[16px] text-[var(--color-mist)]">Awaiting problem statement...</p>
-            </div>
-          ) : (
-            <AgentPipeline 
-              status={statusData?.status ?? "pending"} 
-              currentAgent={statusData?.current_agent ?? null} 
-              completedSteps={statusData?.completed_steps ?? []} 
-            />
-          )}
+        {/* Hero Section */}
+        <section className="flex flex-col md:flex-row gap-[40px] items-start w-full">
+          <div className="flex-1 max-w-[600px] flex flex-col gap-[24px]">
+            <h1 className="font-suisseintlcond font-bold text-[80px] leading-[0.9] tracking-[-2.4px] text-[var(--color-ink-black)]">
+              AUTONOMOUS <span className="text-[var(--color-electric-yellow)]">AGENT</span> PIPELINE
+            </h1>
+            <p className="font-suisseintl font-normal text-[18px] leading-[1.25] tracking-[-0.22px] text-[var(--color-ink-black)] max-w-[480px]">
+              Dayos OS operates a secure, high-density pipeline of Planners, Coders, Testers, and Reviewers to architect and ship production-ready software.
+            </p>
+          </div>
+          
+          <div className="flex-1 w-full cc-panel p-[40px] flex flex-col items-center justify-center min-h-[300px]">
+            {(!isLoading && !result && !error) ? (
+              <div className="text-center space-y-[16px] opacity-60">
+                <p className="font-suisseintlmono text-[12px] uppercase tracking-wide">Awaiting input</p>
+                <div className="w-[64px] h-[64px] rounded-[16px] bg-[var(--color-surface-mist)] mx-auto flex items-center justify-center">
+                  <span className="text-[24px]">✦</span>
+                </div>
+              </div>
+            ) : (
+              <AgentPipeline 
+                status={statusData?.status ?? "pending"} 
+                currentAgent={statusData?.current_agent ?? null} 
+                completedSteps={statusData?.completed_steps ?? []} 
+              />
+            )}
+          </div>
         </section>
 
         {error && (
-          <div className="cc-panel p-[16px] border-[var(--color-fault-red)] bg-[var(--color-fault-red)]/10 text-[var(--color-fault-red)] text-[14px]">
-            [SYS_ERR] {error}
+          <div className="cc-panel !bg-[var(--color-pure-white)] p-[24px] border-l-4 border-[var(--color-ink-black)] text-[var(--color-ink-black)] text-[14px]">
+            <span className="font-suisseintlmono font-bold mr-2">SYS_ERR:</span> {error}
           </div>
         )}
 
         {/* Split View: Results & Terminal */}
         {(isLoading || result) && (
-          <section className="flex flex-col lg:flex-row gap-[24px] flex-1 min-h-[500px]">
+          <section className="flex flex-col lg:flex-row gap-[24px] flex-1 min-h-[600px]">
             {/* Results Tabbed Panel */}
             <div className="flex-[2] flex flex-col min-w-0">
               <ResultPanel result={result} isLoading={isLoading} currentAgent={statusData?.current_agent} />
             </div>
 
             {/* Terminal Log Panel */}
-            <div className="flex-1 min-w-[300px] flex flex-col">
+            <div className="flex-1 min-w-[350px] flex flex-col">
               <TerminalLog statusData={statusData} />
             </div>
           </section>

@@ -10,33 +10,41 @@ interface LogEntry {
   timestamp: string;
   agent: string;
   message: string;
-  type: "info" | "warn" | "success";
+  type: "info" | "warn" | "success" | "system" | "agent_start" | "agent_complete";
 }
 
 export default function TerminalLog({ statusData }: Props) {
   const [logs, setLogs] = useState<LogEntry[]>([]);
-  const scrollRef = useRef<HTMLDivElement>(null);
-  
-  // Simulated log generation based on state changes
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // Auto-scroll to bottom
+  useEffect(() => {
+    if (containerRef.current) {
+      containerRef.current.scrollTop = containerRef.current.scrollHeight;
+    }
+  }, [logs]);
+
   useEffect(() => {
     if (!statusData) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setLogs([]);
+      setLogs([
+        { id: 1, type: "system", message: "System initializing...", timestamp: new Date().toISOString(), agent: "SYSTEM" },
+        { id: 2, type: "system", message: "Awaiting problem statement in the console.", timestamp: new Date().toISOString(), agent: "SYSTEM" }
+      ]);
       return;
     }
 
-    const now = new Date().toISOString().split("T")[1].slice(0, -1); // HH:MM:SS.mmm
+    const now = new Date().toISOString();
     
     setLogs(prev => {
       const newLogs = [...prev];
       
       // If we just started
-      if (prev.length === 0 && statusData.status !== "pending") {
-        newLogs.push({ id: Date.now(), timestamp: now, agent: "SYSTEM", message: "Swarm matrix initialized.", type: "info" });
+      if (prev.length <= 2 && statusData.status !== "pending") {
+        newLogs.push({ id: Date.now(), timestamp: now, agent: "SYSTEM", message: "Swarm matrix initialized.", type: "system" });
       }
 
       // Check for newly completed steps
-      const lastCompletedCount = prev.filter(l => l.message.includes("completed")).length;
+      const lastCompletedCount = prev.filter(l => l.type === "agent_complete").length;
       if (statusData.completed_steps.length > lastCompletedCount) {
         const newlyCompleted = statusData.completed_steps[statusData.completed_steps.length - 1];
         newLogs.push({ 
@@ -44,21 +52,20 @@ export default function TerminalLog({ statusData }: Props) {
           timestamp: now, 
           agent: newlyCompleted, 
           message: `Process completed successfully.`, 
-          type: "success" 
+          type: "agent_complete" 
         });
       }
 
       // Check current active agent
       if (statusData.current_agent) {
-        // Only log if the last log wasn't this agent starting
         const lastLog = prev[prev.length - 1];
-        if (!lastLog || lastLog.agent !== statusData.current_agent || lastLog.message.includes("completed")) {
+        if (!lastLog || lastLog.agent !== statusData.current_agent || lastLog.type === "agent_complete") {
           newLogs.push({ 
             id: Date.now() + 2, 
             timestamp: now, 
             agent: statusData.current_agent, 
             message: `Allocating compute resources and beginning synthesis...`, 
-            type: "info" 
+            type: "agent_start" 
           });
         }
       }
@@ -74,45 +81,61 @@ export default function TerminalLog({ statusData }: Props) {
 
   }, [statusData]);
 
-  // Auto-scroll
-  useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-    }
-  }, [logs]);
-
   return (
-    <div className="cc-panel flex flex-col h-full overflow-hidden bg-[var(--color-steel-navy)]">
-      <div className="flex items-center p-[12px] border-b border-[var(--border-dim)] bg-[var(--color-abyssal-blue)] gap-[8px]">
-        <span className="text-[var(--color-warning-amber)]">ℹ</span>
-        <span className="text-[12px] font-jetbrains-mono text-[var(--color-mist)] tracking-widest uppercase">System Telemetry</span>
+    <div className="cc-panel flex flex-col h-full overflow-hidden bg-[var(--color-pure-white)]">
+      {/* Terminal Header */}
+      <div className="flex items-center justify-between p-[24px] pb-[16px] border-b border-[var(--color-surface-mist)]">
+        <div className="flex items-center gap-[8px]">
+          <span className="text-[12px] font-suisseintlmono font-bold tracking-widest uppercase text-[var(--color-ink-black)]">
+            Telemetry
+          </span>
+        </div>
+        <div className="flex items-center gap-[6px]">
+          {statusData?.status === "running" ? (
+            <span className="w-[8px] h-[8px] bg-[var(--color-mint-pulse)] rounded-full animate-pulse" />
+          ) : (
+            <span className="w-[8px] h-[8px] bg-[var(--color-surface-mist)] rounded-full" />
+          )}
+        </div>
       </div>
-      
+
+      {/* Terminal Output */}
       <div 
-        ref={scrollRef}
-        className="flex-1 overflow-auto bg-[var(--color-cosmic-void)] p-[16px] font-jetbrains-mono text-[12px] leading-relaxed space-y-[8px]"
+        ref={containerRef}
+        className="flex-1 overflow-y-auto p-[24px] font-suisseintlmono text-[12px] leading-[1.6] tracking-[-0.36px] space-y-[12px]"
       >
-        {logs.length === 0 ? (
-          <div className="text-[var(--color-ash)] italic">Waiting for telemetry...</div>
-        ) : (
-          logs.map((log) => (
-            <div key={log.id} className="flex gap-[12px]">
-              <span className="text-[var(--color-ash)] shrink-0">[{log.timestamp}]</span>
-              <span className={`shrink-0 font-normal uppercase w-16
-                ${log.agent === "SYSTEM" ? "text-[var(--color-ash)]" : 
-                  log.agent === "Planner" ? "text-[var(--color-portal-blue)]" : 
-                  log.agent === "Coder" ? "text-[var(--color-ice-blue)]" : 
-                  log.agent === "Tester" ? "text-[var(--color-terminal-amber)]" : "text-[var(--color-specimen-green)]"}`}
-              >
-                {log.agent}
-              </span>
-              <span className={`break-words
-                ${log.type === "success" ? "text-[var(--color-specimen-green)]" : log.type === "warn" ? "text-[var(--color-fault-red)]" : "text-[var(--color-mist)]"}`}
-              >
+        {logs.map((log) => (
+          <div key={log.id} className="flex gap-[16px] group">
+            {/* Timestamp */}
+            <div className="text-[var(--color-steel-gray)] shrink-0 select-none">
+              {new Date(log.timestamp).toLocaleTimeString([], { hour12: false, hour: '2-digit', minute:'2-digit', second:'2-digit' })}
+            </div>
+            
+            {/* Message Body */}
+            <div className="flex-1 text-[var(--color-ink-black)] break-words">
+              {log.type === "agent_start" && (
+                <span className="bg-[var(--color-electric-yellow)] text-[var(--color-ink-black)] px-[4px] font-bold mr-2 uppercase">
+                  {log.agent}
+                </span>
+              )}
+              {log.type === "agent_complete" && (
+                <span className="bg-[var(--color-mint-pulse)] text-[var(--color-ink-black)] px-[4px] font-bold mr-2 uppercase">
+                  OK
+                </span>
+              )}
+              <span className={(log.type === "system" || log.type === "info") ? "text-[var(--color-steel-gray)]" : ""}>
                 {log.message}
               </span>
             </div>
-          ))
+          </div>
+        ))}
+        
+        {/* Blinking Cursor */}
+        {statusData?.status === "running" && (
+          <div className="flex gap-[16px]">
+            <div className="text-[var(--color-surface-mist)] shrink-0">--:--:--</div>
+            <div className="cursor-blink"></div>
+          </div>
         )}
       </div>
     </div>

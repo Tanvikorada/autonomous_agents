@@ -1,19 +1,25 @@
 import type { Metadata } from "next";
-import { JetBrains_Mono, DM_Sans } from "next/font/google";
+import { Inter, Barlow_Condensed, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 
-const jetbrainsMono = JetBrains_Mono({
-  variable: "--font-jetbrains-mono",
+const inter = Inter({
+  variable: "--font-suisseintl",
   subsets: ["latin"],
 });
 
-const dmSans = DM_Sans({
-  variable: "--font-dm-sans",
+const barlowCondensed = Barlow_Condensed({
+  variable: "--font-suisseintlcond",
+  weight: ["700"],
+  subsets: ["latin"],
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  variable: "--font-suisseintlmono",
   subsets: ["latin"],
 });
 
 export const metadata: Metadata = {
-  title: "Swarm OS",
+  title: "Dayos OS",
   description: "Autonomous Multi-Agent Software Engineering System",
 };
 
@@ -24,7 +30,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${jetbrainsMono.variable} ${dmSans.variable} antialiased`}>
+      <body className={`${inter.variable} ${barlowCondensed.variable} ${jetbrainsMono.variable} antialiased`}>
         {children}
       </body>
     </html>

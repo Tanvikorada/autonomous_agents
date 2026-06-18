@@ -2,50 +2,53 @@
 
 @theme {
   /* Colors */
-  --color-cosmic-void: #06051d;
-  --color-abyssal-blue: #0f1c36;
-  --color-steel-navy: #1d293d;
-  --color-deep-slate: #314062;
-  --color-mist: #cad5e2;
-  --color-fog: #e5e7eb;
-  --color-ash: #2e3038;
-  --color-ghost-white: #ffffff;
-  --color-ice-blue: #ebf8ff;
-  --color-portal-blue: #63b3ed;
-  --color-bioluminescent-green: #004f3b;
-  --color-terminal-amber: #733e0a;
-  --color-crimson-depth: #8b0836;
-  --color-specimen-green: #00bc7d;
-  --color-warning-amber: #f0b100;
-  --color-fault-red: #ff2056;
+  --color-canvas-mist: #e5e7eb;
+  --color-pure-white: #ffffff;
+  --color-surface-mist: #f3f3f3;
+  --color-ink-black: #000000;
+  --color-steel-gray: #979797;
+  --color-graphite: #444444;
+  --color-mint-pulse: #d1ffca;
+  --color-electric-yellow: #fff100;
 
   /* Typography */
-  --font-jetbrains-mono: var(--font-jetbrains-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  --font-dm-sans: var(--font-dm-sans), ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-suisseintl: var(--font-suisseintl), ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-suisseintlcond: var(--font-suisseintlcond), ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-suisseintlmono: var(--font-suisseintlmono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+  /* Spacing */
+  --spacing-8: 8px;
+  --spacing-16: 16px;
+  --spacing-24: 24px;
+  --spacing-40: 40px;
+  --spacing-64: 64px;
+  --spacing-80: 80px;
+  --spacing-96: 96px;
 
   /* Border Radius */
+  --radius-md: 4px;
   --radius-lg: 8px;
-  --radius-full: 9999px;
-
-  /* Shadows */
-  --shadow-sm: rgba(0, 0, 0, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.1) 0px 2px 4px -2px;
+  --radius-xl: 12px;
+  --radius-2xl: 20px;
+  --radius-3xl: 24px;
+  --radius-3xl-2: 32px;
+  --radius-full: 48px;
+  --radius-full-2: 64px;
 }
 
 :root {
-  --surface-deep-navy-gradient: #061434;
-  --border-dim: rgba(229, 231, 235, 0.1); /* Fog at 10% */
+  --border-dim: var(--color-canvas-mist);
 }
 
 body {
-  background: linear-gradient(0deg, var(--color-cosmic-void) 30%, var(--surface-deep-navy-gradient));
-  background-attachment: fixed;
-  color: var(--color-mist);
-  font-family: var(--font-jetbrains-mono);
+  background-color: var(--color-canvas-mist);
+  color: var(--color-ink-black);
+  font-family: var(--font-suisseintl);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Base custom scrollbar for terminal panels */
+/* Base custom scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
@@ -54,11 +57,11 @@ body {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--color-ash);
+  background: var(--color-canvas-mist);
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--color-deep-slate);
+  background: var(--color-steel-gray);
 }
 
 @layer utilities {
@@ -68,28 +71,28 @@ body {
 }
 
 @layer components {
-  /* Restyled Midjourney Panels */
+  /* Dayos Oversized Cards */
   .cc-panel {
-    @apply bg-[var(--color-steel-navy)] border border-[var(--border-dim)] rounded-lg shadow-sm overflow-hidden;
+    @apply bg-[var(--color-pure-white)] rounded-[32px] overflow-hidden;
   }
 
-  /* Restyled inputs */
+  /* Dayos Inputs */
   .cc-input {
-    @apply bg-[var(--color-abyssal-blue)] border border-[var(--border-dim)] text-[var(--color-mist)] font-jetbrains-mono focus:outline-none focus:border-[var(--color-portal-blue)] placeholder-[var(--color-ash)];
+    @apply bg-[var(--color-surface-mist)] border-none text-[var(--color-ink-black)] font-suisseintl focus:outline-none focus:ring-2 focus:ring-[var(--color-electric-yellow)] placeholder-[var(--color-steel-gray)];
   }
 
-  /* Restyled primary buttons (Terminal Amber) */
+  /* Dayos Solid Buttons */
   .cc-btn-primary {
-    @apply bg-[var(--color-terminal-amber)]/20 text-[var(--color-terminal-amber)] border border-[var(--color-ghost-white)]/10 shadow-sm transition-colors hover:bg-[var(--color-terminal-amber)]/30 font-jetbrains-mono;
+    @apply bg-[var(--color-ink-black)] text-[var(--color-pure-white)] transition-colors hover:bg-[var(--color-graphite)] font-suisseintl font-medium rounded-[8px] px-[20px] py-[10px];
   }
 }
 
-/* Blinking cursor for terminal */
+/* Blinking cursor */
 .cursor-blink {
   display: inline-block;
   width: 8px;
   height: 14px;
-  background-color: var(--color-mist);
+  background-color: var(--color-ink-black);
   animation: blink 1s step-end infinite;
 }
 
