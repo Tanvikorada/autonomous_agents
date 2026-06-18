@@ -284,33 +284,28 @@ export default function Home() {
       )}
 
       {/* ── Navbar ── */}
-      <nav style={{
-        position: "sticky", top: 0, width: "100%", zIndex: 50,
-        display: "flex", justifyContent: "space-between", alignItems: "center",
-        padding: "16px 40px", background: "rgba(19,19,19,0.6)", backdropFilter: "blur(48px)",
-        borderBottom: "1px solid rgba(255,255,255,0.08)", boxShadow: "0 0 20px rgba(71,214,255,0.08)",
-      }}>
+      <nav className="sticky top-0 w-full z-50 flex flex-wrap justify-between items-center px-4 md:px-10 py-4 border-b border-white/10 shadow-[0_0_20px_rgba(71,214,255,0.08)] bg-[#131313]/60 backdrop-blur-xl gap-4">
         <div className="glitch-hover" data-text="AUTONOMOUS_" style={{
           fontFamily: "'Geist', monospace", color: "#b6ebff", fontSize: 16, fontWeight: 600, letterSpacing: "-0.04em",
         }}>
           AUTONOMOUS<span style={{ color: "#00d2ff" }}>_</span>
         </div>
 
-        <div style={{ display: "flex", alignItems: "center", gap: 32 }}>
+        <div className="flex items-center gap-4 md:gap-8 overflow-x-auto w-full md:w-auto order-3 md:order-2 pb-2 md:pb-0 hide-scrollbar">
           {(["Workspace", "Agents", "Logs"] as ViewState[]).map(view => (
             <button key={view} onClick={(e) => { triggerRipple(e); setActiveView(view); }} style={{
               background: "transparent", border: "none",
               fontFamily: "'Outfit', sans-serif", fontSize: 16,
               color: activeView === view ? "#b6ebff" : "#bbc9cf",
               borderBottom: activeView === view ? "2px solid #b6ebff" : "2px solid transparent",
-              paddingBottom: 4, transition: "color 0.2s",
+              paddingBottom: 4, transition: "color 0.2s", whiteSpace: "nowrap"
             }}>
               {view}
             </button>
           ))}
         </div>
 
-        <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+        <div className="flex items-center gap-4 order-2 md:order-3">
           <button className="interactive-node" onClick={(e) => { triggerRipple(e); setShowTree(true); }} style={{ background: "none", border: "none", color: "#bbc9cf", padding: 4, lineHeight: 1 }}>
             <span className="material-symbols-outlined" style={{ fontSize: 22 }}>account_tree</span>
           </button>
@@ -325,8 +320,9 @@ export default function Home() {
         </div>
       </nav>
 
+
       {/* ── Main Grid ── */}
-      <main className="view-enter" key={activeView} style={{ maxWidth: 1400, margin: "0 auto", padding: "48px 40px", display: "grid", gridTemplateColumns: "repeat(12, 1fr)", gap: 24, position: "relative" }}>
+      <main className="view-enter max-w-[1400px] mx-auto px-4 md:px-10 py-8 md:py-12 grid grid-cols-1 lg:grid-cols-12 gap-6 relative" key={activeView}>
         
         {/* Workspace View */}
         {activeView === "Workspace" && (
@@ -339,7 +335,7 @@ export default function Home() {
               <p style={{ maxWidth: 640, margin: "16px auto 0", fontSize: 16, lineHeight: 1.7, color: "#bbc9cf", opacity: 0.85 }}>Deploy a swarm of specialized autonomous agents to architect, synthesize, and audit your applications. Experience the next evolution of multi-agent software engineering.</p>
             </section>
 
-            <aside className="stagger-2" style={{ gridColumn: "span 1", display: "flex", flexDirection: "column", gap: 12, position: "sticky", top: 96, alignSelf: "start" }}>
+            <aside className="stagger-2 col-span-1 hidden lg:flex flex-col gap-3 sticky top-32 self-start">
               {[
                 { icon: "analytics",     action: "Analytics module" },
                 { icon: "memory",        action: "Memory cache" },
@@ -354,7 +350,7 @@ export default function Home() {
               ))}
             </aside>
 
-            <div className="stagger-3" style={{ gridColumn: "span 8", display: "flex", flexDirection: "column", gap: 24 }}>
+            <div className="stagger-3 col-span-1 lg:col-span-8 flex flex-col gap-6">
               <ProblemInput onSubmit={handleSubmit} isLoading={isLoading} />
               {error && (
                 <div className="glass-panel" style={{ borderRadius: 12, padding: 24, borderLeft: "4px solid #ffb4ab" }}>
@@ -385,7 +381,7 @@ export default function Home() {
               )}
             </div>
 
-            <div className="stagger-5" style={{ gridColumn: "span 3", display: "flex", flexDirection: "column", gap: 24, position: "sticky", top: 96, alignSelf: "start" }}>
+            <div className="stagger-5 col-span-1 lg:col-span-3 flex flex-col gap-6 lg:sticky top-32 self-start">
               <AgentPipeline status={statusData?.status ?? "pending"} currentAgent={statusData?.current_agent ?? null} completedSteps={statusData?.completed_steps ?? []} isIdle={isIdle} />
               <div className="glass-panel" style={{ borderRadius: 12, padding: 16, display: "flex", flexDirection: "column", gap: 12 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 10 }}><div style={{ width: 8, height: 8, borderRadius: "50%", background: "#00d2ff", boxShadow: "0 0 8px #00d2ff", flexShrink: 0 }} /><span style={{ fontFamily: "'Geist', monospace", fontSize: 13, color: "#bbc9cf" }}>CPU: {isLoading ? "78%" : "12%"}</span></div>
