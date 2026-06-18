@@ -2,6 +2,7 @@
 
 import { JobStatus } from "@/lib/api";
 import { motion } from "framer-motion";
+import Tilt from "react-parallax-tilt";
 
 interface Props {
   status: JobStatus | "pending";
@@ -33,59 +34,75 @@ export default function AgentPipeline({ status, currentAgent, completedSteps, is
         const isDone = state === "done";
 
         return (
-          <motion.div 
-            key={agent.name} 
-            className="flex gap-4 relative"
-            animate={{ opacity: isActive || isDone ? 1 : 0.4 }}
-            transition={{ duration: 0.5 }}
+          <Tilt
+            key={agent.name}
+            tiltMaxAngleX={10}
+            tiltMaxAngleY={10}
+            glareEnable={true}
+            glareMaxOpacity={0.1}
+            glareColor="#ffffff"
+            glarePosition="all"
+            transitionSpeed={2500}
+            tiltReverse={true}
+            className="relative"
           >
-            {/* Connecting Line */}
-            {index !== AGENTS.length - 1 && (
-              <div 
-                className="absolute left-[11px] top-[30px] w-[2px] h-[calc(100%+8px)]"
-                style={{
-                  background: isDone 
-                    ? "linear-gradient(to bottom, hsl(262, 83%, 58%), hsl(280, 80%, 50%))" 
-                    : "rgba(255, 255, 255, 0.1)"
-                }}
-              />
-            )}
-            
-            {/* Glowing Orb Indicator */}
-            <div className="z-10 flex items-center justify-center mt-1">
-              <div 
-                className={`w-6 h-6 rounded-full flex items-center justify-center transition-all duration-500
-                  ${isActive ? "bg-purple-500 shadow-[0_0_15px_rgba(168,85,247,0.6)]" 
-                  : isDone ? "bg-gradient-to-br from-purple-500 to-indigo-600 shadow-[0_0_10px_rgba(168,85,247,0.3)]" 
-                  : "bg-white/5 border border-white/10"}`}
-              >
-                {isDone ? (
-                  <svg className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                  </svg>
-                ) : isActive ? (
-                  <div className="w-2 h-2 rounded-full bg-white animate-ping" />
-                ) : (
-                  <div className="w-1.5 h-1.5 rounded-full bg-white/20" />
-                )}
+            <motion.div 
+              className="flex gap-4 relative"
+              animate={{ opacity: isActive || isDone ? 1 : 0.4 }}
+              transition={{ duration: 0.5 }}
+            >
+              {/* Animated Laser Pulse Line */}
+              {index !== AGENTS.length - 1 && (
+                <div className="absolute left-[11px] top-[30px] w-[2px] h-[calc(100%+8px)] bg-white/10 overflow-hidden">
+                  {isActive && (
+                    <motion.div 
+                      className="w-full h-8 bg-gradient-to-b from-transparent via-purple-500 to-transparent"
+                      animate={{ y: ["-100%", "300%"] }}
+                      transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+                    />
+                  )}
+                  {isDone && (
+                    <div className="w-full h-full bg-gradient-to-b from-[hsl(262,83%,58%)] to-[#33d0ff]" />
+                  )}
+                </div>
+              )}
+              
+              {/* Glowing Orb Indicator */}
+              <div className="z-10 flex items-center justify-center mt-1">
+                <div 
+                  className={`w-6 h-6 rounded-full flex items-center justify-center transition-all duration-500
+                    ${isActive ? "bg-purple-500 shadow-[0_0_20px_rgba(168,85,247,0.8)]" 
+                    : isDone ? "bg-gradient-to-br from-purple-500 to-[#33d0ff] shadow-[0_0_10px_rgba(51,208,255,0.4)]" 
+                    : "bg-black/50 border border-white/20"}`}
+                >
+                  {isDone ? (
+                    <svg className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                    </svg>
+                  ) : isActive ? (
+                    <div className="w-2 h-2 rounded-full bg-white animate-ping" />
+                  ) : (
+                    <div className="w-1.5 h-1.5 rounded-full bg-white/20" />
+                  )}
+                </div>
               </div>
-            </div>
 
-            {/* Content */}
-            <div className="flex flex-col gap-1.5">
-              <div className="flex items-center gap-3">
-                <span className={`text-sm font-semibold tracking-wide ${isActive || isDone ? "text-white" : "text-white/50"}`}>
-                  {agent.label}
-                </span>
-                <span className={`glass-badge ${isActive ? "glass-badge-active" : "opacity-50"}`}>
-                  {state.toUpperCase()}
-                </span>
+              {/* Content Card */}
+              <div className="flex flex-col gap-1.5 bg-white/[0.02] border border-white/5 p-3 rounded-lg w-full backdrop-blur-sm">
+                <div className="flex items-center gap-3">
+                  <span className={`text-sm font-semibold tracking-wide ${isActive || isDone ? "text-white" : "text-white/50"}`}>
+                    {agent.label}
+                  </span>
+                  <span className={`glass-badge ${isActive ? "glass-badge-active" : "opacity-50"}`}>
+                    {state.toUpperCase()}
+                  </span>
+                </div>
+                <p className="text-[10px] text-white/40 font-mono tracking-wider uppercase">
+                  {isActive ? "> Executing neural routines..." : isDone ? "> Sequence complete." : "> Awaiting authorization."}
+                </p>
               </div>
-              <p className="text-xs text-white/40 font-mono">
-                {isActive ? "> Executing neural routines..." : isDone ? "> Sequence complete." : "> Awaiting authorization."}
-              </p>
-            </div>
-          </motion.div>
+            </motion.div>
+          </Tilt>
         );
       })}
     </div>
