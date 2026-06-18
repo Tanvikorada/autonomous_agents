@@ -1,7 +1,6 @@
 "use client";
 
 import { JobStatus } from "@/lib/api";
-import { motion, AnimatePresence } from "framer-motion";
 
 interface Props {
   status: JobStatus | "pending";
@@ -11,34 +10,10 @@ interface Props {
 }
 
 const AGENTS = [
-  {
-    name: "Planner",
-    label: "Cognitive Planner",
-    desc: "Drafting project blueprint and task breakdown.",
-    activeStatus: "planning",
-    idleIcon: "psychology",
-  },
-  {
-    name: "Coder",
-    label: "Neural Synthesizer",
-    desc: "Synthesizing implementation code across the stack.",
-    activeStatus: "coding",
-    idleIcon: "memory",
-  },
-  {
-    name: "Tester",
-    label: "Validation Matrix",
-    desc: "Generating pytest suite and edge-case coverage.",
-    activeStatus: "testing",
-    idleIcon: "hourglass_empty",
-  },
-  {
-    name: "Reviewer",
-    label: "Security Auditor",
-    desc: "Performing deep static analysis and refactoring.",
-    activeStatus: "reviewing",
-    idleIcon: "lock_open",
-  },
+  { name: "Planner", label: "COGNITIVE PLANNER", activeStatus: "planning" },
+  { name: "Coder", label: "NEURAL SYNTHESIZER", activeStatus: "coding" },
+  { name: "Tester", label: "VALIDATION MATRIX", activeStatus: "testing" },
+  { name: "Reviewer", label: "SECURITY AUDITOR", activeStatus: "reviewing" },
 ] as const;
 
 export default function AgentPipeline({ status, currentAgent, completedSteps, isIdle }: Props) {
@@ -50,131 +25,37 @@ export default function AgentPipeline({ status, currentAgent, completedSteps, is
   };
 
   return (
-    <div>
-      <h3 style={{
-        fontFamily: "'Outfit', sans-serif", fontSize: 13, fontWeight: 400,
-        color: "#bbc9cf", textTransform: "uppercase", letterSpacing: "0.1em",
-        margin: "0 0 28px 0",
-      }}>
-        Swarm Telemetry
-      </h3>
+    <div style={{ display: "flex", flexDirection: "column", gap: 15 }}>
+      {AGENTS.map(agent => {
+        const state = isIdle ? "idle" : getState(agent);
+        const isActive = state === "active";
+        const isDone = state === "done";
+        
+        let color = "var(--color-smoke)";
+        if (isActive) color = "var(--color-paper-white)";
+        if (isDone) color = "var(--color-paper-white)";
 
-      <div style={{ position: "relative", paddingLeft: 32 }}>
-        {/* Vertical dashed connector line */}
-        <div className="pipeline-line" style={{
-          position: "absolute", left: 11, top: 12, bottom: 12, width: 2,
-        }} />
-
-        <div style={{ display: "flex", flexDirection: "column", gap: 36 }}>
-          {AGENTS.map(agent => {
-            const state   = isIdle ? "idle" : getState(agent);
-            const isActive = state === "active";
-            const isDone   = state === "done";
-            const dimmed   = state === "idle" && !isIdle;
-
-            return (
-              <motion.div
-                layout
-                key={agent.name}
-                initial={false}
-                animate={{
-                  opacity: dimmed ? 0.4 : isIdle ? 0.45 : 1,
-                  scale: isActive ? 1.02 : 1,
-                }}
-                transition={{ type: "spring", stiffness: 400, damping: 25 }}
-                style={{
-                  position: "relative",
-                  display: "flex", flexDirection: "column", gap: 6,
-                }}
-              >
-                {/* Node indicator */}
-                <div
-                  className={isActive ? "active-agent-pulse" : ""}
-                  style={{
-                    position: "absolute",
-                    left: isActive ? -32 : -28,
-                    top: 2,
-                    width:  isActive ? 32 : 24,
-                    height: isActive ? 32 : 24,
-                    borderRadius: "50%",
-                    border: `2px solid ${isDone ? "#b6ebff" : isActive ? "#47d6ff" : "rgba(255,255,255,0.12)"}`,
-                    background: isDone ? "transparent" : isActive ? "rgba(71,214,255,0.15)" : "#131313",
-                    display: "flex", alignItems: "center", justifyContent: "center",
-                    zIndex: 10,
-                    transition: "all 0.4s ease",
-                  }}
-                >
-                  <span
-                    className={`material-symbols-outlined ${isActive ? "spin-icon" : ""}`}
-                    style={{
-                      fontSize: isActive ? 20 : 16,
-                      color: isDone ? "#b6ebff" : isActive ? "#47d6ff" : "#859399",
-                      fontVariationSettings: isDone ? "'FILL' 1" : "'FILL' 0",
-                    }}
-                  >
-                    {isDone ? "check_circle" : isActive ? "sync" : agent.idleIcon}
-                  </span>
-                </div>
-
-                {/* Label row */}
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <h4 style={{
-                    margin: 0,
-                    fontFamily: "'Outfit', sans-serif",
-                    fontSize: 15, fontWeight: 600,
-                    color: isActive ? "#ffffff" : isDone ? "#b6ebff" : "#e5e2e1",
-                  }}>
-                    {agent.label}
-                  </h4>
-                  <span style={{
-                    fontFamily: "'Geist', monospace", fontSize: 10,
-                    color: isActive ? "#47d6ff" : isDone ? "rgba(182,235,255,0.55)" : "#859399",
-                    animation: isActive ? "pulse 1.5s infinite" : "none",
-                  }}>
-                    {isActive ? "ACTIVE" : isDone ? "DONE" : "IDLE"}
-                  </span>
-                </div>
-
-                {/* Description */}
-                <p style={{
-                  margin: 0, fontFamily: "'Outfit', sans-serif",
-                  fontSize: 12, color: "#bbc9cf", lineHeight: 1.5,
-                }}>
-                  {agent.desc}
-                </p>
-
-                {/* Progress bar (active only) */}
-                <AnimatePresence>
-                  {isActive && (
-                    <motion.div
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: 3, opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      style={{
-                        width: "100%", borderRadius: 4,
-                        background: "rgba(255,255,255,0.06)",
-                        overflow: "hidden", marginTop: 6,
-                      }}
-                    >
-                      <motion.div
-                        initial={{ width: "0%" }}
-                        animate={{ width: "100%" }}
-                        transition={{ duration: 4, ease: "linear", repeat: Infinity }}
-                        style={{
-                          height: "100%",
-                          background: "#47d6ff",
-                          boxShadow: "0 0 10px rgba(71,214,255,0.8)",
-                          borderRadius: 4,
-                        }}
-                      />
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </motion.div>
-            );
-          })}
-        </div>
-      </div>
+        return (
+          <div key={agent.name} style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <span style={{
+              display: "inline-block",
+              width: 4, height: 4,
+              borderRadius: "50%",
+              backgroundColor: isActive ? "var(--color-paper-white)" : "transparent",
+              border: isActive ? "none" : `1px solid ${color}`
+            }} />
+            <span style={{
+              fontFamily: "var(--font-saans)",
+              fontSize: "var(--text-caption)",
+              letterSpacing: "var(--tracking-caption)",
+              color: color,
+              opacity: isActive ? 1 : isDone ? 0.7 : 0.4
+            }}>
+              {agent.label}
+            </span>
+          </div>
+        );
+      })}
     </div>
   );
 }
