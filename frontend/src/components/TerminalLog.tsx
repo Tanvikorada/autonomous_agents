@@ -26,17 +26,20 @@ export default function TerminalLog({ statusData }: Props) {
 
   useEffect(() => {
     if (!statusData) {
-      setLogs([
-        { id: 1, type: "system", message: "System initializing...", timestamp: new Date().toISOString(), agent: "SYSTEM" },
-        { id: 2, type: "system", message: "Awaiting problem statement in the console.", timestamp: new Date().toISOString(), agent: "SYSTEM" }
-      ]);
+      setTimeout(() => {
+        setLogs([
+          { id: 1, type: "system", message: "System initializing...", timestamp: new Date().toISOString(), agent: "SYSTEM" },
+          { id: 2, type: "system", message: "Awaiting problem statement in the console.", timestamp: new Date().toISOString(), agent: "SYSTEM" }
+        ]);
+      }, 0);
       return;
     }
 
     const now = new Date().toISOString();
     
-    setLogs(prev => {
-      const newLogs = [...prev];
+    setTimeout(() => {
+      setLogs(prev => {
+        const newLogs = [...prev];
       
       // If we just started
       if (prev.length <= 2 && statusData.status !== "pending") {
@@ -78,6 +81,7 @@ export default function TerminalLog({ statusData }: Props) {
 
       return newLogs;
     });
+    }, 0);
 
   }, [statusData]);
 

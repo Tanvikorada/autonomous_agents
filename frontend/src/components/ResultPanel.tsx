@@ -25,10 +25,12 @@ export default function ResultPanel({ result, isLoading, currentAgent, status, o
   // Determine which tab to show by default if no result yet
   useEffect(() => {
     if (!result && currentAgent) {
-      if (currentAgent === "planner") setActiveTab("plan");
-      else if (currentAgent === "coder") setActiveTab("code");
-      else if (currentAgent === "tester") setActiveTab("tests");
-      else if (currentAgent === "reviewer") setActiveTab("review");
+      setTimeout(() => {
+        if (currentAgent === "planner") setActiveTab("plan");
+        else if (currentAgent === "coder") setActiveTab("code");
+        else if (currentAgent === "tester") setActiveTab("tests");
+        else if (currentAgent === "reviewer") setActiveTab("review");
+      }, 0);
     }
   }, [currentAgent, result]);
 

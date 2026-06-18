@@ -1,3 +1,5 @@
+"use client";
+
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -66,7 +68,7 @@ export default function IntroScreen({ onComplete }: { onComplete: () => void }) 
                 key={i}
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
-                className={log.startsWith("OK:") ? "text-[var(--color-electric-yellow, #fff100)] mt-4 font-bold" : "opacity-80"}
+                className={log?.startsWith("OK:") ? "text-[var(--color-electric-yellow, #fff100)] mt-4 font-bold" : "opacity-80"}
               >
                 {log}
               </motion.div>
