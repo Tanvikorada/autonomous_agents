@@ -1,9 +1,5 @@
-"use client";
-
 import { JobStatus } from "@/lib/api";
 import { motion } from "framer-motion";
-import Tilt from "react-parallax-tilt";
-import Image from "next/image";
 
 interface Props {
   status: JobStatus | "pending";
@@ -13,10 +9,10 @@ interface Props {
 }
 
 const AGENTS = [
-  { name: "Planner", label: "Alex (Architect)", activeStatus: "planning", id: "01", avatar: "/avatars/planner.png" },
-  { name: "Coder", label: "Nova (Engineer)", activeStatus: "coding", id: "02", avatar: "/avatars/coder.png" },
-  { name: "Tester", label: "Kai (QA Testing)", activeStatus: "testing", id: "03", avatar: "/avatars/tester.png" },
-  { name: "Reviewer", label: "Zara (Security)", activeStatus: "reviewing", id: "04", avatar: "/avatars/reviewer.png" },
+  { name: "Planner", label: "Architecture Planner", activeStatus: "planning" },
+  { name: "Coder", label: "Software Engineer", activeStatus: "coding" },
+  { name: "Tester", label: "QA Automation", activeStatus: "testing" },
+  { name: "Reviewer", label: "Security Auditor", activeStatus: "reviewing" },
 ] as const;
 
 export default function AgentPipeline({ status, currentAgent, completedSteps, isIdle }: Props) {
@@ -28,80 +24,45 @@ export default function AgentPipeline({ status, currentAgent, completedSteps, is
   };
 
   return (
-    <div className="flex flex-col gap-6 relative ml-2">
+    <div className="flex flex-col gap-0 relative ml-2">
+      {/* Background track line */}
+      <div className="absolute left-[7px] top-[10px] bottom-[10px] w-[1px] bg-[#222]" />
+
       {AGENTS.map((agent, index) => {
         const state = isIdle ? "idle" : getState(agent);
         const isActive = state === "active";
         const isDone = state === "done";
 
         return (
-          <Tilt
-            key={agent.name}
-            tiltMaxAngleX={5}
-            tiltMaxAngleY={5}
-            glareEnable={true}
-            glareMaxOpacity={0.1}
-            glareColor="#ffffff"
-            glarePosition="all"
-            transitionSpeed={2500}
-            tiltReverse={true}
-            className="relative w-full"
-            style={{ width: "100%" }}
-          >
-            <motion.div 
-              className="flex gap-4 relative w-full"
-              animate={{ opacity: isActive || isDone ? 1 : 0.5 }}
-              transition={{ duration: 0.5 }}
-            >
-              {/* Animated Connection Line */}
-              {index !== AGENTS.length - 1 && (
-                <div className="absolute left-[20px] top-[48px] w-[2px] h-[calc(100%-4px)] bg-white/5 overflow-hidden rounded-full">
-                  {isActive && (
-                    <motion.div 
-                      className="w-full h-8 bg-gradient-to-b from-transparent via-purple-500 to-transparent"
-                      animate={{ y: ["-100%", "300%"] }}
-                      transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-                    />
-                  )}
-                  {isDone && (
-                    <div className="w-full h-full bg-gradient-to-b from-purple-500 to-purple-500/50" />
-                  )}
-                </div>
-              )}
-              
-              {/* Avatar Indicator */}
-              <div className="z-10 flex flex-col items-center">
-                <div 
-                  className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-500 overflow-hidden
-                    ${isActive ? "ring-2 ring-purple-500 ring-offset-2 ring-offset-[#050505] shadow-[0_0_20px_rgba(168,85,247,0.6)]" 
-                    : isDone ? "ring-2 ring-[#33d0ff]/50 ring-offset-2 ring-offset-[#050505]" 
-                    : "ring-1 ring-white/10 opacity-70 grayscale"}`}
-                >
-                  <img src={agent.avatar} alt={agent.name} className="w-full h-full object-cover" />
-                </div>
-              </div>
+          <div key={agent.name} className="flex gap-6 relative py-4">
+            
+            {/* Timeline Dot */}
+            <div className="relative z-10 flex flex-col items-center justify-start mt-1">
+              <div 
+                className={`w-[15px] h-[15px] rounded-full transition-colors duration-300
+                  ${isActive ? "bg-white ring-4 ring-white/10" 
+                  : isDone ? "bg-[#555]" 
+                  : "bg-[#111] border border-[#333]"}`}
+              />
+            </div>
 
-              {/* Content Card */}
-              <div className="flex flex-col gap-2 bg-white/[0.02] border border-white/5 p-4 rounded-2xl w-full backdrop-blur-md shadow-xl">
-                <div className="flex items-center gap-3">
-                  <span className={`text-[15px] font-semibold tracking-tight ${isActive || isDone ? "text-white" : "text-white/60"}`}>
-                    {agent.label}
+            {/* Content */}
+            <div className="flex flex-col gap-1 w-full">
+              <div className="flex items-center gap-3">
+                <span className={`text-[15px] font-medium tracking-tight ${isActive ? "text-white" : isDone ? "text-[#888]" : "text-[#444]"}`}>
+                  {agent.label}
+                </span>
+                {isActive && (
+                  <span className="text-[10px] uppercase tracking-wider font-mono text-[#888] bg-[#111] px-2 py-0.5 rounded-sm">
+                    In Progress
                   </span>
-                  {isActive && (
-                    <span className="flex h-2 w-2 rounded-full bg-purple-500 animate-pulse ml-auto"></span>
-                  )}
-                  {isDone && (
-                    <svg className="w-4 h-4 text-[#33d0ff] ml-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                    </svg>
-                  )}
-                </div>
-                <p className="text-xs text-white/50 leading-relaxed">
-                  {isActive ? "Currently synthesizing the solution matrix..." : isDone ? "Task successfully verified and completed." : "Awaiting upstream dependencies."}
-                </p>
+                )}
               </div>
-            </motion.div>
-          </Tilt>
+              <p className="text-[13px] text-[#555] font-light">
+                {isActive ? "Synthesizing code architecture..." : isDone ? "Task completed." : "Waiting..."}
+              </p>
+            </div>
+          </div>
         );
       })}
     </div>
