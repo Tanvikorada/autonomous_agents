@@ -58,6 +58,11 @@ def run_planner(state: AgentState) -> AgentState:
         response = llm.invoke(messages)
         raw = response.content.strip()
 
+        token_usage = response.response_metadata.get("token_usage", {})
+        tokens_used = token_usage.get("total_tokens", len(raw) // 3)
+        total_tokens = state.get("total_tokens", 0) + tokens_used
+        total_cost = state.get("total_cost", 0.0) + (tokens_used * 0.000005)
+
         # Extract JSON array from response (handles wrapped markdown)
         json_match = re.search(r"\[.*\]", raw, re.DOTALL)
         if json_match:
@@ -66,10 +71,17 @@ def run_planner(state: AgentState) -> AgentState:
             # Fallback: split by newlines if JSON parsing fails
             plan = [line.strip() for line in raw.split("\n") if line.strip()]
 
-        logger.info(f"[{job_id}] Planner produced {len(plan)} steps.")
-        job_store.update(job_id, {"plan": plan})
+        logger.info(f"[{job_id}] Planner produced {len(plan)} steps. Tokens used: {tokens_used}")
+        update_data = {
+            "plan": plan, 
+            "status": "awaiting_approval", 
+            "current_agent": None,
+            "total_tokens": total_tokens,
+            "total_cost": total_cost,
+        }
+        job_store.update(job_id, update_data)
 
-        return {**state, "plan": plan, "current_agent": "Planner"}
+        return {**state, **update_data}
 
     except Exception as e:
         logger.error(f"[{job_id}] Planner Agent error: {e}")

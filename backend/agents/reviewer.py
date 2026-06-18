@@ -12,31 +12,24 @@ logger = logging.getLogger(__name__)
 
 SYSTEM_PROMPT = """You are a principal engineer conducting a thorough code review.
 
-Your job is to review the provided code and tests, then produce a structured markdown review report.
+Your job is to review the provided code and tests, then produce a structured JSON response.
 
-Your review MUST include these sections:
-
-## ✅ Strengths
-List what is done well (2-4 points).
-
-## ⚠️ Issues Found
-List specific bugs, anti-patterns, or missing features. Be precise — include line references if possible.
-
-## 🔧 Suggested Fixes
-For each issue, provide the corrected code snippet or a clear description of how to fix it.
-
-## 📊 Quality Score
-Rate the overall code quality: X/10 and explain the score in one sentence.
-
-Be honest, specific, and actionable. Do not be vague.
+You MUST output ONLY valid JSON with no markdown wrapping and no backticks. The JSON must match this structure exactly:
+{
+  "strengths": ["List what is done well"],
+  "issues_found": ["List specific bugs, anti-patterns, or missing features"],
+  "suggested_fixes": ["For each issue, provide how to fix it"],
+  "quality_score": "X/10 (explain)",
+  "risk_score": 5,
+  "confidence": "high/medium/low. Example: this fix touches a function called from 5 other places, higher regression risk."
+}
 """
-
 
 def run_reviewer(state: AgentState) -> AgentState:
     """
     Reviewer Agent node for LangGraph.
     
-    Takes code + tests from state, produces a structured markdown review.
+    Takes code + tests from state, produces a structured JSON review.
     Returns updated state with `review` populated and `status` = "done".
     """
     job_id = state["job_id"]
@@ -56,18 +49,50 @@ def run_reviewer(state: AgentState) -> AgentState:
                     f"Original Problem:\n{problem}\n\n"
                     f"--- CODE ---\n```python\n{code}\n```\n\n"
                     f"--- TESTS ---\n```python\n{tests}\n```\n\n"
-                    "Perform a thorough code review following the required format."
+                    "Perform a thorough code review and output the JSON response."
                 )
             ),
         ]
 
         response = llm.invoke(messages)
-        review = response.content.strip()
+        review_text = response.content.strip()
 
-        logger.info(f"[{job_id}] Reviewer produced {len(review)} characters of review.")
-        job_store.update(job_id, {"review": review, "status": "done", "current_agent": None})
+        token_usage = response.response_metadata.get("token_usage", {})
+        tokens_used = token_usage.get("total_tokens", len(review_text) // 3)
+        total_tokens = state.get("total_tokens", 0) + tokens_used
+        total_cost = state.get("total_cost", 0.0) + (tokens_used * 0.000005)
 
-        return {**state, "review": review, "status": "done", "current_agent": None}
+        if review_text.startswith("```json"):
+            review_text = review_text.replace("```json", "").replace("```", "").strip()
+        elif review_text.startswith("```"):
+            review_text = review_text.replace("```", "").strip()
+
+        import json
+        try:
+            review_json = json.loads(review_text)
+            review = json.dumps(review_json, indent=2)
+            risk_score = review_json.get("risk_score")
+            confidence = review_json.get("confidence")
+        except Exception:
+            review = review_text
+            risk_score = None
+            confidence = None
+
+        logger.info(f"[{job_id}] Reviewer produced {len(review)} characters of review. Tokens used: {tokens_used}")
+        update_data = {
+            "review": review, 
+            "review_risk_score": risk_score,
+            "review_confidence": confidence,
+            "status": "done", 
+            "current_agent": None,
+            "total_tokens": total_tokens,
+            "total_cost": total_cost,
+        }
+        job_store.update(job_id, update_data)
+
+        return {**state, **update_data}
+
+
 
     except Exception as e:
         logger.error(f"[{job_id}] Reviewer Agent error: {e}")

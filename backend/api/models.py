@@ -30,11 +30,13 @@ class JobCreatedResponse(BaseModel):
 class JobStatusResponse(BaseModel):
     """Returned by GET /api/status/{job_id}"""
     job_id: str
-    status: str                          # pending | planning | coding | testing | reviewing | done | error
+    status: str                          # pending | planning | awaiting_approval | coding | testing | reviewing | done | error
     current_agent: Optional[str] = None  # which agent is currently running
     completed_steps: List[str] = []      # list of completed agent names
     error: Optional[str] = None
-
+    retries: int = 0
+    total_tokens: int = 0
+    total_cost: float = 0.0
 
 class PipelineResult(BaseModel):
     """Full pipeline output returned by GET /api/result/{job_id}"""
@@ -45,7 +47,12 @@ class PipelineResult(BaseModel):
     code: Optional[str] = None
     tests: Optional[str] = None
     review: Optional[str] = None
+    review_risk_score: Optional[int] = None
+    review_confidence: Optional[str] = None
     error: Optional[str] = None
+    retries: int = 0
+    total_tokens: int = 0
+    total_cost: float = 0.0
 
 
 class HealthResponse(BaseModel):

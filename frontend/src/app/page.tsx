@@ -5,8 +5,11 @@ import { startPipeline, getJobStatus, getJobResult, PipelineResult, JobStatusRes
 import AgentPipeline from "@/components/AgentPipeline";
 import ResultPanel from "@/components/ResultPanel";
 import TerminalLog from "@/components/TerminalLog";
+import IntroScreen from "@/components/IntroScreen";
+import { AnimatePresence } from "framer-motion";
 
 export default function Home() {
+  const [hasEntered, setHasEntered] = useState(false);
   const [jobId, setJobId] = useState<string | null>(null);
   const [statusData, setStatusData] = useState<JobStatusResponse | null>(null);
   const [result, setResult] = useState<PipelineResult | null>(null);
@@ -34,10 +37,12 @@ export default function Home() {
       try {
         const data = await getJobStatus(jobId);
         setStatusData(data);
-        if (data.status === "done") {
+        if (data.status === "done" || data.status === "awaiting_approval") {
           const resultData = await getJobResult(jobId);
           setResult(resultData);
-          setJobId(null);
+          if (data.status === "done") {
+            setJobId(null);
+          }
         } else if (data.status === "error") {
           setError(data.error || "Job failed.");
           setJobId(null);
@@ -52,36 +57,38 @@ export default function Home() {
     return () => clearInterval(intervalId);
   }, [jobId]);
 
+  const handleApprove = async (plan: string[]) => {
+    if (!jobId) return;
+    try {
+      const response = await fetch(`http://localhost:8000/api/approve/${jobId}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ plan }),
+      });
+      if (!response.ok) throw new Error("Approval failed");
+      // Result panel should show coding tab next
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Approval failed");
+    }
+  };
+
   const isLoading = !!jobId;
 
   return (
-    <div className="min-h-screen flex flex-col font-suisseintl relative bg-[var(--color-canvas-mist)] text-[var(--color-ink-black)]">
-      
-      {/* Navigation Pill */}
-      <div className="w-full max-w-[1280px] mx-auto px-[24px] pt-[24px] z-50 sticky top-0">
+    <>
+      <AnimatePresence>
+        {!hasEntered && <IntroScreen onComplete={() => setHasEntered(true)} />}
+      </AnimatePresence>
+
+      <div className={`min-h-screen flex flex-col font-suisseintl relative bg-[var(--color-canvas-mist)] text-[var(--color-ink-black)] transition-opacity duration-1000 ${hasEntered ? "opacity-100" : "opacity-0 h-screen overflow-hidden"}`}>
+        
+        {/* Navigation Pill */}
+        <div className="w-full max-w-[1280px] mx-auto px-[24px] pt-[24px] z-50 sticky top-0">
         <header className="w-full bg-[var(--color-pure-white)] rounded-[48px] h-[64px] flex items-center px-[24px] justify-between shadow-sm">
           <div className="flex items-center gap-[8px] font-medium tracking-tight text-[16px]">
             <span className="text-[var(--color-electric-yellow)]">✦</span>
             <span>dayos</span>
           </div>
-          
-          <form onSubmit={handleSubmit} className="flex-1 flex justify-center max-w-[600px] mx-auto relative px-[24px]">
-            <input
-              type="text"
-              value={problem}
-              onChange={e => setProblem(e.target.value)}
-              disabled={isLoading}
-              placeholder="Enter problem statement... (e.g. Build an autonomous trading bot)"
-              className="w-full cc-input rounded-[20px] py-[10px] px-[20px] pr-[100px] text-[14px] transition-all"
-            />
-            <button
-              type="submit"
-              disabled={isLoading || problem.trim().length < 5}
-              className="absolute right-[30px] top-[4px] bottom-[4px] cc-btn-primary disabled:opacity-50 disabled:cursor-not-allowed text-[14px]"
-            >
-              {isLoading ? "Running" : "Run"}
-            </button>
-          </form>
 
           <div className="min-w-[120px] flex justify-end">
             {isLoading && (
@@ -100,31 +107,58 @@ export default function Home() {
       <main className="flex-1 flex flex-col w-full px-[24px] py-[80px] gap-[80px] max-w-[1280px] mx-auto">
         
         {/* Hero Section */}
-        <section className="flex flex-col md:flex-row gap-[40px] items-start w-full">
-          <div className="flex-1 max-w-[600px] flex flex-col gap-[24px]">
-            <h1 className="font-suisseintlcond font-bold text-[80px] leading-[0.9] tracking-[-2.4px] text-[var(--color-ink-black)]">
+        <section className="flex flex-col gap-[40px] items-center text-center w-full max-w-[800px] mx-auto">
+          <div className="flex flex-col gap-[16px]">
+            <h1 className="font-suisseintlcond font-bold text-[64px] leading-[0.9] tracking-[-2px] text-[var(--color-ink-black)]">
               AUTONOMOUS <span className="text-[var(--color-electric-yellow)]">AGENT</span> PIPELINE
             </h1>
-            <p className="font-suisseintl font-normal text-[18px] leading-[1.25] tracking-[-0.22px] text-[var(--color-ink-black)] max-w-[480px]">
-              Dayos OS operates a secure, high-density pipeline of Planners, Coders, Testers, and Reviewers to architect and ship production-ready software.
+            <p className="font-suisseintl font-normal text-[18px] text-[var(--color-ink-black)] opacity-80">
+              Initialize the Dayos OS swarm to architect and ship production-ready software.
             </p>
           </div>
           
-          <div className="flex-1 w-full cc-panel p-[40px] flex flex-col items-center justify-center min-h-[300px]">
-            {(!isLoading && !result && !error) ? (
-              <div className="text-center space-y-[16px] opacity-60">
-                <p className="font-suisseintlmono text-[12px] uppercase tracking-wide">Awaiting input</p>
-                <div className="w-[64px] h-[64px] rounded-[16px] bg-[var(--color-surface-mist)] mx-auto flex items-center justify-center">
-                  <span className="text-[24px]">✦</span>
+          <form onSubmit={handleSubmit} className="w-full relative group">
+            <div className="absolute -inset-[2px] bg-gradient-to-r from-[var(--color-mint-pulse)] via-[var(--color-electric-yellow)] to-[var(--color-mint-pulse)] rounded-[24px] blur-[8px] opacity-20 group-focus-within:opacity-50 transition-opacity duration-500"></div>
+            <div className="relative bg-[var(--color-pure-white)] border border-[var(--color-surface-mist)] rounded-[24px] shadow-sm flex flex-col overflow-hidden transition-all duration-300 focus-within:border-[var(--color-mint-pulse)]">
+              <textarea
+                value={problem}
+                onChange={e => setProblem(e.target.value)}
+                onKeyDown={e => {
+                  if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    if (problem.trim().length >= 5 && !isLoading) {
+                      handleSubmit(e as unknown as React.FormEvent);
+                    }
+                  }
+                }}
+                disabled={isLoading}
+                placeholder="Describe what you want to build... (e.g., 'A Python trading bot with a Flask API')"
+                className="w-full min-h-[120px] resize-none bg-transparent outline-none p-[24px] text-[16px] font-suisseintl text-[var(--color-ink-black)] placeholder-[var(--color-steel-gray)] leading-relaxed"
+              />
+              <div className="flex justify-between items-center px-[24px] pb-[20px]">
+                <div className="text-[12px] font-suisseintlmono text-[var(--color-steel-gray)] uppercase tracking-wide">
+                  Press Enter ⏎ to execute
                 </div>
+                <button
+                  type="submit"
+                  disabled={isLoading || problem.trim().length < 5}
+                  className="cc-btn-primary disabled:opacity-50 disabled:cursor-not-allowed text-[14px] px-[32px] shadow-md"
+                >
+                  {isLoading ? "Running..." : "Initialize Swarm"}
+                </button>
               </div>
-            ) : (
+            </div>
+          </form>
+          
+          {/* Pipeline visualization when active */}
+          <div className={`w-full transition-all duration-700 ${(!isLoading && !result && !error) ? "opacity-0 h-0 overflow-hidden" : "opacity-100 h-auto"}`}>
+            <div className="w-full cc-panel p-[40px] flex flex-col items-center justify-center min-h-[160px]">
               <AgentPipeline 
                 status={statusData?.status ?? "pending"} 
                 currentAgent={statusData?.current_agent ?? null} 
                 completedSteps={statusData?.completed_steps ?? []} 
               />
-            )}
+            </div>
           </div>
         </section>
 
@@ -139,7 +173,13 @@ export default function Home() {
           <section className="flex flex-col lg:flex-row gap-[24px] flex-1 min-h-[600px]">
             {/* Results Tabbed Panel */}
             <div className="flex-[2] flex flex-col min-w-0">
-              <ResultPanel result={result} isLoading={isLoading} currentAgent={statusData?.current_agent} />
+              <ResultPanel 
+                result={result} 
+                isLoading={isLoading} 
+                currentAgent={statusData?.current_agent} 
+                status={statusData?.status}
+                onApprove={handleApprove}
+              />
             </div>
 
             {/* Terminal Log Panel */}
@@ -151,5 +191,6 @@ export default function Home() {
 
       </main>
     </div>
+    </>
   );
 }

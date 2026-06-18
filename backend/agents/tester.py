@@ -58,15 +58,63 @@ def run_tester(state: AgentState) -> AgentState:
         response = llm.invoke(messages)
         tests = response.content.strip()
 
+        token_usage = response.response_metadata.get("token_usage", {})
+        tokens_used = token_usage.get("total_tokens", len(tests) // 3)
+        total_tokens = state.get("total_tokens", 0) + tokens_used
+        total_cost = state.get("total_cost", 0.0) + (tokens_used * 0.000005)
+
         # Strip markdown code fences if present
         if tests.startswith("```"):
             lines = tests.split("\n")
             tests = "\n".join(lines[1:-1]) if lines[-1].strip() == "```" else "\n".join(lines[1:])
 
-        logger.info(f"[{job_id}] Tester produced {len(tests)} characters of test code.")
-        job_store.update(job_id, {"tests": tests})
+        logger.info(f"[{job_id}] Tester produced {len(tests)} characters of test code. Tokens used: {tokens_used}")
+        
+        # Execute the generated tests using pytest
+        import tempfile
+        import subprocess
+        import os
+        
+        test_passed = False
+        test_output = "No tests were run."
+        
+        with tempfile.TemporaryDirectory() as tmpdir:
+            # write code to module.py
+            with open(os.path.join(tmpdir, "module.py"), "w") as f:
+                f.write(code)
+            # write tests to test_module.py
+            with open(os.path.join(tmpdir, "test_module.py"), "w") as f:
+                f.write(tests)
+            
+            # run pytest
+            result = subprocess.run(
+                ["pytest", "test_module.py", "-v"],
+                cwd=tmpdir,
+                capture_output=True,
+                text=True
+            )
+            test_passed = result.returncode == 0
+            test_output = result.stdout + "\n" + result.stderr
+            
+        logger.info(f"[{job_id}] Tests execution finished. Passed: {test_passed}")
+        
+        # Increment retries if failed
+        new_retries = state.get("retries", 0)
+        if not test_passed:
+            new_retries += 1
+            
+        # Update job store
+        update_data = {
+            "tests": tests,
+            "test_passed": test_passed,
+            "test_output": test_output,
+            "retries": new_retries,
+            "total_tokens": total_tokens,
+            "total_cost": total_cost,
+        }
+        job_store.update(job_id, update_data)
 
-        return {**state, "tests": tests, "current_agent": "Tester"}
+        return {**state, **update_data, "current_agent": "Tester"}
 
     except Exception as e:
         logger.error(f"[{job_id}] Tester Agent error: {e}")

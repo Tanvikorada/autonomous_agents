@@ -26,6 +26,15 @@ class AgentState(TypedDict):
     code: Optional[str]
     tests: Optional[str]
     review: Optional[str]
-    status: str                  # "pending" | "planning" | "coding" | "testing" | "reviewing" | "done" | "error"
+    status: str                  # "pending" | "planning" | "awaiting_approval" | "coding" | "testing" | "reviewing" | "done" | "error"
     error: Optional[str]
     current_agent: Optional[str]
+    
+    # Advanced features
+    retries: int
+    test_passed: Optional[bool]
+    test_output: Optional[str]
+    review_risk_score: Optional[int]
+    review_confidence: Optional[str]
+    total_tokens: int
+    total_cost: float

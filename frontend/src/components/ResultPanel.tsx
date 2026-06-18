@@ -6,9 +6,11 @@ interface Props {
   result: PipelineResult | null;
   isLoading: boolean;
   currentAgent?: string | null;
+  status?: string;
+  onApprove?: (plan: string[]) => void;
 }
 
-export default function ResultPanel({ result, isLoading, currentAgent }: Props) {
+export default function ResultPanel({ result, isLoading, currentAgent, status, onApprove }: Props) {
   const [activeTab, setActiveTab] = useState<"plan" | "code" | "tests" | "review">("plan");
 
   const tabs = [
@@ -75,8 +77,22 @@ export default function ResultPanel({ result, isLoading, currentAgent }: Props) 
             )
           )}
           {activeTab === "plan" && (
-            <div className="font-suisseintl text-[16px] leading-[1.33] text-[var(--color-ink-black)]">
-              {result?.plan ? <div className="whitespace-pre-wrap">{result.plan}</div> : (
+            <div className="font-suisseintl text-[16px] leading-[1.33] text-[var(--color-ink-black)] flex flex-col h-full">
+              {result?.plan ? (
+                <div className="flex-1">
+                  <div className="whitespace-pre-wrap">{Array.isArray(result.plan) ? result.plan.join("\n") : result.plan}</div>
+                  {status === "awaiting_approval" && onApprove && (
+                    <div className="mt-8 pt-4 border-t border-[var(--color-surface-mist)] flex justify-end">
+                      <button 
+                        onClick={() => onApprove(result.plan || [])}
+                        className="cc-btn-primary"
+                      >
+                        Approve Plan & Continue
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ) : (
                 <div className="h-full flex items-center justify-center text-[var(--color-steel-gray)] font-suisseintlmono text-[12px] uppercase min-h-[200px]">
                   [ No plan output yet ]
                 </div>
@@ -102,6 +118,26 @@ export default function ResultPanel({ result, isLoading, currentAgent }: Props) 
             </div>
           )}
         </div>
+        
+        {/* Metrics Footer */}
+        {result && (result.total_tokens !== undefined || result.review_risk_score !== undefined) && (
+          <div className="absolute bottom-0 left-0 right-0 p-4 bg-[var(--color-surface-mist)] border-t border-[var(--color-mist)] flex items-center justify-between text-[12px] font-suisseintlmono text-[var(--color-graphite)] uppercase">
+            <div className="flex gap-6">
+              {result.total_tokens !== undefined && (
+                <span>Tokens: {result.total_tokens.toLocaleString()} | Cost: ${result.total_cost?.toFixed(5)}</span>
+              )}
+              {result.retries !== undefined && result.retries > 0 && (
+                <span className="text-red-500">Retries: {result.retries}</span>
+              )}
+            </div>
+            {result.review_risk_score !== undefined && (
+              <div className="flex gap-4">
+                <span>Risk Score: {result.review_risk_score}/10</span>
+                <span>Confidence: {result.review_confidence}</span>
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

@@ -19,21 +19,29 @@ export interface JobCreatedResponse {
 
 export interface JobStatusResponse {
   job_id: string;
-  status: JobStatus;
-  current_agent: string | null;
+  status: string;
+  current_agent?: string;
   completed_steps: string[];
-  error: string | null;
+  error?: string;
+  retries?: number;
+  total_tokens?: number;
+  total_cost?: number;
 }
 
 export interface PipelineResult {
   job_id: string;
   status: string;
   problem: string;
-  plan: string[] | null;
-  code: string | null;
-  tests: string | null;
-  review: string | null;
-  error: string | null;
+  plan?: string[];
+  code?: string;
+  tests?: string;
+  review?: string;
+  review_risk_score?: number;
+  review_confidence?: string;
+  error?: string;
+  retries?: number;
+  total_tokens?: number;
+  total_cost?: number;
 }
 
 // ── Start a pipeline job ──────────────────────────────────────────────────────

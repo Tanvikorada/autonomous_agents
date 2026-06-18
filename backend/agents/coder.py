@@ -35,38 +35,72 @@ def run_coder(state: AgentState) -> AgentState:
     job_id = state["job_id"]
     problem = state["problem"]
     plan = state.get("plan") or []
+    retries = state.get("retries", 0)
+    test_output = state.get("test_output")
 
-    logger.info(f"[{job_id}] Coder Agent starting...")
+    logger.info(f"[{job_id}] Coder Agent starting... (Attempt {retries + 1})")
     job_store.update(job_id, {"status": "coding", "current_agent": "Coder"})
 
     plan_text = "\n".join(plan) if plan else "No plan provided — infer from the problem."
+    
+    # Simple context retrieval based on problem keywords (Mocking full RAG for simplicity, or doing a basic search)
+    import glob
+    import os
+    context_text = ""
+    # In a real system, this would use embeddings against the target repo. 
+    # Here we simulate finding related files if the problem mentions specific components.
+    target_repo = "c:/Users/Tanvi/Desktop/autonomous agents"
+    if "api" in problem.lower():
+        try:
+            with open(os.path.join(target_repo, "backend", "api", "routes.py"), "r") as f:
+                context_text += f"\n--- backend/api/routes.py ---\n{f.read()[:1000]}...\n"
+        except:
+            pass
 
     try:
         llm = get_llm(temperature=0.2)
+        
+        prompt_content = (
+            f"Original Problem:\n{problem}\n\n"
+            f"Implementation Plan:\n{plan_text}\n\n"
+        )
+        
+        if context_text:
+            prompt_content += f"Retrieved Context from Repo:\n{context_text}\n\n"
+            
+        if retries > 0 and test_output:
+            prompt_content += f"Previous attempt failed tests. Fix the code to pass these tests:\n```\n{test_output}\n```\n\n"
+            
+        prompt_content += "Now write the complete Python implementation. If you are modifying existing code, output standard Unified Diffs (```diff). If creating new files, output the full file contents (```python). Separate multiple files with # ===== FILE: filename =====."
+
         messages = [
             SystemMessage(content=SYSTEM_PROMPT),
-            HumanMessage(
-                content=(
-                    f"Original Problem:\n{problem}\n\n"
-                    f"Implementation Plan:\n{plan_text}\n\n"
-                    "Now write the complete Python implementation."
-                )
-            ),
+            HumanMessage(content=prompt_content),
         ]
 
         response = llm.invoke(messages)
         code = response.content.strip()
 
+        token_usage = response.response_metadata.get("token_usage", {})
+        tokens_used = token_usage.get("total_tokens", len(code) // 3)
+        total_tokens = state.get("total_tokens", 0) + tokens_used
+        total_cost = state.get("total_cost", 0.0) + (tokens_used * 0.000005)
+
         # Strip markdown code fences if the LLM wraps in them
-        if code.startswith("```"):
+        if code.startswith("```python") or code.startswith("```diff"):
             lines = code.split("\n")
-            # Remove first line (```python) and last line (```)
             code = "\n".join(lines[1:-1]) if lines[-1].strip() == "```" else "\n".join(lines[1:])
 
-        logger.info(f"[{job_id}] Coder produced {len(code)} characters of code.")
-        job_store.update(job_id, {"code": code})
+        logger.info(f"[{job_id}] Coder produced {len(code)} characters of code. Tokens used: {tokens_used}")
+        update_data = {
+            "code": code,
+            "total_tokens": total_tokens,
+            "total_cost": total_cost,
+            "current_agent": "Coder"
+        }
+        job_store.update(job_id, update_data)
 
-        return {**state, "code": code, "current_agent": "Coder"}
+        return {**state, **update_data}
 
     except Exception as e:
         logger.error(f"[{job_id}] Coder Agent error: {e}")
