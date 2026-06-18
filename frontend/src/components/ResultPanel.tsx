@@ -39,7 +39,7 @@ export default function ResultPanel({ result, isLoading, currentAgent }: Props) 
     <div className="cc-panel flex flex-col h-full overflow-hidden relative">
       
       {/* Header Tabs */}
-      <div className="flex items-center p-2 border-b border-[var(--border-dim)] bg-[#0A0A0F]/50 gap-2">
+      <div className="flex items-center p-[8px] border-b border-[var(--border-dim)] bg-[var(--color-abyssal-blue)] gap-[8px]">
         {tabs.map(tab => {
           const isActive = activeTab === tab.id;
           const hasContent = !!tab.content;
@@ -49,21 +49,21 @@ export default function ResultPanel({ result, isLoading, currentAgent }: Props) 
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id as "plan" | "code" | "tests" | "review")}
-              className={`px-4 py-2 text-xs font-mono transition-all rounded flex items-center gap-2
+              className={`px-[16px] py-[8px] text-[12px] font-jetbrains-mono transition-all rounded-[4px] flex items-center gap-[8px]
                 ${isActive 
-                  ? "bg-[#1E1B4B] text-[#A78BFA] border border-[#7C3AED]/30" 
-                  : "text-[#64748B] hover:text-[#94A3B8] hover:bg-[#1E293B]/50 border border-transparent"}`}
+                  ? "text-[var(--color-portal-blue)]" 
+                  : "text-[var(--color-ash)] hover:text-[var(--color-mist)]"}`}
             >
               {tab.label}
-              {isGenerating && <span className="flex h-1.5 w-1.5 rounded-full bg-[#06B6D4] animate-ping ml-1" />}
-              {hasContent && !isGenerating && <span className="flex h-1.5 w-1.5 rounded-full bg-[#7C3AED] ml-1" />}
+              {isGenerating && <span className="flex h-1.5 w-1.5 rounded-full bg-[var(--color-portal-blue)] animate-ping ml-1" />}
+              {hasContent && !isGenerating && <span className="flex h-1.5 w-1.5 rounded-full bg-[var(--color-steel-navy)] ml-1" />}
             </button>
           )
         })}
       </div>
 
       {/* Content Area */}
-      <div className="flex-1 overflow-auto bg-[#050505] p-6 relative">
+      <div className="flex-1 overflow-auto bg-[var(--color-cosmic-void)] p-[24px] relative">
         <AnimatePresence mode="wait">
           <motion.div
             key={activeTab}
@@ -74,11 +74,11 @@ export default function ResultPanel({ result, isLoading, currentAgent }: Props) 
             className="h-full"
           >
             {activeContent ? (
-              <pre className="text-[#E2E8F0] text-[13px] font-mono leading-relaxed whitespace-pre-wrap">
+              <pre className="text-[var(--color-mist)] text-[13px] font-jetbrains-mono leading-relaxed whitespace-pre-wrap">
                 <code>{activeContent}</code>
               </pre>
             ) : (
-              <div className="flex items-center justify-center h-full text-[#475569] font-mono text-sm flex-col gap-3 opacity-50">
+              <div className="flex items-center justify-center h-full text-[var(--color-ash)] font-jetbrains-mono text-[14px] flex-col gap-[12px] opacity-50">
                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" x2="20" y1="19" y2="19"/></svg>
                 <p>Awaiting stream buffer...</p>
               </div>

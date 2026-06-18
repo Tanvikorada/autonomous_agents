@@ -82,32 +82,32 @@ export default function TerminalLog({ statusData }: Props) {
   }, [logs]);
 
   return (
-    <div className="cc-panel flex flex-col h-full overflow-hidden">
-      <div className="flex items-center p-3 border-b border-[var(--border-dim)] bg-[#0A0A0F]/50 gap-2">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[#64748B]"><polyline points="4 17 10 11 4 5"/><line x1="12" x2="20" y1="19" y2="19"/></svg>
-        <span className="text-xs font-mono text-[#94A3B8] tracking-widest uppercase">System Telemetry</span>
+    <div className="cc-panel flex flex-col h-full overflow-hidden bg-[var(--color-steel-navy)]">
+      <div className="flex items-center p-[12px] border-b border-[var(--border-dim)] bg-[var(--color-abyssal-blue)] gap-[8px]">
+        <span className="text-[var(--color-warning-amber)]">ℹ</span>
+        <span className="text-[12px] font-jetbrains-mono text-[var(--color-mist)] tracking-widest uppercase">System Telemetry</span>
       </div>
       
       <div 
         ref={scrollRef}
-        className="flex-1 overflow-auto bg-[#050505] p-4 font-mono text-[11px] leading-relaxed space-y-2"
+        className="flex-1 overflow-auto bg-[var(--color-cosmic-void)] p-[16px] font-jetbrains-mono text-[12px] leading-relaxed space-y-[8px]"
       >
         {logs.length === 0 ? (
-          <div className="text-[#475569] italic">Waiting for telemetry...</div>
+          <div className="text-[var(--color-ash)] italic">Waiting for telemetry...</div>
         ) : (
           logs.map((log) => (
-            <div key={log.id} className="flex gap-3">
-              <span className="text-[#475569] shrink-0">[{log.timestamp}]</span>
-              <span className={`shrink-0 font-bold uppercase w-16
-                ${log.agent === "SYSTEM" ? "text-[#94A3B8]" : 
-                  log.agent === "Planner" ? "text-[#7C3AED]" : 
-                  log.agent === "Coder" ? "text-[#3B82F6]" : 
-                  log.agent === "Tester" ? "text-[#EAB308]" : "text-[#10B981]"}`}
+            <div key={log.id} className="flex gap-[12px]">
+              <span className="text-[var(--color-ash)] shrink-0">[{log.timestamp}]</span>
+              <span className={`shrink-0 font-normal uppercase w-16
+                ${log.agent === "SYSTEM" ? "text-[var(--color-ash)]" : 
+                  log.agent === "Planner" ? "text-[var(--color-portal-blue)]" : 
+                  log.agent === "Coder" ? "text-[var(--color-ice-blue)]" : 
+                  log.agent === "Tester" ? "text-[var(--color-terminal-amber)]" : "text-[var(--color-specimen-green)]"}`}
               >
                 {log.agent}
               </span>
               <span className={`break-words
-                ${log.type === "success" ? "text-[#06B6D4]" : log.type === "warn" ? "text-[#EF4444]" : "text-[#CBD5E1]"}`}
+                ${log.type === "success" ? "text-[var(--color-specimen-green)]" : log.type === "warn" ? "text-[var(--color-fault-red)]" : "text-[var(--color-mist)]"}`}
               >
                 {log.message}
               </span>

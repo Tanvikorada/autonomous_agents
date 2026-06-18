@@ -1,19 +1,19 @@
 import type { Metadata } from "next";
-import { Space_Grotesk, JetBrains_Mono } from "next/font/google";
+import { JetBrains_Mono, DM_Sans } from "next/font/google";
 import "./globals.css";
 
-const spaceGrotesk = Space_Grotesk({ 
+const jetbrainsMono = JetBrains_Mono({
+  variable: "--font-jetbrains-mono",
   subsets: ["latin"],
-  variable: "--font-space"
 });
 
-const jetbrainsMono = JetBrains_Mono({ 
+const dmSans = DM_Sans({
+  variable: "--font-dm-sans",
   subsets: ["latin"],
-  variable: "--font-mono"
 });
 
 export const metadata: Metadata = {
-  title: "Swarm | Command Center",
+  title: "Swarm OS",
   description: "Autonomous Multi-Agent Software Engineering System",
 };
 
@@ -23,8 +23,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${spaceGrotesk.variable} ${jetbrainsMono.variable}`}>
-      <body className="antialiased font-sans">
+    <html lang="en">
+      <body className={`${jetbrainsMono.variable} ${dmSans.variable} antialiased`}>
         {children}
       </body>
     </html>

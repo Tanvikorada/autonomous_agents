@@ -55,41 +55,39 @@ export default function Home() {
   const isLoading = !!jobId;
 
   return (
-    <div className="min-h-screen flex flex-col font-sans relative">
-      <div className="ambient-grid"></div>
-
+    <div className="min-h-screen flex flex-col font-jetbrains-mono relative">
       {/* Top Bar */}
-      <header className="sticky top-0 z-50 w-full border-b border-[#1C1C24] bg-[#0A0A0F]/90 backdrop-blur-md">
-        <div className="w-full flex h-16 items-center px-6 gap-6">
-          <div className="flex items-center gap-3 font-medium tracking-tight text-white min-w-[200px]">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[#7C3AED]"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
-            <span>SWARM<span className="text-[#7C3AED]">_</span>OS</span>
+      <header className="sticky top-0 z-50 w-full bg-[var(--color-steel-navy)] border-b border-[var(--border-dim)]">
+        <div className="w-full flex h-[64px] items-center px-[24px] gap-[24px]">
+          <div className="flex items-center gap-[8px] font-normal tracking-wide text-[var(--color-ghost-white)] text-[16px] min-w-[200px]">
+            <span className="text-[var(--color-warning-amber)]">ℹ</span>
+            <span>SWARM_OS</span>
           </div>
           
-          <form onSubmit={handleSubmit} className="flex-1 flex justify-center max-w-3xl mx-auto relative">
+          <form onSubmit={handleSubmit} className="flex-1 flex justify-center max-w-[800px] mx-auto relative">
             <input
               type="text"
               value={problem}
               onChange={e => setProblem(e.target.value)}
               disabled={isLoading}
               placeholder="Enter problem statement... (e.g. Build an autonomous trading bot in Python)"
-              className="w-full cc-input rounded-full py-2.5 px-6 pr-24 text-sm transition-all"
+              className="w-full cc-input rounded-[8px] py-[8px] px-[16px] pr-24 text-[16px] transition-all"
             />
             <button
               type="submit"
               disabled={isLoading || problem.trim().length < 5}
-              className="absolute right-1 top-1 bottom-1 px-5 rounded-full text-sm font-medium cc-btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
+              className="absolute right-1 top-1 bottom-1 px-[20px] rounded-full text-[14px] font-normal cc-btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {isLoading ? "Running..." : "Run"}
+              {isLoading ? "Running" : "Run"}
             </button>
           </form>
 
           <div className="min-w-[200px] flex justify-end">
             {isLoading && (
-              <div className="flex items-center gap-2 text-xs text-[#06B6D4]">
+              <div className="flex items-center gap-2 text-[14px] text-[var(--color-specimen-green)]">
                 <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#06B6D4] opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-[#06B6D4]"></span>
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[var(--color-specimen-green)] opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-[var(--color-specimen-green)]"></span>
                 </span>
                 PIPELINE ACTIVE
               </div>
@@ -98,14 +96,14 @@ export default function Home() {
         </div>
       </header>
 
-      <main className="flex-1 flex flex-col w-full px-6 py-6 pb-20 gap-6 max-w-[1600px] mx-auto">
+      <main className="flex-1 flex flex-col w-full px-[24px] py-[24px] pb-[64px] gap-[24px] max-w-[1600px] mx-auto">
         
         {/* Horizontal Agent Pipeline Hero */}
-        <section className="w-full cc-panel p-6 flex flex-col items-center justify-center min-h-[160px]">
+        <section className="w-full cc-panel p-[32px] flex flex-col items-center justify-center min-h-[160px]">
           {(!isLoading && !result && !error) ? (
-            <div className="text-center space-y-2 opacity-50">
-              <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="mx-auto"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><line x1="3" x2="21" y1="9" y2="9"/><line x1="9" x2="9" y1="21" y2="9"/></svg>
-              <p className="text-sm">Awaiting problem statement...</p>
+            <div className="text-center space-y-[8px] opacity-50">
+              <span className="text-[var(--color-warning-amber)] text-[24px]">⚙</span>
+              <p className="text-[16px] text-[var(--color-mist)]">Awaiting problem statement...</p>
             </div>
           ) : (
             <AgentPipeline 
@@ -117,14 +115,14 @@ export default function Home() {
         </section>
 
         {error && (
-          <div className="cc-panel p-4 border-[#ef4444] bg-[#ef4444]/10 text-[#ef4444] text-sm">
+          <div className="cc-panel p-[16px] border-[var(--color-fault-red)] bg-[var(--color-fault-red)]/10 text-[var(--color-fault-red)] text-[14px]">
             [SYS_ERR] {error}
           </div>
         )}
 
         {/* Split View: Results & Terminal */}
         {(isLoading || result) && (
-          <section className="flex flex-col lg:flex-row gap-6 flex-1 min-h-[500px]">
+          <section className="flex flex-col lg:flex-row gap-[24px] flex-1 min-h-[500px]">
             {/* Results Tabbed Panel */}
             <div className="flex-[2] flex flex-col min-w-0">
               <ResultPanel result={result} isLoading={isLoading} currentAgent={statusData?.current_agent} />

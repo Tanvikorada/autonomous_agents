@@ -1,121 +1,99 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
-@layer base {
-  :root {
-    --bg-navy: #0A0A0F;
-    --accent-violet: #7C3AED;
-    --accent-cyan: #06B6D4;
-    --border-dim: #1C1C24;
-    --border-glow: rgba(124, 58, 237, 0.5);
-  }
+@theme {
+  /* Colors */
+  --color-cosmic-void: #06051d;
+  --color-abyssal-blue: #0f1c36;
+  --color-steel-navy: #1d293d;
+  --color-deep-slate: #314062;
+  --color-mist: #cad5e2;
+  --color-fog: #e5e7eb;
+  --color-ash: #2e3038;
+  --color-ghost-white: #ffffff;
+  --color-ice-blue: #ebf8ff;
+  --color-portal-blue: #63b3ed;
+  --color-bioluminescent-green: #004f3b;
+  --color-terminal-amber: #733e0a;
+  --color-crimson-depth: #8b0836;
+  --color-specimen-green: #00bc7d;
+  --color-warning-amber: #f0b100;
+  --color-fault-red: #ff2056;
+
+  /* Typography */
+  --font-jetbrains-mono: var(--font-jetbrains-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  --font-dm-sans: var(--font-dm-sans), ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+
+  /* Border Radius */
+  --radius-lg: 8px;
+  --radius-full: 9999px;
+
+  /* Shadows */
+  --shadow-sm: rgba(0, 0, 0, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.1) 0px 2px 4px -2px;
 }
 
-@layer base {
-  body {
-    background-color: var(--bg-navy);
-    color: #F8FAFC; /* slate-50 */
-    font-family: var(--font-space), ui-sans-serif, system-ui, sans-serif;
-    overflow-x: hidden;
-  }
+:root {
+  --surface-deep-navy-gradient: #061434;
+  --border-dim: rgba(229, 231, 235, 0.1); /* Fog at 10% */
 }
 
-/* Typography Overrides */
-.font-mono {
-  font-family: var(--font-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+body {
+  background: linear-gradient(0deg, var(--color-cosmic-void) 30%, var(--surface-deep-navy-gradient));
+  background-attachment: fixed;
+  color: var(--color-mist);
+  font-family: var(--font-jetbrains-mono);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* Faint Animated Grid Atmosphere */
-.ambient-grid {
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  background-size: 40px 40px;
-  background-image: 
-    linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
-  mask-image: linear-gradient(to bottom, black 40%, transparent 100%);
-  -webkit-mask-image: linear-gradient(to bottom, black 40%, transparent 100%);
-  pointer-events: none;
-  animation: gridMove 20s linear infinite;
+/* Base custom scrollbar for terminal panels */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
 }
-
-@keyframes gridMove {
-  0% { transform: translateY(0); }
-  100% { transform: translateY(40px); }
-}
-
-/* Command Center UI Components */
-.cc-panel {
-  background: rgba(15, 15, 20, 0.6);
-  border: 1px solid var(--border-dim);
-  border-radius: 0.5rem;
-  backdrop-filter: blur(8px);
-}
-
-.cc-input {
-  background: rgba(0, 0, 0, 0.2);
-  border: 1px solid var(--border-dim);
-  color: #F8FAFC;
-}
-
-.cc-input:focus {
-  outline: none;
-  border-color: var(--accent-violet);
-  box-shadow: 0 0 15px rgba(124, 58, 237, 0.2);
-}
-
-.cc-btn {
+::-webkit-scrollbar-track {
   background: transparent;
-  color: #fff;
-  border: 1px solid var(--border-dim);
-  border-radius: 0.375rem;
-  transition: all 0.2s ease-in-out;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-ash);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-deep-slate);
 }
 
-.cc-btn:hover:not(:disabled) {
-  border-color: var(--accent-violet);
-  box-shadow: 0 0 12px var(--border-glow);
-  color: var(--accent-violet);
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
 }
 
-.cc-btn-primary {
-  background: var(--accent-violet);
-  color: white;
-  border: none;
-}
-.cc-btn-primary:hover:not(:disabled) {
-  box-shadow: 0 0 20px var(--border-glow);
+@layer components {
+  /* Restyled Midjourney Panels */
+  .cc-panel {
+    @apply bg-[var(--color-steel-navy)] border border-[var(--border-dim)] rounded-lg shadow-sm overflow-hidden;
+  }
+
+  /* Restyled inputs */
+  .cc-input {
+    @apply bg-[var(--color-abyssal-blue)] border border-[var(--border-dim)] text-[var(--color-mist)] font-jetbrains-mono focus:outline-none focus:border-[var(--color-portal-blue)] placeholder-[var(--color-ash)];
+  }
+
+  /* Restyled primary buttons (Terminal Amber) */
+  .cc-btn-primary {
+    @apply bg-[var(--color-terminal-amber)]/20 text-[var(--color-terminal-amber)] border border-[var(--color-ghost-white)]/10 shadow-sm transition-colors hover:bg-[var(--color-terminal-amber)]/30 font-jetbrains-mono;
+  }
 }
 
-/* Typewriter Cursor */
+/* Blinking cursor for terminal */
 .cursor-blink {
   display: inline-block;
   width: 8px;
-  height: 1.2em;
-  background-color: var(--accent-cyan);
-  vertical-align: middle;
+  height: 14px;
+  background-color: var(--color-mist);
   animation: blink 1s step-end infinite;
 }
 
 @keyframes blink {
   0%, 100% { opacity: 1; }
   50% { opacity: 0; }
-}
-
-/* Custom Scrollbar for Terminals */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-::-webkit-scrollbar-thumb {
-  background: #2D2D3A;
-  border-radius: 3px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: #3D3D4A;
 }
