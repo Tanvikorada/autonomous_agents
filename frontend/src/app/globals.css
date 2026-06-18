@@ -268,3 +268,105 @@ body {
   line-height: 1;
   user-select: none;
 }
+
+/* ── Glitch Text Effect ───────────────────────────────────────────────── */
+@keyframes glitch-anim {
+  0% { clip-path: inset(20% 0 80% 0); transform: translate(-2px, 2px); }
+  20% { clip-path: inset(60% 0 10% 0); transform: translate(2px, -2px); }
+  40% { clip-path: inset(40% 0 50% 0); transform: translate(-2px, 2px); }
+  60% { clip-path: inset(80% 0 5% 0); transform: translate(2px, -2px); }
+  80% { clip-path: inset(10% 0 70% 0); transform: translate(-2px, 2px); }
+  100% { clip-path: inset(30% 0 50% 0); transform: translate(2px, -2px); }
+}
+
+.glitch-hover:hover {
+  position: relative;
+}
+
+.glitch-hover:hover::before,
+.glitch-hover:hover::after {
+  content: attr(data-text);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+}
+
+.glitch-hover:hover::before {
+  left: 2px;
+  text-shadow: -2px 0 #ffb4ab;
+  animation: glitch-anim 0.3s infinite linear alternate-reverse;
+}
+
+.glitch-hover:hover::after {
+  left: -2px;
+  text-shadow: -2px 0 #47d6ff;
+  animation: glitch-anim 0.4s infinite linear alternate-reverse;
+}
+
+/* ── Ripple Effect ────────────────────────────────────────────────────── */
+.ripple {
+  position: relative;
+  overflow: hidden;
+}
+
+.ripple-span {
+  position: absolute;
+  border-radius: 50%;
+  transform: scale(0);
+  animation: ripple-anim 0.6s linear;
+  background-color: rgba(255, 255, 255, 0.4);
+  pointer-events: none;
+}
+
+@keyframes ripple-anim {
+  to {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+/* ── Sliding Drawers ──────────────────────────────────────────────────── */
+@keyframes slideInRight {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes slideOutRight {
+  from { transform: translateX(0); opacity: 1; }
+  to { transform: translateX(100%); opacity: 0; }
+}
+
+.drawer-enter {
+  animation: slideInRight 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+.drawer-exit {
+  animation: slideOutRight 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+/* ── Toast Notifications ──────────────────────────────────────────────── */
+@keyframes toastEnter {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes toastExit {
+  from { transform: translateY(0); opacity: 1; }
+  to { transform: translateY(-20px); opacity: 0; }
+}
+
+.toast-enter {
+  animation: toastEnter 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+.toast-exit {
+  animation: toastExit 0.3s ease-in forwards;
+}
+
+/* ── Page Transition ──────────────────────────────────────────────────── */
+.view-enter {
+  animation: fadeInUp 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
