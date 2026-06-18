@@ -1,6 +1,7 @@
 "use client";
 
 import { JobStatus } from "@/lib/api";
+import { motion } from "framer-motion";
 
 interface Props {
   status: JobStatus | "pending";
@@ -10,10 +11,10 @@ interface Props {
 }
 
 const AGENTS = [
-  { name: "Planner", label: "Planner", activeStatus: "planning", id: "01" },
-  { name: "Coder", label: "Coder", activeStatus: "coding", id: "02" },
-  { name: "Tester", label: "Tester", activeStatus: "testing", id: "03" },
-  { name: "Reviewer", label: "Reviewer", activeStatus: "reviewing", id: "04" },
+  { name: "Planner", label: "Architecture Planner", activeStatus: "planning", id: "01" },
+  { name: "Coder", label: "Software Engineer", activeStatus: "coding", id: "02" },
+  { name: "Tester", label: "QA Automation", activeStatus: "testing", id: "03" },
+  { name: "Reviewer", label: "Security Auditor", activeStatus: "reviewing", id: "04" },
 ] as const;
 
 export default function AgentPipeline({ status, currentAgent, completedSteps, isIdle }: Props) {
@@ -25,49 +26,66 @@ export default function AgentPipeline({ status, currentAgent, completedSteps, is
   };
 
   return (
-    <div className="flex flex-col gap-4 relative ml-2">
+    <div className="flex flex-col gap-6 relative ml-2">
       {AGENTS.map((agent, index) => {
         const state = isIdle ? "idle" : getState(agent);
         const isActive = state === "active";
         const isDone = state === "done";
 
         return (
-          <div key={agent.name} className="flex gap-4 relative pb-4">
+          <motion.div 
+            key={agent.name} 
+            className="flex gap-4 relative"
+            animate={{ opacity: isActive || isDone ? 1 : 0.4 }}
+            transition={{ duration: 0.5 }}
+          >
             {/* Connecting Line */}
             {index !== AGENTS.length - 1 && (
               <div 
-                className={`absolute left-[11px] top-[24px] bottom-0 w-[2px] ${isDone ? "bg-[hsl(var(--primary))]" : "bg-[hsl(var(--border))]"}`}
+                className="absolute left-[11px] top-[30px] w-[2px] h-[calc(100%+8px)]"
+                style={{
+                  background: isDone 
+                    ? "linear-gradient(to bottom, hsl(262, 83%, 58%), hsl(280, 80%, 50%))" 
+                    : "rgba(255, 255, 255, 0.1)"
+                }}
               />
             )}
             
-            {/* Step Indicator */}
-            <div className="z-10 flex items-center justify-center">
-              <div className={`w-6 h-6 rounded-full flex items-center justify-center border-2 ${isActive ? "border-[hsl(var(--primary))] bg-[hsl(var(--background))]" : isDone ? "border-[hsl(var(--primary))] bg-[hsl(var(--primary))]" : "border-[hsl(var(--border))] bg-[hsl(var(--background))]"}`}>
+            {/* Glowing Orb Indicator */}
+            <div className="z-10 flex items-center justify-center mt-1">
+              <div 
+                className={`w-6 h-6 rounded-full flex items-center justify-center transition-all duration-500
+                  ${isActive ? "bg-purple-500 shadow-[0_0_15px_rgba(168,85,247,0.6)]" 
+                  : isDone ? "bg-gradient-to-br from-purple-500 to-indigo-600 shadow-[0_0_10px_rgba(168,85,247,0.3)]" 
+                  : "bg-white/5 border border-white/10"}`}
+              >
                 {isDone ? (
-                  <svg className="w-3.5 h-3.5 text-[hsl(var(--primary-foreground))]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3">
+                  <svg className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                   </svg>
                 ) : isActive ? (
-                  <div className="w-2 h-2 rounded-full bg-[hsl(var(--primary))] animate-pulse" />
-                ) : null}
+                  <div className="w-2 h-2 rounded-full bg-white animate-ping" />
+                ) : (
+                  <div className="w-1.5 h-1.5 rounded-full bg-white/20" />
+                )}
               </div>
             </div>
 
             {/* Content */}
-            <div className="flex flex-col gap-1 -mt-0.5">
-              <div className="flex items-center gap-2">
-                <span className={`text-sm font-medium ${isActive || isDone ? "text-[hsl(var(--foreground))]" : "text-[hsl(var(--muted-foreground))]"}`}>
+            <div className="flex flex-col gap-1.5">
+              <div className="flex items-center gap-3">
+                <span className={`text-sm font-semibold tracking-wide ${isActive || isDone ? "text-white" : "text-white/50"}`}>
                   {agent.label}
                 </span>
-                <span className={`shadcn-badge ${isActive ? "shadcn-badge-active" : ""}`}>
+                <span className={`glass-badge ${isActive ? "glass-badge-active" : "opacity-50"}`}>
                   {state.toUpperCase()}
                 </span>
               </div>
-              <p className="text-xs text-[hsl(var(--muted-foreground))]">
-                {isActive ? "Processing current step..." : isDone ? "Completed successfully." : "Waiting in queue."}
+              <p className="text-xs text-white/40 font-mono">
+                {isActive ? "> Executing neural routines..." : isDone ? "> Sequence complete." : "> Awaiting authorization."}
               </p>
             </div>
-          </div>
+          </motion.div>
         );
       })}
     </div>

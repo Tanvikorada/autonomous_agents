@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { startPipeline, getJobStatus, getJobResult, PipelineResult, JobStatusResponse } from "@/lib/api";
 import ProblemInput from "@/components/ProblemInput";
 import AgentPipeline from "@/components/AgentPipeline";
@@ -53,64 +54,113 @@ export default function Home() {
   const isLoading = !!jobId;
 
   return (
-    <div className="min-h-screen bg-[hsl(var(--background))] text-[hsl(var(--foreground))]">
+    <div className="min-h-screen text-[hsl(var(--foreground))] selection:bg-purple-500/30">
       
-      {/* Navigation */}
-      <header className="sticky top-0 z-50 w-full border-b border-[hsl(var(--border))] bg-[hsl(var(--background))] backdrop-blur">
-        <div className="container mx-auto flex h-14 max-w-5xl items-center justify-between px-4">
-          <div className="flex items-center gap-2 font-semibold">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5">
-              <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/>
-            </svg>
-            Swarm AI
+      {/* Premium Navbar */}
+      <motion.header 
+        initial={{ y: -20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.8, ease: "easeOut" }}
+        className="sticky top-0 z-50 w-full border-b border-white/5 bg-black/40 backdrop-blur-xl"
+      >
+        <div className="container mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
+          <div className="flex items-center gap-3 font-semibold tracking-tight text-white/90">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-purple-500 to-indigo-600 shadow-lg shadow-purple-500/20">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
+                <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/>
+              </svg>
+            </div>
+            Swarm UI
           </div>
-          <nav className="flex items-center gap-4">
-            <a href="#" className="text-sm font-medium text-[hsl(var(--muted-foreground))] hover:text-[hsl(var(--foreground))]">Documentation</a>
-            <button className="shadcn-btn-outline h-8 px-3 text-xs">Sign In</button>
+          <nav className="flex items-center gap-6">
+            <a href="#" className="text-sm font-medium text-white/60 transition-colors hover:text-white">Documentation</a>
+            <button className="rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-sm font-medium text-white transition-all hover:bg-white/10">
+              Sign In
+            </button>
           </nav>
         </div>
-      </header>
+      </motion.header>
 
-      {/* Main Content */}
-      <main className="container mx-auto max-w-5xl px-4 py-10 space-y-8">
+      <main className="container mx-auto max-w-6xl px-6 py-12 lg:py-20">
         
-        <div className="flex flex-col space-y-2">
-          <h1 className="text-3xl font-bold tracking-tight">Create Agent Workspace</h1>
-          <p className="text-[hsl(var(--muted-foreground))]">
-            Deploy an autonomous swarm to plan, code, and test your software requirements.
-          </p>
-        </div>
-
-        {error && (
-          <div className="rounded-md bg-red-50 p-4 border border-red-200 dark:bg-red-950/50 dark:border-red-900">
-            <p className="text-sm text-red-600 dark:text-red-400 font-medium">Error: {error}</p>
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.2 }}
+          className="flex flex-col items-center text-center space-y-4 mb-16"
+        >
+          <div className="inline-flex items-center rounded-full border border-purple-500/30 bg-purple-500/10 px-3 py-1 text-sm text-purple-300">
+            <span className="flex h-2 w-2 rounded-full bg-purple-500 mr-2 animate-pulse"></span>
+            Agent Swarm Active
           </div>
-        )}
+          <h1 className="text-4xl lg:text-6xl font-bold tracking-tight text-white">
+            Design. Build. <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-indigo-400">Deploy.</span>
+          </h1>
+          <p className="max-w-2xl text-lg text-white/50">
+            Orchestrate a swarm of autonomous AI agents to plan, write, and validate your software architecture in real-time.
+          </p>
+        </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           
-          {/* Main Workspace Area */}
-          <div className="md:col-span-2 space-y-6">
+          {/* Main Input & Results Area */}
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.4 }}
+            className="lg:col-span-8 space-y-8"
+          >
             <ProblemInput onSubmit={handleSubmit} isLoading={isLoading} />
             
-            {result && (
-              <ResultPanel result={result} />
-            )}
-          </div>
+            <AnimatePresence mode="popLayout">
+              {error && (
+                <motion.div 
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  className="rounded-xl border border-red-500/20 bg-red-500/10 p-4 backdrop-blur-md"
+                >
+                  <p className="text-sm font-medium text-red-400">Error: {error}</p>
+                </motion.div>
+              )}
 
-          {/* Sidebar / Telemetry */}
-          <div className="shadcn-card p-4 space-y-4 sticky top-20">
-            <div>
-              <h3 className="font-semibold text-sm">Pipeline Telemetry</h3>
-              <p className="text-xs text-[hsl(var(--muted-foreground))]">Real-time agent status</p>
+              {result && (
+                <motion.div
+                  initial={{ opacity: 0, y: 40 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, type: "spring", bounce: 0.2 }}
+                >
+                  <ResultPanel result={result} />
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </motion.div>
+
+          {/* Telemetry Sidebar */}
+          <motion.div 
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8, delay: 0.5 }}
+            className="lg:col-span-4 sticky top-24"
+          >
+            <div className="glass-panel p-6 space-y-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="font-semibold text-white/90">Agent Telemetry</h3>
+                  <p className="text-xs text-white/50">Real-time execution status</p>
+                </div>
+                {isLoading && (
+                  <div className="h-4 w-4 rounded-full border-2 border-purple-500 border-t-transparent animate-spin"></div>
+                )}
+              </div>
+              <AgentPipeline 
+                status={statusData?.status ?? "pending"} 
+                currentAgent={statusData?.current_agent ?? null} 
+                completedSteps={statusData?.completed_steps ?? []} 
+                isIdle={!isLoading} 
+              />
             </div>
-            <AgentPipeline 
-              status={statusData?.status ?? "pending"} 
-              currentAgent={statusData?.current_agent ?? null} 
-              completedSteps={statusData?.completed_steps ?? []} 
-              isIdle={!isLoading} 
-            />
-          </div>
+          </motion.div>
 
         </div>
 
