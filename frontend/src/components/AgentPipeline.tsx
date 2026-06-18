@@ -57,7 +57,6 @@ export default function AgentPipeline({ status, currentAgent, completedSteps }: 
           const state = getState(agent);
           const isActive = state === "active";
           const isDone = state === "done";
-          const isIdle = state === "idle";
 
           return (
             <div key={agent.name} className="flex items-center flex-1 last:flex-none">

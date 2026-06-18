@@ -20,6 +20,7 @@ export default function TerminalLog({ statusData }: Props) {
   // Simulated log generation based on state changes
   useEffect(() => {
     if (!statusData) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setLogs([]);
       return;
     }

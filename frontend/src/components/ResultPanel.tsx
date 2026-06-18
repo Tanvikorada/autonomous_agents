@@ -22,10 +22,15 @@ export default function ResultPanel({ result, isLoading, currentAgent }: Props) 
 
   // Auto-switch tabs based on current agent if loading
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     if (isLoading && currentAgent) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       if (currentAgent === "Planner") setActiveTab("plan");
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       if (currentAgent === "Coder") setActiveTab("code");
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       if (currentAgent === "Tester") setActiveTab("tests");
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       if (currentAgent === "Reviewer") setActiveTab("review");
     }
   }, [currentAgent, isLoading]);
@@ -43,7 +48,7 @@ export default function ResultPanel({ result, isLoading, currentAgent }: Props) 
           return (
             <button
               key={tab.id}
-              onClick={() => setActiveTab(tab.id as any)}
+              onClick={() => setActiveTab(tab.id as "plan" | "code" | "tests" | "review")}
               className={`px-4 py-2 text-xs font-mono transition-all rounded flex items-center gap-2
                 ${isActive 
                   ? "bg-[#1E1B4B] text-[#A78BFA] border border-[#7C3AED]/30" 

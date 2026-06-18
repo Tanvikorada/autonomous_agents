@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import { startPipeline, getJobStatus, getJobResult, PipelineResult, JobStatusResponse } from "@/lib/api";
 import AgentPipeline from "@/components/AgentPipeline";
 import ResultPanel from "@/components/ResultPanel";
@@ -23,15 +22,14 @@ export default function Home() {
       setStatusData(null);
       const res = await startPipeline(problem);
       setJobId(res.job_id);
-    } catch (err: any) {
-      setError(err.message || "Failed to start swarm.");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Failed to start swarm.");
     }
   };
 
   useEffect(() => {
     if (!jobId) return;
 
-    let intervalId: NodeJS.Timeout;
     const poll = async () => {
       try {
         const data = await getJobStatus(jobId);
@@ -44,13 +42,13 @@ export default function Home() {
           setError(data.error || "Job failed.");
           setJobId(null);
         }
-      } catch (err: any) {
-        setError(err.message || "Failed to fetch status.");
+      } catch (err: unknown) {
+        setError(err instanceof Error ? err.message : "Failed to fetch status.");
         setJobId(null);
       }
     };
 
-    intervalId = setInterval(poll, 1000);
+    const intervalId = setInterval(poll, 1000);
     return () => clearInterval(intervalId);
   }, [jobId]);
 
