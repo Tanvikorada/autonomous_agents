@@ -40,18 +40,19 @@ export default function ResultPanel({ result }: Props) {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "var(--spacing-20)" }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid var(--color-fog)", paddingBottom: "4px" }}>
-        <h2 className="serif-headline" style={{ fontSize: "24px" }}>System Output</h2>
-        <div className="mono-badge">job: {result.job_id.substring(0, 8)}...</div>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid var(--color-mist)", paddingBottom: "var(--spacing-14)" }}>
+        <h2 className="editorial-accent" style={{ color: "var(--color-bone-white)", fontSize: "24px" }}>System Output</h2>
+        <div className="tag-chip" style={{ backgroundColor: "var(--color-obsidian-surface)" }}>
+          job: {result.job_id.substring(0, 8)}...
+        </div>
       </div>
 
       {/* Tabs Menu */}
-      <div style={{ display: "flex", gap: "8px", overflowX: "auto", borderBottom: "1px solid var(--color-fog)", paddingBottom: "1px" }}>
+      <div style={{ display: "flex", gap: "var(--spacing-14)", overflowX: "auto", borderBottom: "1px solid var(--color-mist)", paddingBottom: "var(--spacing-14)" }}>
         {result.plan && (
           <button
             onClick={() => setActiveTab("plan")}
-            className={`result-tab-btn ${activeTab === "plan" ? "active" : ""}`}
-            style={{ display: "flex", alignItems: "center", gap: 6 }}
+            className={activeTab === "plan" ? "active-tab-pill" : "inactive-tab-btn"}
           >
             <span className="material-symbols-outlined" style={{ fontSize: 16 }}>menu_book</span>
             Strategy
@@ -60,8 +61,7 @@ export default function ResultPanel({ result }: Props) {
         {result.code && (
           <button
             onClick={() => setActiveTab("code")}
-            className={`result-tab-btn ${activeTab === "code" ? "active" : ""}`}
-            style={{ display: "flex", alignItems: "center", gap: 6 }}
+            className={activeTab === "code" ? "active-tab-pill" : "inactive-tab-btn"}
           >
             <span className="material-symbols-outlined" style={{ fontSize: 16 }}>code</span>
             Source Code
@@ -70,8 +70,7 @@ export default function ResultPanel({ result }: Props) {
         {result.tests && (
           <button
             onClick={() => setActiveTab("tests")}
-            className={`result-tab-btn ${activeTab === "tests" ? "active" : ""}`}
-            style={{ display: "flex", alignItems: "center", gap: 6 }}
+            className={activeTab === "tests" ? "active-tab-pill" : "inactive-tab-btn"}
           >
             <span className="material-symbols-outlined" style={{ fontSize: 16 }}>verified</span>
             Validation
@@ -80,8 +79,7 @@ export default function ResultPanel({ result }: Props) {
         {result.review && (
           <button
             onClick={() => setActiveTab("review")}
-            className={`result-tab-btn ${activeTab === "review" ? "active" : ""}`}
-            style={{ display: "flex", alignItems: "center", gap: 6 }}
+            className={activeTab === "review" ? "active-tab-pill" : "inactive-tab-btn"}
           >
             <span className="material-symbols-outlined" style={{ fontSize: 16 }}>shield</span>
             Audit
@@ -90,26 +88,26 @@ export default function ResultPanel({ result }: Props) {
       </div>
 
       {/* Tab Contents */}
-      <div style={{ marginTop: "8px" }}>
+      <div style={{ marginTop: "var(--spacing-10)" }}>
         {activeTab === "plan" && result.plan && (
-          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              <span className="mono-badge">/plan</span>
-              <h3 style={{ fontFamily: "var(--font-pplxsans)", fontSize: "15px", fontWeight: 600, color: "var(--color-teal-accent)" }}>Execution Strategy</h3>
+          <div style={{ display: "flex", flexDirection: "column", gap: "var(--spacing-20)" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "var(--spacing-10)" }}>
+              <span className="tag-chip" style={{ backgroundColor: "var(--color-voltage-yellow)", color: "var(--color-obsidian-surface)" }}>/plan</span>
+              <h3 style={{ fontFamily: "var(--font-canvasans)", fontSize: "16px", fontWeight: 700, color: "var(--color-bone-white)", margin: 0 }}>Execution Strategy</h3>
             </div>
             
-            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+            <div style={{ display: "flex", flexDirection: "column", gap: "var(--spacing-14)" }}>
               {result.plan.map((step, i) => (
-                <div key={i} style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
+                <div key={i} style={{ display: "flex", gap: "var(--spacing-14)", alignItems: "flex-start" }}>
                   <div style={{ 
-                    fontFamily: "var(--font-pplxsansmono)", 
-                    fontSize: "11px", 
-                    fontWeight: 600, 
-                    color: "var(--color-teal-accent)", 
-                    backgroundColor: "rgba(59, 241, 224, 0.15)", 
+                    fontFamily: "var(--font-canvasans)", 
+                    fontSize: "12px", 
+                    fontWeight: 700, 
+                    color: "var(--color-obsidian-surface)", 
+                    backgroundColor: "var(--color-voltage-yellow)", 
                     borderRadius: "50%", 
-                    width: "20px", 
-                    height: "20px", 
+                    width: "24px", 
+                    height: "24px", 
                     display: "flex", 
                     alignItems: "center", 
                     justifyContent: "center",
@@ -118,7 +116,7 @@ export default function ResultPanel({ result }: Props) {
                   }}>
                     {i + 1}
                   </div>
-                  <p className="body-stack" style={{ margin: 0, fontSize: "14px", color: "var(--color-aged-sepia)" }}>
+                  <p className="body-text" style={{ color: "var(--color-ash-text)", margin: 0 }}>
                     {step}
                   </p>
                 </div>
@@ -128,32 +126,29 @@ export default function ResultPanel({ result }: Props) {
         )}
 
         {(activeTab === "code" || activeTab === "tests") && currentCode && (
-          <div style={{ display: "flex", flexDirection: "column" }}>
+          <div style={{ display: "flex", flexDirection: "column", borderRadius: "var(--radius-cards)", overflow: "hidden", border: "1px solid var(--color-mist)" }}>
             {/* Terminal Window Chrome */}
-            <div className="code-console-header">
-              <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+            <div style={{ 
+              backgroundColor: "var(--color-obsidian-surface)", 
+              padding: "var(--spacing-14) var(--spacing-20)", 
+              display: "flex", 
+              justifyContent: "space-between", 
+              alignItems: "center",
+              borderBottom: "1px solid var(--color-mist)"
+            }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "var(--spacing-10)" }}>
                 {/* Simulated mac dots */}
-                <div style={{ display: "flex", gap: 4 }}>
-                  <div style={{ width: 8, height: 8, borderRadius: "50%", backgroundColor: "#e26c5c" }}></div>
-                  <div style={{ width: 8, height: 8, borderRadius: "50%", backgroundColor: "#f3cc63" }}></div>
-                  <div style={{ width: 8, height: 8, borderRadius: "50%", backgroundColor: "#6fc961" }}></div>
+                <div style={{ display: "flex", gap: 6 }}>
+                  <div style={{ width: 10, height: 10, borderRadius: "50%", backgroundColor: "var(--color-ember-coral)" }}></div>
+                  <div style={{ width: 10, height: 10, borderRadius: "50%", backgroundColor: "var(--color-voltage-yellow)" }}></div>
+                  <div style={{ width: 10, height: 10, borderRadius: "50%", backgroundColor: "var(--color-toxic-lime)" }}></div>
                 </div>
-                <span style={{ marginLeft: 6, opacity: 0.8 }}>{currentFileName}</span>
+                <span style={{ marginLeft: "var(--spacing-10)", fontFamily: "var(--font-canvasans)", fontSize: "14px", color: "var(--color-ash-text)" }}>{currentFileName}</span>
               </div>
               <button 
                 onClick={() => handleCopy(currentCode)}
-                style={{ 
-                  background: "transparent", 
-                  border: "none", 
-                  color: "var(--color-moss-shadow)", 
-                  cursor: "pointer", 
-                  display: "flex", 
-                  alignItems: "center", 
-                  gap: 4,
-                  fontSize: "11px",
-                  fontWeight: 500,
-                  fontFamily: "var(--font-pplxsans)"
-                }}
+                className="ghost-cta"
+                style={{ padding: "6px 14px", fontSize: "12px", borderRadius: "var(--radius-buttons)" }}
               >
                 <span className="material-symbols-outlined" style={{ fontSize: 14 }}>
                   {copied ? "check" : "content_copy"}
@@ -162,36 +157,45 @@ export default function ResultPanel({ result }: Props) {
               </button>
             </div>
             {/* Code Body */}
-            <pre className="code-console-body">
+            <pre style={{ 
+              backgroundColor: "var(--color-midnight-canvas)", 
+              padding: "var(--spacing-20)", 
+              margin: 0, 
+              overflowX: "auto", 
+              fontFamily: "'JetBrains Mono', 'Fira Code', monospace", 
+              fontSize: "13px",
+              lineHeight: 1.5,
+              color: "var(--color-arc-blue)" 
+            }}>
               <code>{currentCode}</code>
             </pre>
           </div>
         )}
 
         {activeTab === "review" && result.review && (
-          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              <span className="mono-badge">/audit</span>
-              <h3 style={{ fontFamily: "var(--font-pplxsans)", fontSize: "15px", fontWeight: 600, color: "var(--color-teal-accent)" }}>Security & Code Quality Review</h3>
+          <div style={{ display: "flex", flexDirection: "column", gap: "var(--spacing-20)" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: "var(--spacing-10)" }}>
+              <span className="tag-chip" style={{ backgroundColor: "var(--color-toxic-lime)", color: "var(--color-obsidian-surface)" }}>/audit</span>
+              <h3 style={{ fontFamily: "var(--font-canvasans)", fontSize: "16px", fontWeight: 700, color: "var(--color-bone-white)", margin: 0 }}>Security & Code Quality Review</h3>
             </div>
             
             <div style={{ 
-              backgroundColor: "rgba(59, 241, 224, 0.05)", 
-              border: "1px solid rgba(59, 241, 224, 0.15)", 
-              borderRadius: "var(--radius-other)",
-              padding: "16px",
+              backgroundColor: "var(--color-obsidian-surface)", 
+              border: "1px solid var(--color-mist)", 
+              borderRadius: "var(--radius-cards)",
+              padding: "var(--spacing-20)",
               display: "flex",
-              gap: 16,
+              gap: "var(--spacing-16)",
               alignItems: "flex-start"
             }}>
-              <span className="material-symbols-outlined" style={{ color: "var(--color-teal-accent)", fontSize: 24, flexShrink: 0 }}>
+              <span className="material-symbols-outlined" style={{ color: "var(--color-toxic-lime)", fontSize: 24, flexShrink: 0 }}>
                 gavel
               </span>
-              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                <div style={{ fontFamily: "var(--font-pplxsans)", fontSize: "14px", fontWeight: 600, color: "var(--color-aged-sepia)" }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: "var(--spacing-10)" }}>
+                <div style={{ fontFamily: "var(--font-canvasans)", fontSize: "16px", fontWeight: 700, color: "var(--color-bone-white)" }}>
                   Audited System Report
                 </div>
-                <p className="body-stack" style={{ margin: 0, fontSize: "13.5px", lineHeight: "1.6", color: "var(--color-aged-sepia)" }}>
+                <p className="body-text" style={{ margin: 0 }}>
                   {result.review}
                 </p>
               </div>

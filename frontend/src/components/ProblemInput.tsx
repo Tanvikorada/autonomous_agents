@@ -18,8 +18,8 @@ export default function ProblemInput({ onSubmit, isLoading }: Props) {
   const canSubmit = !isLoading && problem.trim().length >= 10;
 
   return (
-    <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-      <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+    <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "var(--spacing-16)" }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: "var(--spacing-8)" }}>
         <textarea
           value={problem}
           onChange={e => setProblem(e.target.value)}
@@ -28,36 +28,35 @@ export default function ProblemInput({ onSubmit, isLoading }: Props) {
           rows={4}
           style={{
             width: "100%",
-            backgroundColor: "var(--surface-parchment-canvas)",
-            border: "1px solid var(--color-fog)",
+            backgroundColor: "var(--color-obsidian-surface)",
+            border: "1px solid var(--color-mist)",
             borderRadius: "var(--radius-inputs)",
-            padding: "16px",
+            padding: "var(--spacing-16)",
             outline: "none",
-            fontFamily: "var(--font-pplxsans)",
-            fontSize: "var(--text-body-lg)",
+            fontFamily: "var(--font-canvasans)",
+            fontSize: "16px",
             fontWeight: 400,
-            lineHeight: "var(--leading-body-lg)",
-            color: "var(--color-aged-sepia)",
+            color: "var(--color-bone-white)",
             resize: "none",
+            transition: "border-color 0.3s ease"
           }}
-          onFocus={(e) => (e.target.style.borderColor = "var(--color-teal-accent)")}
-          onBlur={(e) => (e.target.style.borderColor = "var(--color-fog)")}
+          onFocus={(e) => (e.target.style.borderColor = "var(--color-leonardo-violet)")}
+          onBlur={(e) => (e.target.style.borderColor = "var(--color-mist)")}
         />
       </div>
 
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 8 }}>
-        <div className="mono-badge">
-          /query: task-generator
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "var(--spacing-10)" }}>
+        <div style={{ fontFamily: "var(--font-canvasans)", fontSize: "12px", color: "var(--color-charcoal-mute)" }}>
+          Minimum 10 characters required.
         </div>
         <button
           type="submit"
           disabled={!canSubmit}
-          className="pill-cta"
-          style={{ padding: "8px 24px" }}
+          className="primary-cta"
         >
           {isLoading ? (
             <>
-              <span className="material-symbols-outlined" style={{ fontSize: 18 }}>sync</span>
+              <span className="material-symbols-outlined" style={{ fontSize: 18, animation: "spin 2s linear infinite" }}>sync</span>
               Processing...
             </>
           ) : (

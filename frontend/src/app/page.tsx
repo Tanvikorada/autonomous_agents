@@ -5,7 +5,6 @@ import { startPipeline, getJobStatus, getJobResult, PipelineResult, JobStatusRes
 import ProblemInput from "@/components/ProblemInput";
 import AgentPipeline from "@/components/AgentPipeline";
 import ResultPanel from "@/components/ResultPanel";
-import FloralDnaEffect from "@/components/FloralDnaEffect";
 
 export default function Home() {
   const [jobId, setJobId] = useState<string | null>(null);
@@ -56,120 +55,97 @@ export default function Home() {
   const isLoading = !!jobId;
 
   return (
-    <div>
-      {/* 100vh Botanical Hero Section */}
-      <section className="botanical-hero" style={{ padding: "var(--spacing-28) var(--spacing-40)" }}>
-        {/* Interactive Floral DNA Canvas Background */}
-        <FloralDnaEffect />
+    <div style={{ backgroundColor: "var(--color-midnight-canvas)", minHeight: "100vh" }}>
+      
+      {/* Navigation */}
+      <nav style={{ 
+        position: "absolute", top: 0, left: 0, right: 0, 
+        height: "80px", display: "flex", justifyContent: "space-between", alignItems: "center", 
+        padding: "0 var(--spacing-44)", zIndex: 10 
+      }}>
+        <div style={{ fontFamily: "var(--font-canvasans)", fontWeight: 700, fontSize: "16px", letterSpacing: "1px" }}>
+          SWARM_OS.
+        </div>
+        <div style={{ display: "flex", gap: "var(--spacing-20)" }}>
+          <button className="ghost-cta">Developer API</button>
+          <button className="primary-cta">Log in</button>
+        </div>
+      </nav>
 
-        {/* Navigation */}
-        <nav style={{ display: "flex", justifyContent: "space-between", alignItems: "center", position: "relative", zIndex: 1 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <span className="mono-badge">/os</span>
-            <span style={{ fontFamily: "var(--font-pplxsans)", fontWeight: 600, fontSize: "16px", letterSpacing: "-0.04em" }}>SWARM_OS</span>
-          </div>
-          <div style={{ display: "flex", gap: "var(--spacing-8)", alignItems: "center" }}>
-            <button className="nav-pill" onClick={() => workspaceRef.current?.scrollIntoView({ behavior: "smooth" })}>Telemetry</button>
-            <button className="nav-pill" onClick={() => workspaceRef.current?.scrollIntoView({ behavior: "smooth" })}>Result Console</button>
-            <button className="pill-cta float-hover" style={{ marginLeft: "var(--spacing-12)" }}>
-              <span className="material-symbols-outlined" style={{ fontSize: 16 }}>terminal</span>
-              OS Terminal
-            </button>
-          </div>
-        </nav>
-
-        {/* Hero Content */}
-        <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", textAlign: "center", paddingBottom: "10vh", position: "relative", zIndex: 1 }}>
-          <div style={{ fontFamily: "var(--font-pplxsansmono)", fontSize: "11px", letterSpacing: "2.5px", color: "var(--color-teal-accent)", textTransform: "uppercase", marginBottom: "var(--spacing-12)", fontWeight: 600 }}>
-            Autonomous Multi-Agent Software Engineering
-          </div>
-          <h1 className="sans-hero" style={{ fontSize: "clamp(48px, 8vw, 96px)", fontWeight: 300, lineHeight: 1.0, letterSpacing: "-0.04em" }}>
-            SWARM_OS
-          </h1>
-          <p className="body-stack" style={{ maxWidth: 620, marginTop: "var(--spacing-20)", color: "var(--color-moss-shadow)", fontSize: "16px", lineHeight: "1.6" }}>
-            Deploy an organic, self-orchestrating swarm of specialized AI agents. Design plans, synthesize source code, validate tests, and audit security in one automated loop.
-          </p>
-          <button 
-            className="pill-cta float-hover" 
-            style={{ marginTop: "var(--spacing-40)" }}
-            onClick={() => workspaceRef.current?.scrollIntoView({ behavior: "smooth" })}
-          >
-            <span className="material-symbols-outlined" style={{ fontSize: 18 }}>bolt</span>
+      {/* Hero Section */}
+      <section style={{ 
+        height: "100vh", width: "100%", display: "flex", flexDirection: "column", 
+        justifyContent: "center", alignItems: "center", position: "relative",
+        overflow: "hidden"
+      }}>
+        <div className="hero-3d-wordmark display-xl animate-fade-in-up" style={{ textAlign: "center", zIndex: 1 }}>
+          SWARM_OS
+        </div>
+        <div className="hero-3d-wordmark display-xl animate-fade-in-up stagger-1" style={{ 
+          textAlign: "center", position: "absolute", opacity: 0.1, top: "20%", left: "5%", zIndex: 0, transform: "scale(1.5)" 
+        }}>
+          SWARM_OS
+        </div>
+        <h1 className="heading-sm animate-fade-in-up stagger-2" style={{ marginTop: "var(--spacing-41)", zIndex: 2 }}>
+          THE AUTONOMOUS SOFTWARE ENGINEERING PLATFORM
+        </h1>
+        <p className="body-text animate-fade-in-up stagger-3" style={{ marginTop: "var(--spacing-20)", textAlign: "center", maxWidth: "600px", zIndex: 2 }}>
+          An organic, self-orchestrating swarm of specialized AI agents. Design plans, synthesize source code, validate tests, and audit security on an infinite black canvas.
+        </p>
+        <div className="animate-fade-in-up stagger-4" style={{ marginTop: "var(--spacing-44)", zIndex: 2 }}>
+          <button className="primary-cta" onClick={() => workspaceRef.current?.scrollIntoView({ behavior: "smooth" })}>
             Initialize Swarm
           </button>
         </div>
       </section>
 
-      {/* Main Workspace Strip (Parchment) */}
-      <section 
-        ref={workspaceRef}
-        style={{ 
-          maxWidth: "800px", 
-          margin: "0 auto", 
-          padding: "var(--spacing-80) var(--spacing-40)",
-          display: "flex",
-          flexDirection: "column",
-          gap: "var(--spacing-40)",
-          position: "relative",
-        }}
-      >
-        <div style={{ textAlign: "center", marginBottom: "var(--spacing-20)" }}>
-          <div style={{ fontFamily: "var(--font-pplxsansmono)", fontSize: "11px", letterSpacing: "1.5px", color: "var(--color-moss-shadow)", textTransform: "uppercase", marginBottom: "var(--spacing-8)" }}>
-            Swarm Core
-          </div>
-          <h2 className="serif-headline" style={{ fontSize: "40px", marginBottom: "var(--spacing-12)", fontWeight: 300 }}>Initialize Agent Swarm</h2>
-          <p className="body-stack" style={{ color: "var(--color-moss-shadow)", maxWidth: 500, margin: "0 auto" }}>
-            Provide your application specifications. The planning, coding, validation, and review agents will execute the cycle.
-          </p>
-        </div>
-
-        {error && (
-          <div className="glass-card" style={{ color: "#b62b1a", fontWeight: 500, borderLeft: "4px solid #b62b1a" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              <span className="material-symbols-outlined">error</span>
-              <span>{error}</span>
-            </div>
-          </div>
-        )}
-
-        <div className="glass-card">
-          <ProblemInput onSubmit={handleSubmit} isLoading={isLoading} />
-        </div>
+      {/* Workspace App Layout */}
+      <section ref={workspaceRef} style={{ maxWidth: "var(--page-max-width)", margin: "0 auto", padding: "var(--spacing-80) var(--spacing-44)" }}>
         
-        {result && (
-          <div className="glass-card" style={{ marginTop: "var(--spacing-40)" }}>
-            <ResultPanel result={result} />
+        {error && (
+          <div className="charcoal-card" style={{ borderLeft: "4px solid var(--color-ember-coral)", marginBottom: "var(--spacing-41)" }}>
+            <span style={{ color: "var(--color-ember-coral)", fontWeight: 500 }}>Error: {error}</span>
           </div>
         )}
-      </section>
 
-      {/* Agent Pipeline Telemetry (Botanical Floating) */}
-      <section className="botanical-section" style={{ display: "flex", justifyContent: "center", padding: "var(--spacing-180) var(--spacing-40)" }}>
-        <div style={{ maxWidth: "600px", width: "100%", display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center" }}>
-          <div style={{ fontFamily: "var(--font-pplxsansmono)", fontSize: "11px", letterSpacing: "1.5px", color: "var(--color-teal-accent)", textTransform: "uppercase", marginBottom: "var(--spacing-8)" }}>
-            Swarm Orchestration
-          </div>
-          <h2 className="serif-headline" style={{ fontSize: "32px", marginBottom: "var(--spacing-8)" }}>Agent Pipeline Telemetry</h2>
-          <p className="body-stack" style={{ color: "var(--color-moss-shadow)", marginBottom: "var(--spacing-40)", maxWidth: "450px" }}>
-            Track the real-time execution matrix of autonomous agent steps as they process your specifications.
-          </p>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 3fr", gap: "var(--spacing-20)", alignItems: "start" }}>
           
-          <div style={{ width: "100%", maxWidth: "400px", textAlign: "left" }}>
-            <div className="glass-card" style={{ padding: "var(--spacing-28)" }}>
-              <AgentPipeline 
-                status={statusData?.status ?? "pending"} 
-                currentAgent={statusData?.current_agent ?? null} 
-                completedSteps={statusData?.completed_steps ?? []} 
-                isIdle={!isLoading} 
-              />
-            </div>
+          {/* Left Column: Telemetry */}
+          <div className="charcoal-card" style={{ display: "flex", flexDirection: "column", gap: "var(--spacing-20)", position: "sticky", top: "var(--spacing-41)" }}>
+            <h3 className="editorial-accent" style={{ color: "var(--color-leonardo-violet)", fontSize: "24px" }}>Telemetry</h3>
+            <p className="body-text">Real-time pipeline analysis.</p>
+            <AgentPipeline 
+              status={statusData?.status ?? "pending"} 
+              currentAgent={statusData?.current_agent ?? null} 
+              completedSteps={statusData?.completed_steps ?? []} 
+              isIdle={!isLoading} 
+            />
           </div>
+
+          {/* Right Column: Input & Results */}
+          <div style={{ display: "flex", flexDirection: "column", gap: "var(--spacing-41)" }}>
+            <div className="charcoal-card">
+              <ProblemInput onSubmit={handleSubmit} isLoading={isLoading} />
+            </div>
+
+            {result && (
+              <div className="charcoal-card animate-fade-in-up">
+                <ResultPanel result={result} />
+              </div>
+            )}
+          </div>
+
         </div>
       </section>
-      
-      {/* Absolute Black Footer */}
-      <footer style={{ backgroundColor: "var(--color-absolute-black)", color: "var(--color-ash-mist)", padding: "var(--spacing-80) var(--spacing-40)", textAlign: "center", fontFamily: "var(--font-pplxsansmono)", fontSize: "var(--text-caption)" }}>
-        <p style={{ letterSpacing: "1.5px" }}>TERMINAL ANCHOR // SWARM OS V1.0.0 // BY ANTIGRAVITY</p>
+
+      {/* Footer */}
+      <footer style={{ padding: "var(--spacing-80) var(--spacing-44)", borderTop: "1px solid var(--color-obsidian-surface)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <div style={{ fontFamily: "var(--font-canvasans)", fontWeight: 700, fontSize: "16px", color: "var(--color-ash-text)" }}>SWARM_OS</div>
+        <div style={{ display: "flex", gap: "var(--spacing-20)" }}>
+          <span className="body-text" style={{ cursor: "pointer" }}>Documentation</span>
+          <span className="body-text" style={{ cursor: "pointer" }}>Privacy Policy</span>
+          <span className="body-text" style={{ cursor: "pointer" }}>Terms of Service</span>
+        </div>
       </footer>
     </div>
   );
