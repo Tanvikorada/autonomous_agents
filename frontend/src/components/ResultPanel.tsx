@@ -40,7 +40,7 @@ export default function ResultPanel({ result }: Props) {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "var(--spacing-20)" }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid var(--color-fog)", pb: 4 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid var(--color-fog)", paddingBottom: "4px" }}>
         <h2 className="serif-headline" style={{ fontSize: "24px" }}>System Output</h2>
         <div className="mono-badge">job: {result.job_id.substring(0, 8)}...</div>
       </div>
