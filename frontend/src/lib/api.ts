@@ -59,6 +59,19 @@ export async function startPipeline(problem: string): Promise<JobCreatedResponse
   return res.json();
 }
 
+// ── Approve a plan ──────────────────────────────────────────────────────────────
+export async function approvePlan(jobId: string, plan: string[]): Promise<void> {
+  const res = await fetch(`${API_BASE}/api/approve/${jobId}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ plan }),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.detail || `HTTP ${res.status}`);
+  }
+}
+
 // ── Poll job status ───────────────────────────────────────────────────────────
 export async function getJobStatus(jobId: string): Promise<JobStatusResponse> {
   const res = await fetch(`${API_BASE}/api/status/${jobId}`);

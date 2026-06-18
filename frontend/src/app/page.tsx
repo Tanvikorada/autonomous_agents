@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { startPipeline, getJobStatus, getJobResult, PipelineResult, JobStatusResponse } from "@/lib/api";
+import { startPipeline, getJobStatus, getJobResult, approvePlan, PipelineResult, JobStatusResponse } from "@/lib/api";
 import AgentPipeline from "@/components/AgentPipeline";
 import ResultPanel from "@/components/ResultPanel";
 import TerminalLog from "@/components/TerminalLog";
@@ -60,12 +60,7 @@ export default function Home() {
   const handleApprove = async (plan: string[]) => {
     if (!jobId) return;
     try {
-      const response = await fetch(`http://localhost:8000/api/approve/${jobId}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ plan }),
-      });
-      if (!response.ok) throw new Error("Approval failed");
+      await approvePlan(jobId, plan);
       // Result panel should show coding tab next
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Approval failed");
