@@ -129,7 +129,7 @@ export default function ResultPanel({ result }: Props) {
           {(activeTab === "code" || activeTab === "tests") && currentCode && (
             <motion.div 
               key="code"
-              initial={{ opacity: 0, opacity: 1 }} // Note: keeping code static to avoid layout jumps
+              initial={{ opacity: 1 }} // Note: keeping code static to avoid layout jumps
               className="flex flex-col h-full"
             >
               <div className="flex items-center justify-between px-4 py-2.5 bg-black/40 border-b border-white/5">
