@@ -27,16 +27,16 @@ export default function IntroSequence({ onComplete }: Props) {
           initial={{ opacity: 1 }}
           exit={{ opacity: 0, filter: "blur(10px)" }}
           transition={{ duration: 1, ease: "easeInOut" }}
-          className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-[#030014] overflow-hidden"
+          className="fixed top-0 left-0 w-[100vw] h-[100vh] z-[9999] flex flex-col items-center justify-center bg-[#030014] overflow-hidden m-0 p-0"
         >
           {/* Abstract Optical Lines drawing */}
           <motion.div
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ duration: 1.5, ease: "easeOut" }}
-            className="absolute inset-0 flex items-center justify-center opacity-30"
+            className="absolute inset-0 flex items-center justify-center opacity-30 pointer-events-none"
           >
-            <svg viewBox="0 0 100 100" className="w-[80vw] h-[80vw] max-w-[800px] max-h-[800px] text-purple-500" fill="none" stroke="currentColor" strokeWidth="0.2">
+            <svg viewBox="0 0 100 100" className="w-[150vw] h-[150vh] text-purple-500" fill="none" stroke="currentColor" strokeWidth="0.1">
               {[...Array(20)].map((_, i) => (
                 <motion.circle
                   key={i}

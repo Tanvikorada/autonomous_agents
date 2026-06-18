@@ -44,10 +44,11 @@ export default function AgentPipeline({ status, currentAgent, completedSteps, is
             glarePosition="all"
             transitionSpeed={2500}
             tiltReverse={true}
-            className="relative"
+            className="relative w-full"
+            style={{ width: "100%" }}
           >
             <motion.div 
-              className="flex gap-4 relative"
+              className="flex gap-4 relative w-full"
               animate={{ opacity: isActive || isDone ? 1 : 0.4 }}
               transition={{ duration: 0.5 }}
             >
