@@ -1,7 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useState, useEffect } from "react";
 import { startPipeline, getJobStatus, getJobResult, PipelineResult, JobStatusResponse } from "@/lib/api";
 import ProblemInput from "@/components/ProblemInput";
 import AgentPipeline from "@/components/AgentPipeline";
@@ -12,8 +11,6 @@ export default function Home() {
   const [statusData, setStatusData] = useState<JobStatusResponse | null>(null);
   const [result, setResult] = useState<PipelineResult | null>(null);
   const [error, setError] = useState<string | null>(null);
-
-  const workspaceRef = useRef<HTMLDivElement>(null);
 
   const handleSubmit = async (problem: string) => {
     try {
@@ -56,118 +53,69 @@ export default function Home() {
   const isLoading = !!jobId;
 
   return (
-    <div style={{ backgroundColor: "var(--color-midnight-canvas)", minHeight: "100vh" }}>
+    <div className="min-h-screen bg-[hsl(var(--background))] text-[hsl(var(--foreground))]">
       
       {/* Navigation */}
-      <nav style={{ 
-        position: "absolute", top: 0, left: 0, right: 0, 
-        height: "80px", display: "flex", justifyContent: "space-between", alignItems: "center", 
-        padding: "0 var(--spacing-44)", zIndex: 10 
-      }}>
-        <div style={{ fontFamily: "var(--font-canvasans)", fontWeight: 700, fontSize: "16px", letterSpacing: "1px", color: "var(--color-bone-white)" }}>
-          SWARM_OS.
+      <header className="sticky top-0 z-50 w-full border-b border-[hsl(var(--border))] bg-[hsl(var(--background))] backdrop-blur">
+        <div className="container mx-auto flex h-14 max-w-5xl items-center justify-between px-4">
+          <div className="flex items-center gap-2 font-semibold">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5">
+              <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/>
+            </svg>
+            Swarm AI
+          </div>
+          <nav className="flex items-center gap-4">
+            <a href="#" className="text-sm font-medium text-[hsl(var(--muted-foreground))] hover:text-[hsl(var(--foreground))]">Documentation</a>
+            <button className="shadcn-btn-outline h-8 px-3 text-xs">Sign In</button>
+          </nav>
         </div>
-        <div style={{ display: "flex", gap: "var(--spacing-20)" }}>
-          <button className="ghost-cta">Developer API</button>
-          <button className="primary-cta" style={{ padding: "7px 14px", fontSize: "14px" }}>Log in</button>
-        </div>
-      </nav>
+      </header>
 
-      {/* Hero Section */}
-      <section style={{ 
-        minHeight: "80vh", width: "100%", display: "flex", flexDirection: "column", 
-        justifyContent: "center", alignItems: "center", paddingTop: "120px", position: "relative"
-      }}>
-        <motion.div 
-          initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
-          style={{ display: "flex", flexDirection: "column", alignItems: "center" }}
-        >
-          <div className="display-xl" style={{ color: "var(--color-leonardo-violet)", zIndex: 1, position: "relative" }}>
-            SWARM
-          </div>
-          <div className="display-xl" style={{ color: "var(--color-leonardo-violet)", marginTop: "-0.2em", zIndex: 2, position: "relative" }}>
-            OS
-          </div>
-        </motion.div>
+      {/* Main Content */}
+      <main className="container mx-auto max-w-5xl px-4 py-10 space-y-8">
         
-        <motion.h1 
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 1.5, delay: 0.4, ease: "easeOut" }}
-          className="heading-sm" 
-          style={{ marginTop: "var(--spacing-41)", zIndex: 2, textAlign: "center" }}
-        >
-          THE AUTONOMOUS MULTI-AGENT SYSTEM
-        </motion.h1>
+        <div className="flex flex-col space-y-2">
+          <h1 className="text-3xl font-bold tracking-tight">Create Agent Workspace</h1>
+          <p className="text-[hsl(var(--muted-foreground))]">
+            Deploy an autonomous swarm to plan, code, and test your software requirements.
+          </p>
+        </div>
 
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1, delay: 0.6, ease: [0.16, 1, 0.3, 1] }}
-          style={{ marginTop: "var(--spacing-68)", width: "100%", maxWidth: "800px", padding: "0 var(--spacing-20)" }}
-        >
-          <ProblemInput onSubmit={handleSubmit} isLoading={isLoading} />
-        </motion.div>
-      </section>
+        {error && (
+          <div className="rounded-md bg-red-50 p-4 border border-red-200 dark:bg-red-950/50 dark:border-red-900">
+            <p className="text-sm text-red-600 dark:text-red-400 font-medium">Error: {error}</p>
+          </div>
+        )}
 
-      {/* Pipeline / Telemetry Area */}
-      <AnimatePresence>
-        {(isLoading || statusData) && (
-          <motion.section 
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-            style={{ maxWidth: "var(--page-max-width)", margin: "0 auto", padding: "var(--spacing-80) var(--spacing-44)", display: "flex", justifyContent: "center", overflow: "hidden" }}
-          >
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
+          
+          {/* Main Workspace Area */}
+          <div className="md:col-span-2 space-y-6">
+            <ProblemInput onSubmit={handleSubmit} isLoading={isLoading} />
+            
+            {result && (
+              <ResultPanel result={result} />
+            )}
+          </div>
+
+          {/* Sidebar / Telemetry */}
+          <div className="shadcn-card p-4 space-y-4 sticky top-20">
+            <div>
+              <h3 className="font-semibold text-sm">Pipeline Telemetry</h3>
+              <p className="text-xs text-[hsl(var(--muted-foreground))]">Real-time agent status</p>
+            </div>
             <AgentPipeline 
               status={statusData?.status ?? "pending"} 
               currentAgent={statusData?.current_agent ?? null} 
               completedSteps={statusData?.completed_steps ?? []} 
               isIdle={!isLoading} 
             />
-          </motion.section>
-        )}
-      </AnimatePresence>
+          </div>
 
-      {/* Results Gallery Area */}
-      <AnimatePresence>
-        {error && (
-          <motion.section 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            style={{ maxWidth: "var(--page-max-width)", margin: "0 auto", padding: "0 var(--spacing-44) var(--spacing-80)" }}
-          >
-            <div className="charcoal-card" style={{ borderLeft: "4px solid var(--color-ember-coral)" }}>
-              <span style={{ color: "var(--color-ember-coral)", fontWeight: 500 }}>Error: {error}</span>
-            </div>
-          </motion.section>
-        )}
-
-        {result && (
-          <motion.section 
-            initial={{ opacity: 0, y: 40 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-            style={{ maxWidth: "var(--page-max-width)", margin: "0 auto", padding: "0 var(--spacing-44) var(--spacing-80)" }}
-          >
-            <ResultPanel result={result} />
-          </motion.section>
-        )}
-      </AnimatePresence>
-
-      {/* Footer */}
-      <footer style={{ padding: "var(--spacing-80) var(--spacing-44)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <div style={{ fontFamily: "var(--font-canvasans)", fontWeight: 700, fontSize: "14px", color: "var(--color-ash-text)" }}>SWARM_OS</div>
-        <div style={{ display: "flex", gap: "var(--spacing-20)" }}>
-          <span className="body-text" style={{ cursor: "pointer", fontSize: "14px" }}>Documentation</span>
-          <span className="body-text" style={{ cursor: "pointer", fontSize: "14px" }}>Privacy Policy</span>
-          <span className="body-text" style={{ cursor: "pointer", fontSize: "14px" }}>Terms of Service</span>
         </div>
-      </footer>
+
+      </main>
+
     </div>
   );
 }

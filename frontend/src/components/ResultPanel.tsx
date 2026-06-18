@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { PipelineResult } from "@/lib/api";
-import { motion, AnimatePresence } from "framer-motion";
 
 interface Props {
   result: PipelineResult;
@@ -12,7 +11,6 @@ export default function ResultPanel({ result }: Props) {
   const [activeTab, setActiveTab] = useState<TabType>("plan");
   const [copied, setCopied] = useState(false);
 
-  // Set first available tab as active when result changes
   useEffect(() => {
     if (result.plan && result.plan.length > 0) {
       setActiveTab("plan");
@@ -40,13 +38,22 @@ export default function ResultPanel({ result }: Props) {
   const currentFileName = activeTab === "code" ? "main.py" : "test_main.py";
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "var(--spacing-20)", width: "100%" }}>
-      {/* Tabs Menu */}
-      <div style={{ display: "flex", gap: "var(--spacing-14)", overflowX: "auto", justifyContent: "center", paddingBottom: "var(--spacing-10)" }}>
+    <div className="shadcn-card overflow-hidden">
+      
+      {/* Header */}
+      <div className="flex items-center justify-between p-4 border-b border-[hsl(var(--border))] bg-[hsl(var(--muted))]">
+        <div className="flex items-center gap-3">
+          <h2 className="font-semibold text-sm">Job Results</h2>
+          <span className="shadcn-badge">{result.job_id.substring(0, 8)}</span>
+        </div>
+      </div>
+
+      {/* Tabs */}
+      <div className="flex border-b border-[hsl(var(--border))] px-4 bg-[hsl(var(--background))]">
         {result.plan && (
           <button
             onClick={() => setActiveTab("plan")}
-            className={activeTab === "plan" ? "active-tab-pill" : "inactive-tab-btn"}
+            className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${activeTab === "plan" ? "border-[hsl(var(--primary))] text-[hsl(var(--foreground))]" : "border-transparent text-[hsl(var(--muted-foreground))] hover:text-[hsl(var(--foreground))]"}`}
           >
             Strategy
           </button>
@@ -54,142 +61,80 @@ export default function ResultPanel({ result }: Props) {
         {result.code && (
           <button
             onClick={() => setActiveTab("code")}
-            className={activeTab === "code" ? "active-tab-pill" : "inactive-tab-btn"}
+            className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${activeTab === "code" ? "border-[hsl(var(--primary))] text-[hsl(var(--foreground))]" : "border-transparent text-[hsl(var(--muted-foreground))] hover:text-[hsl(var(--foreground))]"}`}
           >
-            Source Code
+            Code
           </button>
         )}
         {result.tests && (
           <button
             onClick={() => setActiveTab("tests")}
-            className={activeTab === "tests" ? "active-tab-pill" : "inactive-tab-btn"}
+            className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${activeTab === "tests" ? "border-[hsl(var(--primary))] text-[hsl(var(--foreground))]" : "border-transparent text-[hsl(var(--muted-foreground))] hover:text-[hsl(var(--foreground))]"}`}
           >
-            Validation
+            Tests
           </button>
         )}
         {result.review && (
           <button
             onClick={() => setActiveTab("review")}
-            className={activeTab === "review" ? "active-tab-pill" : "inactive-tab-btn"}
+            className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${activeTab === "review" ? "border-[hsl(var(--primary))] text-[hsl(var(--foreground))]" : "border-transparent text-[hsl(var(--muted-foreground))] hover:text-[hsl(var(--foreground))]"}`}
           >
-            Audit
+            Review
           </button>
         )}
       </div>
 
-      {/* Main Card (8.4px radius, Charcoal #353535) */}
-      <div className="charcoal-card" style={{ padding: 0, overflow: "hidden", minHeight: "400px" }}>
-        
-        {/* Header Strip inside Card */}
-        <div style={{ 
-          backgroundColor: "rgba(0,0,0,0.2)", 
-          padding: "var(--spacing-14) var(--spacing-20)", 
-          display: "flex", 
-          justifyContent: "space-between", 
-          alignItems: "center",
-          borderBottom: "1px solid var(--color-mist)"
-        }}>
-          <div style={{ display: "flex", alignItems: "center", gap: "var(--spacing-10)" }}>
-            <span className="tag-chip" style={{ backgroundColor: "var(--color-obsidian-surface)", color: "var(--color-ash-text)" }}>
-              {activeTab.toUpperCase()}
-            </span>
-            <span style={{ fontFamily: "var(--font-canvasans)", fontSize: "14px", color: "var(--color-ash-text)" }}>
-              {activeTab === "code" || activeTab === "tests" ? currentFileName : `job: ${result.job_id.substring(0, 8)}`}
-            </span>
-          </div>
-          {(activeTab === "code" || activeTab === "tests") && currentCode && (
-            <button 
-              onClick={() => handleCopy(currentCode)}
-              className="ghost-cta"
-              style={{ padding: "6px 14px", fontSize: "12px", borderRadius: "var(--radius-buttons)" }}
-            >
-              {copied ? "Copied!" : "Copy Code"}
-            </button>
-          )}
-        </div>
-
-        {/* Tab Contents */}
-        <div style={{ padding: "var(--spacing-27)" }}>
-          <AnimatePresence mode="wait">
-            {activeTab === "plan" && result.plan && (
-              <motion.div 
-                key="plan"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.3 }}
-                style={{ display: "flex", flexDirection: "column", gap: "var(--spacing-14)" }}
-              >
-                {result.plan.map((step, i) => (
-                  <div key={i} style={{ display: "flex", gap: "var(--spacing-14)", alignItems: "flex-start" }}>
-                    <div style={{ 
-                      fontFamily: "var(--font-canvasans)", 
-                      fontSize: "12px", 
-                      fontWeight: 700, 
-                      color: "var(--color-obsidian-surface)", 
-                      backgroundColor: "var(--color-voltage-yellow)", 
-                      borderRadius: "50%", 
-                      width: "24px", 
-                      height: "24px", 
-                      display: "flex", 
-                      alignItems: "center", 
-                      justifyContent: "center",
-                      flexShrink: 0,
-                      marginTop: 2
-                    }}>
-                      {i + 1}
-                    </div>
-                    <p className="body-text" style={{ color: "var(--color-bone-white)", margin: 0, fontSize: "16px" }}>
-                      {step}
-                    </p>
-                  </div>
-                ))}
-              </motion.div>
-            )}
-
-            {(activeTab === "code" || activeTab === "tests") && currentCode && (
-              <motion.div 
-                key="code"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.3 }}
-              >
-                <pre style={{ 
-                  margin: 0, 
-                  overflowX: "auto", 
-                  fontFamily: "'JetBrains Mono', 'Fira Code', monospace", 
-                  fontSize: "14px",
-                  lineHeight: 1.6,
-                  color: "var(--color-bone-white)" 
-                }}>
-                  <code>{currentCode}</code>
-                </pre>
-              </motion.div>
-            )}
-
-            {activeTab === "review" && result.review && (
-              <motion.div 
-                key="review"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.3 }}
-                style={{ display: "flex", gap: "var(--spacing-16)", alignItems: "flex-start" }}
-              >
-                <span className="material-symbols-outlined" style={{ color: "var(--color-toxic-lime)", fontSize: 24, flexShrink: 0 }}>
-                  gavel
-                </span>
-                <div style={{ display: "flex", flexDirection: "column", gap: "var(--spacing-10)" }}>
-                  <p className="body-text" style={{ margin: 0, fontSize: "16px", color: "var(--color-bone-white)" }}>
-                    {result.review}
-                  </p>
+      {/* Content Area */}
+      <div className="bg-[hsl(var(--background))]">
+        {activeTab === "plan" && result.plan && (
+          <div className="p-6 space-y-4">
+            {result.plan.map((step, i) => (
+              <div key={i} className="flex gap-4 items-start">
+                <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[hsl(var(--muted))] text-xs font-medium border border-[hsl(var(--border))]">
+                  {i + 1}
                 </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
+                <p className="text-sm pt-0.5 leading-relaxed text-[hsl(var(--foreground))]">
+                  {step}
+                </p>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {(activeTab === "code" || activeTab === "tests") && currentCode && (
+          <div className="flex flex-col">
+            <div className="flex items-center justify-between px-4 py-2 bg-[hsl(var(--muted))] border-b border-[hsl(var(--border))]">
+              <span className="text-xs font-mono text-[hsl(var(--muted-foreground))]">{currentFileName}</span>
+              <button 
+                onClick={() => handleCopy(currentCode)}
+                className="shadcn-btn-outline h-7 text-xs px-2"
+              >
+                {copied ? "Copied" : "Copy"}
+              </button>
+            </div>
+            <pre className="p-4 overflow-x-auto bg-[#0d1117] text-[#e6edf3] text-sm font-mono m-0 leading-relaxed max-h-[500px]">
+              <code>{currentCode}</code>
+            </pre>
+          </div>
+        )}
+
+        {activeTab === "review" && result.review && (
+          <div className="p-6">
+            <div className="rounded-lg border border-[hsl(var(--border))] bg-[hsl(var(--card))] p-6 space-y-3">
+              <div className="flex items-center gap-2">
+                <svg className="w-5 h-5 text-[hsl(var(--foreground))]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                </svg>
+                <h3 className="font-semibold text-sm">Security Audit</h3>
+              </div>
+              <p className="text-sm text-[hsl(var(--muted-foreground))] leading-relaxed whitespace-pre-wrap">
+                {result.review}
+              </p>
+            </div>
+          </div>
+        )}
       </div>
+
     </div>
   );
 }
