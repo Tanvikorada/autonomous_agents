@@ -1,7 +1,6 @@
 import { useState, useEffect, MouseEvent, useRef } from "react";
 import { PipelineResult } from "@/lib/api";
 import { motion, AnimatePresence } from "framer-motion";
-import { Check, Copy, ShieldCheck, Terminal } from "lucide-react";
 
 interface Props {
   result: PipelineResult;
@@ -61,7 +60,10 @@ export default function ResultPanel({ result }: Props) {
         <div className="flex items-center justify-between p-5 border-b border-white/5 bg-black/40 backdrop-blur-md">
           <div className="flex items-center gap-4">
             <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-purple-500 to-[#33d0ff] shadow-[0_0_20px_rgba(51,208,255,0.3)]">
-              <Terminal className="h-4 w-4 text-white" />
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4 text-white">
+                <polyline points="4 17 10 11 4 5"></polyline>
+                <line x1="12" y1="19" x2="20" y2="19"></line>
+              </svg>
             </div>
             <div className="flex flex-col">
               <h2 className="font-bold text-sm tracking-widest text-white uppercase">Execution Sandbox</h2>
@@ -160,7 +162,11 @@ export default function ResultPanel({ result }: Props) {
                     onClick={() => handleCopy(currentCode)}
                     className="flex items-center gap-2 rounded-md px-3 py-1.5 text-[10px] font-bold tracking-widest uppercase border border-white/10 bg-white/5 text-white/80 hover:bg-white/10 hover:border-white/20 transition-all"
                   >
-                    {copied ? <Check className="w-3 h-3 text-green-400" /> : <Copy className="w-3 h-3" />}
+                    {copied ? (
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-3 h-3 text-green-400"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    ) : (
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-3 h-3"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                    )}
                     {copied ? "Copied" : "Copy Source"}
                   </button>
                 </div>
@@ -183,7 +189,10 @@ export default function ResultPanel({ result }: Props) {
                 <div className="h-full rounded-2xl border border-[#33d0ff]/20 bg-[#33d0ff]/5 p-8 space-y-6 shadow-[inset_0_0_50px_rgba(51,208,255,0.05)]">
                   <div className="flex items-center gap-4">
                     <div className="p-3 rounded-full bg-[#33d0ff]/20">
-                      <ShieldCheck className="w-6 h-6 text-[#33d0ff]" />
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6 text-[#33d0ff]">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                        <path d="m9 12 2 2 4-4"></path>
+                      </svg>
                     </div>
                     <div>
                       <h3 className="font-bold text-lg text-white">System Audit Complete</h3>
