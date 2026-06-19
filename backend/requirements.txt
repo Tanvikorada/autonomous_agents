@@ -32,3 +32,4 @@ langchain-chroma==0.1.4
 langchain-huggingface==0.1.2
 sentence-transformers==3.3.1
 gitpython==3.1.43
+PyGithub==2.1.1

@@ -16,6 +16,11 @@ class RunRequest(BaseModel):
         description="The software problem or task description.",
         examples=["Build a Python REST API for a simple todo list with CRUD operations."],
     )
+    repo_url: Optional[str] = Field(
+        None,
+        description="Optional target GitHub repository URL to pull context and push PRs.",
+        examples=["https://github.com/Tanvikorada/autonomous_agents"]
+    )
 
 
 # ── Response Models ────────────────────────────────────────────────────────────
@@ -43,6 +48,7 @@ class PipelineResult(BaseModel):
     job_id: str
     status: str
     problem: str
+    repo_url: Optional[str] = None
     plan: Optional[List[str]] = None
     code: Optional[str] = None
     tests: Optional[str] = None

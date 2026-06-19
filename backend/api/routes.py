@@ -54,7 +54,7 @@ def _get_completed_steps(status: str) -> list[str]:
 
 # ── Background task ────────────────────────────────────────────────────────────
 
-async def _run_pipeline(job_id: str, problem: str) -> None:
+async def _run_pipeline(job_id: str, problem: str, repo_url: str = None) -> None:
     """
     Execute the initial agent pipeline asynchronously.
     Runs in a background thread so it doesn't block the event loop.
@@ -62,6 +62,7 @@ async def _run_pipeline(job_id: str, problem: str) -> None:
     initial_state: AgentState = {
         "job_id": job_id,
         "problem": problem,
+        "repo_url": repo_url,
         "plan": None,
         "code": None,
         "tests": None,
@@ -145,6 +146,7 @@ async def run_pipeline(body: RunRequest, background_tasks: BackgroundTasks) -> J
     job_store.create(job_id, {
         "job_id": job_id,
         "problem": body.problem,
+        "repo_url": body.repo_url,
         "plan": None,
         "code": None,
         "tests": None,
@@ -162,7 +164,7 @@ async def run_pipeline(body: RunRequest, background_tasks: BackgroundTasks) -> J
     })
 
     # Kick off the pipeline in the background
-    background_tasks.add_task(_run_pipeline, job_id, body.problem)
+    background_tasks.add_task(_run_pipeline, job_id, body.problem, body.repo_url)
 
     return JobCreatedResponse(job_id=job_id)
 
@@ -207,6 +209,7 @@ async def get_result(job_id: str) -> PipelineResult:
         job_id=job_id,
         status=state["status"],
         problem=state["problem"],
+        repo_url=state.get("repo_url"),
         plan=state.get("plan"),
         code=state.get("code"),
         tests=state.get("tests"),

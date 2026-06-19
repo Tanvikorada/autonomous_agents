@@ -33,6 +33,7 @@ export interface PipelineResult {
   job_id: string;
   status: JobStatus;
   problem: string;
+  repo_url?: string;
   plan?: string[];
   code?: string;
   tests?: string;
@@ -49,11 +50,15 @@ export interface PipelineResult {
 }
 
 // ── Start a pipeline job ──────────────────────────────────────────────────────
-export async function startPipeline(problem: string): Promise<JobCreatedResponse> {
+export async function startPipeline(problem: string, repoUrl: string = ""): Promise<JobCreatedResponse> {
+  const payload: any = { problem };
+  if (repoUrl && repoUrl.trim().length > 0) {
+    payload.repo_url = repoUrl.trim();
+  }
   const res = await fetch(`${API_BASE}/api/run`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ problem }),
+    body: JSON.stringify(payload),
   });
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));

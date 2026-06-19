@@ -7,6 +7,11 @@ from langchain_core.messages import SystemMessage, HumanMessage
 from backend.core.llm import get_llm
 from backend.core.state import AgentState
 from backend.storage.memory_store import job_store
+from backend.core.memory import append_project_memory
+import os
+import re
+import tempfile
+import shutil
 
 logger = logging.getLogger(__name__)
 
@@ -84,6 +89,24 @@ def run_reviewer(state: AgentState) -> AgentState:
             confidence = None
 
         logger.info(f"[{job_id}] Reviewer produced {len(review)} characters of review. Tokens used: {tokens_used}")
+        
+        # Memory Extraction
+        repo_url = state.get("repo_url")
+        if repo_url:
+            try:
+                mem_msg = [
+                    SystemMessage(content="You are an architect. Extract 1-2 core architectural lessons or style preferences from this code to remember for future tasks. Output only the lessons as bullet points."),
+                    HumanMessage(content=f"Code:\n{code}\n\nReview:\n{review}")
+                ]
+                mem_resp = llm.invoke(mem_msg)
+                append_project_memory(repo_url, mem_resp.content.strip())
+            except Exception as e:
+                logger.error(f"Memory extraction failed: {e}")
+
+        # Open PR if successful and repo exists
+        if repo_url and state.get("test_passed"):
+            _open_pr_for_job(job_id, repo_url, code)
+            
         update_data = {
             "review": review, 
             "review_risk_score": risk_score,
@@ -97,6 +120,85 @@ def run_reviewer(state: AgentState) -> AgentState:
         job_store.update(job_id, update_data)
 
         return {**state, **update_data}
+
+def _open_pr_for_job(job_id: str, repo_url: str, code: str):
+    """
+    Parses code blocks and pushes a new branch + PR to GitHub.
+    Requires GITHUB_TOKEN.
+    """
+    token = os.environ.get("GITHUB_TOKEN")
+    if not token or "github.com" not in repo_url:
+        logger.warning("No GITHUB_TOKEN or invalid repo_url. Skipping PR creation.")
+        return
+        
+    try:
+        from github import Github
+        from git import Repo
+        import urllib.parse
+        
+        gh = Github(token)
+        # Extract owner/repo
+        path = urllib.parse.urlparse(repo_url).path.strip('/')
+        if path.endswith('.git'):
+            path = path[:-4]
+            
+        gh_repo = gh.get_repo(path)
+        branch_name = f"dayos-feature-{job_id[:8]}"
+        
+        tmp_dir = tempfile.mkdtemp()
+        try:
+            auth_url = repo_url.replace("https://", f"https://{token}@")
+            repo = Repo.clone_from(auth_url, tmp_dir)
+            
+            # Create branch
+            new_branch = repo.create_head(branch_name)
+            new_branch.checkout()
+            
+            # Parse code files using # ===== FILE: filename.ext =====
+            files_written = 0
+            current_file = None
+            current_content = []
+            
+            for line in code.split('\n'):
+                match = re.match(r'# ===== FILE:\s*(.+?)\s*=====', line)
+                if match:
+                    if current_file:
+                        file_path = os.path.join(tmpdir, current_file)
+                        os.makedirs(os.path.dirname(file_path), exist_ok=True)
+                        with open(file_path, "w") as f:
+                            f.write('\n'.join(current_content).strip())
+                        files_written += 1
+                        
+                    current_file = match.group(1).strip()
+                    current_content = []
+                else:
+                    current_content.append(line)
+                    
+            if current_file:
+                file_path = os.path.join(tmpdir, current_file)
+                os.makedirs(os.path.dirname(file_path), exist_ok=True)
+                with open(file_path, "w") as f:
+                    f.write('\n'.join(current_content).strip())
+                files_written += 1
+                
+            if files_written > 0:
+                repo.git.add(A=True)
+                repo.index.commit(f"Dayos auto-implementation for {job_id}")
+                repo.git.push("--set-upstream", "origin", branch_name)
+                
+                # Open PR
+                gh_repo.create_pull(
+                    title=f"Dayos Implementation - Job {job_id[:8]}",
+                    body=f"Automated PR created by Dayos for job `{job_id}`.",
+                    head=branch_name,
+                    base=gh_repo.default_branch
+                )
+                logger.info(f"Successfully opened PR on {repo_url} (branch: {branch_name})")
+        finally:
+            shutil.rmtree(tmp_dir, ignore_errors=True)
+            
+    except Exception as e:
+        logger.error(f"Failed to open PR: {e}")
 
 
 

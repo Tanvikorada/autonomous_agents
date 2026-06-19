@@ -10,6 +10,7 @@ from langchain_core.messages import SystemMessage, HumanMessage
 from backend.core.llm import get_llm
 from backend.core.state import AgentState
 from backend.storage.memory_store import job_store
+from backend.core.memory import get_project_memory
 
 logger = logging.getLogger(__name__)
 
@@ -49,10 +50,17 @@ def run_planner(state: AgentState) -> AgentState:
     job_store.update(job_id, {"status": "planning", "current_agent": "Planner"})
 
     try:
+        repo_url = state.get("repo_url", "")
+        memory_context = get_project_memory(repo_url)
+        
+        prompt_content = f"Problem to solve:\n\n{problem}"
+        if memory_context:
+            prompt_content += f"\n\nArchitectural Lessons & Preferences for this Repo:\n{memory_context}"
+            
         llm = get_llm(agent_name="planner", temperature=0.3)
         messages = [
             SystemMessage(content=SYSTEM_PROMPT),
-            HumanMessage(content=f"Problem to solve:\n\n{problem}"),
+            HumanMessage(content=prompt_content),
         ]
 
         response = llm.invoke(messages)

@@ -21,6 +21,7 @@ class AgentState(TypedDict):
     """
     job_id: str
     problem: str
+    repo_url: Optional[str]
     plan: Optional[List[str]]
     code: Optional[str]
     tests: Optional[str]

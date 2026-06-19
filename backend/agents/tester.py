@@ -10,18 +10,23 @@ from backend.storage.memory_store import job_store
 
 logger = logging.getLogger(__name__)
 
-SYSTEM_PROMPT = """You are a QA engineer specializing in Python test automation.
+SYSTEM_PROMPT = """You are a QA engineer specializing in test automation.
 
-Your job is to write comprehensive pytest test cases for the given code.
+Your job is to write comprehensive test cases for the given code.
 
 Rules:
-- Write tests using pytest framework (no unittest).
+- Write tests using the appropriate framework for the language (pytest for Python, jest for Node/TS, go test for Go).
 - Cover: happy path, edge cases, and error/exception cases.
-- Use clear test function names that describe what is being tested (test_should_...).
-- Mock external dependencies (APIs, databases, file system) using pytest-mock or unittest.mock.
+- Use clear test function names that describe what is being tested.
+- Mock external dependencies where necessary.
 - Do NOT include any explanation or markdown outside the code.
-- Output ONLY the test code. Start with imports.
-- Aim for at least 5-8 meaningful test cases.
+- Output ONLY the test code. 
+- You MUST start your response with a metadata header specifying the language, like:
+  # LANGUAGE: python
+  OR
+  // LANGUAGE: typescript
+  OR
+  // LANGUAGE: go
 """
 
 
@@ -75,6 +80,16 @@ def run_tester(state: AgentState) -> AgentState:
 
         logger.info(f"[{job_id}] Tester produced {len(tests)} characters of test code. Tokens used: {tokens_used}")
         
+        # Detect language from metadata header
+        lang = "python"
+        first_line = tests.split('\n')[0].lower()
+        if "language: typescript" in first_line or "language: ts" in first_line or "language: node" in first_line or "language: javascript" in first_line:
+            lang = "typescript"
+        elif "language: go" in first_line:
+            lang = "go"
+            
+        logger.info(f"[{job_id}] Tester detected language: {lang}")
+        
         # Execute the generated tests using a secure Docker sandbox
         import tempfile
         import subprocess
@@ -84,33 +99,64 @@ def run_tester(state: AgentState) -> AgentState:
         test_output = "No tests were run."
         
         with tempfile.TemporaryDirectory() as tmpdir:
-            # write code to module.py
-            with open(os.path.join(tmpdir, "module.py"), "w") as f:
-                f.write(code)
-            # write tests to test_module.py
-            with open(os.path.join(tmpdir, "test_module.py"), "w") as f:
-                f.write(tests)
-                
-            # Create Dockerfile for the sandbox
-            dockerfile_content = """FROM python:3.11-slim
+            if lang == "python":
+                code_ext = ".py"
+                test_ext = "_test.py"
+                dockerfile_content = """FROM python:3.11-slim
 WORKDIR /workspace
 RUN pip install --no-cache-dir pytest pytest-mock
 COPY . /workspace
-CMD ["python", "-m", "pytest", "test_module.py", "-v"]
+CMD ["python", "-m", "pytest", "module_test.py", "-v"]
 """
+            elif lang == "typescript":
+                code_ext = ".ts"
+                test_ext = ".test.ts"
+                dockerfile_content = """FROM node:18-alpine
+WORKDIR /workspace
+RUN npm init -y && npm install jest typescript ts-jest @types/jest
+RUN npx ts-jest config:init
+COPY . /workspace
+CMD ["npx", "jest", "module.test.ts"]
+"""
+            elif lang == "go":
+                code_ext = ".go"
+                test_ext = "_test.go"
+                dockerfile_content = """FROM golang:1.21-alpine
+WORKDIR /workspace
+COPY . /workspace
+CMD ["go", "test", "-v", "./..."]
+"""
+            else:
+                code_ext = ".py"
+                test_ext = "_test.py"
+                dockerfile_content = """FROM python:3.11-slim
+WORKDIR /workspace
+RUN pip install --no-cache-dir pytest pytest-mock
+COPY . /workspace
+CMD ["python", "-m", "pytest", "module_test.py", "-v"]
+"""
+
+            # write code to module
+            with open(os.path.join(tmpdir, f"module{code_ext}"), "w") as f:
+                f.write(code)
+            # write tests to test_module
+            with open(os.path.join(tmpdir, f"module{test_ext}"), "w") as f:
+                f.write(tests)
+                
+            # Create Dockerfile for the sandbox
             with open(os.path.join(tmpdir, "Dockerfile"), "w") as f:
                 f.write(dockerfile_content)
                 
             image_tag = f"dayos-sandbox-{job_id.lower()}"
             
             try:
-                # Build the image (has network access to download pytest)
+                # Build the image (has network access to download dependencies)
                 build_result = subprocess.run(
                     ["docker", "build", "-t", image_tag, "."],
                     cwd=tmpdir,
                     capture_output=True,
                     text=True,
-                    timeout=60
+                    timeout=120
                 )
                 
                 if build_result.returncode != 0:

@@ -8,21 +8,21 @@ from langchain_core.messages import SystemMessage, HumanMessage
 from backend.core.llm import get_llm
 from backend.core.state import AgentState
 from backend.storage.memory_store import job_store
+from backend.core.memory import get_project_memory
 
 logger = logging.getLogger(__name__)
 
-SYSTEM_PROMPT = """You are a senior Python developer with 10 years of experience.
+SYSTEM_PROMPT = """You are a senior polyglot software developer with 10 years of experience.
 
-Your job is to write clean, working, production-quality Python code based on a given implementation plan.
+Your job is to write clean, working, production-quality code based on a given implementation plan.
 
 Rules:
-- Write complete, runnable Python code.
+- Write complete, runnable code in the appropriate language.
 - Use clear variable names and add brief inline comments.
-- Include proper error handling (try/except where needed).
-- Use type hints throughout.
+- Include proper error handling (try/except/catch where needed).
 - Do NOT include any explanation or markdown outside the code block.
-- Output ONLY the Python code. Start directly with imports or module docstring.
-- If multiple files are needed, clearly separate them with a comment like: # ===== FILE: filename.py =====
+- Output ONLY the code.
+- If multiple files are needed, clearly separate them with a comment like: # ===== FILE: filename.ext =====
 """
 
 
@@ -64,10 +64,16 @@ def run_coder(state: AgentState) -> AgentState:
     try:
         llm = get_llm(agent_name="coder", temperature=0.2)
         
+        repo_url = state.get("repo_url", "")
+        memory_context = get_project_memory(repo_url)
+
         prompt_content = (
             f"Original Problem:\n{problem}\n\n"
             f"Implementation Plan:\n{plan_text}\n\n"
         )
+        
+        if memory_context:
+            prompt_content += f"Architectural Lessons & Preferences for this Repo:\n{memory_context}\n\n"
         
         if context_text:
             prompt_content += f"Retrieved Context from Repo:\n{context_text}\n\n"
@@ -75,7 +81,7 @@ def run_coder(state: AgentState) -> AgentState:
         if retries > 0 and test_output:
             prompt_content += f"Previous attempt failed tests. Fix the code to pass these tests:\n```\n{test_output}\n```\n\n"
             
-        prompt_content += "Now write the complete Python implementation. If you are modifying existing code, output standard Unified Diffs (```diff). If creating new files, output the full file contents (```python). Separate multiple files with # ===== FILE: filename =====."
+        prompt_content += "Now write the complete implementation. Output standard Unified Diffs (```diff) for existing files, or full file contents (```language) for new files. Separate multiple files with # ===== FILE: filename ====="
 
         messages = [
             SystemMessage(content=SYSTEM_PROMPT),

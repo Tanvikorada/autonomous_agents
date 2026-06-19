@@ -15,6 +15,7 @@ export default function Home() {
   const [result, setResult] = useState<PipelineResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [problem, setProblem] = useState("");
+  const [repoUrl, setRepoUrl] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,7 +24,7 @@ export default function Home() {
       setError(null);
       setResult(null);
       setStatusData(null);
-      const res = await startPipeline(problem);
+      const res = await startPipeline(problem, repoUrl);
       setJobId(res.job_id);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Failed to start swarm.");
@@ -130,6 +131,16 @@ export default function Home() {
                 placeholder="Describe what you want to build... (e.g., 'A Python trading bot with a Flask API')"
                 className="w-full min-h-[120px] resize-none bg-transparent outline-none p-[24px] text-[16px] font-suisseintl text-[var(--color-ink-black)] placeholder-[var(--color-steel-gray)] leading-relaxed"
               />
+              <div className="w-full px-[24px] pb-[16px]">
+                <input
+                  type="text"
+                  value={repoUrl}
+                  onChange={e => setRepoUrl(e.target.value)}
+                  disabled={isLoading}
+                  placeholder="Optional target repository URL (e.g., https://github.com/user/repo)"
+                  className="w-full bg-[var(--color-surface-mist)] rounded-[12px] px-[16px] py-[12px] text-[14px] font-suisseintl text-[var(--color-ink-black)] placeholder-[var(--color-steel-gray)] outline-none border border-transparent focus:border-[var(--color-mint-pulse)] transition-colors"
+                />
+              </div>
               <div className="flex justify-between items-center px-[24px] pb-[20px]">
                 <div className="text-[12px] font-suisseintlmono text-[var(--color-steel-gray)] uppercase tracking-wide">
                   Press Enter ⏎ to execute
