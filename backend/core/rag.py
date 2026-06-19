@@ -1,4 +1,8 @@
 import os
+
+# Explicitly set git path for Windows environments
+os.environ["GIT_PYTHON_GIT_EXECUTABLE"] = r"C:\Program Files\Git\cmd\git.exe"
+
 import shutil
 import tempfile
 import logging
