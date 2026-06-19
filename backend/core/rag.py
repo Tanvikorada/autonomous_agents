@@ -1,17 +1,14 @@
 import os
 import shutil
+import tempfile
+import logging
+from typing import List, Dict, Any
 
 # Dynamically locate git for Windows environments and silence errors
 git_path = shutil.which("git")
 if git_path:
     os.environ["GIT_PYTHON_GIT_EXECUTABLE"] = git_path
 os.environ["GIT_PYTHON_REFRESH"] = "quiet"
-
-import tempfile
-import logging
-from typing import List, Dict, Any
-
-from git import Repo
 from langchain_chroma import Chroma
 from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_text_splitters import Language, RecursiveCharacterTextSplitter
@@ -58,6 +55,10 @@ def ingest_repo(repo_url: str, force_reindex: bool = False) -> Chroma:
     try:
         if repo_url.startswith("http") or repo_url.startswith("git@"):
             logger.info(f"Cloning {repo_url} to {tmp_dir}")
+            
+            # Defer git import until absolutely needed to avoid initialization crashes
+            from git import Repo
+            
             env = {}
             if "GITHUB_TOKEN" in os.environ:
                 # Insert token into https url
