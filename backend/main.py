@@ -44,7 +44,7 @@ app.add_middleware(
     allow_origins=[
         "*" # Allow any frontend domain (Vercel)
     ],
-    allow_credentials=True,
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
