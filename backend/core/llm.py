@@ -32,13 +32,25 @@ def get_llm(temperature: float = 0.3) -> BaseChatModel:
             )
         from langchain_groq import ChatGroq
         logger.info(f"Using Groq LLM: {settings.groq_model}")
-        return ChatGroq(
+        
+        primary_model = ChatGroq(
             api_key=settings.groq_api_key,
             model_name=settings.groq_model,
             temperature=temperature,
-            max_retries=2,
+            max_retries=3,
             timeout=45,
         )
+        
+        # Add a fallback to a smaller, faster model in case the versatile model is over capacity (503 error)
+        fallback_model = ChatGroq(
+            api_key=settings.groq_api_key,
+            model_name="llama-3.1-8b-instant",
+            temperature=temperature,
+            max_retries=3,
+            timeout=45,
+        )
+        
+        return primary_model.with_fallbacks([fallback_model])
 
     elif provider == "openai":
         if not settings.openai_api_key:
