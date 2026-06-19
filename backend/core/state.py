@@ -2,8 +2,7 @@
 core/state.py — Shared state definition for the LangGraph pipeline.
 Each field is populated by a specific agent as the pipeline progresses.
 """
-from typing import TypedDict, Optional, List
-
+from typing import TypedDict, Optional, List, Dict, Any
 
 class AgentState(TypedDict):
     """
@@ -38,3 +37,5 @@ class AgentState(TypedDict):
     review_confidence: Optional[str]
     total_tokens: int
     total_cost: float
+    retrieved_context: Optional[List[dict]]
+    agent_metrics: Optional[Dict[str, Any]]

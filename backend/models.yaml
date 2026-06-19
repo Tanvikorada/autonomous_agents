@@ -1,0 +1,12 @@
+planner:
+  primary: "groq/llama-3.3-70b-versatile"
+  fallback: ["groq/llama-3.1-8b-instant"]
+coder:
+  primary: "groq/llama-3.3-70b-versatile"
+  fallback: ["groq/llama-3.1-8b-instant"]
+tester:
+  primary: "groq/llama-3.3-70b-versatile"
+  fallback: ["groq/llama-3.1-8b-instant"]
+reviewer:
+  primary: "groq/llama-3.3-70b-versatile"
+  fallback: ["groq/llama-3.1-8b-instant"]

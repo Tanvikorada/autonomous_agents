@@ -36,6 +36,7 @@ export interface PipelineResult {
   plan?: string[];
   code?: string;
   tests?: string;
+  test_passed?: boolean;
   review?: string;
   review_risk_score?: number;
   review_confidence?: string;
@@ -43,6 +44,8 @@ export interface PipelineResult {
   retries?: number;
   total_tokens?: number;
   total_cost?: number;
+  retrieved_context?: Array<{source: string; content: string}>;
+  agent_metrics?: Record<string, {tokens: number, cost: number}>;
 }
 
 // ── Start a pipeline job ──────────────────────────────────────────────────────

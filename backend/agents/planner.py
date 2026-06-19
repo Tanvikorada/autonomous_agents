@@ -49,7 +49,7 @@ def run_planner(state: AgentState) -> AgentState:
     job_store.update(job_id, {"status": "planning", "current_agent": "Planner"})
 
     try:
-        llm = get_llm(temperature=0.3)
+        llm = get_llm(agent_name="planner", temperature=0.3)
         messages = [
             SystemMessage(content=SYSTEM_PROMPT),
             HumanMessage(content=f"Problem to solve:\n\n{problem}"),
@@ -60,8 +60,13 @@ def run_planner(state: AgentState) -> AgentState:
 
         token_usage = response.response_metadata.get("token_usage", {})
         tokens_used = token_usage.get("total_tokens", len(raw) // 3)
+        cost = tokens_used * 0.000005
+        
         total_tokens = state.get("total_tokens", 0) + tokens_used
-        total_cost = state.get("total_cost", 0.0) + (tokens_used * 0.000005)
+        total_cost = state.get("total_cost", 0.0) + cost
+        
+        agent_metrics = state.get("agent_metrics") or {}
+        agent_metrics["planner"] = {"tokens": tokens_used, "cost": cost}
 
         # Extract JSON array from response (handles wrapped markdown)
         json_match = re.search(r"\[.*\]", raw, re.DOTALL)
@@ -78,6 +83,7 @@ def run_planner(state: AgentState) -> AgentState:
             "current_agent": None,
             "total_tokens": total_tokens,
             "total_cost": total_cost,
+            "agent_metrics": agent_metrics
         }
         job_store.update(job_id, update_data)
 

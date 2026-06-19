@@ -2,6 +2,7 @@
 agents/coder.py — Coder Agent.
 Generates clean, working Python code based on the Planner's output.
 """
+import os
 import logging
 from langchain_core.messages import SystemMessage, HumanMessage
 from backend.core.llm import get_llm
@@ -43,22 +44,25 @@ def run_coder(state: AgentState) -> AgentState:
 
     plan_text = "\n".join(plan) if plan else "No plan provided — infer from the problem."
     
-    # Simple context retrieval based on problem keywords (Mocking full RAG for simplicity, or doing a basic search)
-    import glob
-    import os
+    # Context retrieval using real RAG
+    from backend.core.rag import retrieve_context
     context_text = ""
-    # In a real system, this would use embeddings against the target repo. 
-    # Here we simulate finding related files if the problem mentions specific components.
-    target_repo = "c:/Users/Tanvi/Desktop/autonomous agents"
-    if "api" in problem.lower():
-        try:
-            with open(os.path.join(target_repo, "backend", "api", "routes.py"), "r") as f:
-                context_text += f"\n--- backend/api/routes.py ---\n{f.read()[:1000]}...\n"
-        except:
-            pass
+    retrieved_chunks = []
+    # Using the Dayos repo for self-hosting context, or fallback to user input
+    # In a fully fleshed system, this would be passed dynamically from the job submission
+    target_repo = os.environ.get("TARGET_REPO", "c:/Users/Tanvi/Desktop/autonomous agents")
+    
+    try:
+        chunks = retrieve_context(target_repo, problem, top_k=5)
+        if chunks:
+            retrieved_chunks = chunks
+            for chunk in chunks:
+                context_text += f"\n--- {chunk['source']} ---\n{chunk['content']}\n"
+    except Exception as e:
+        logger.error(f"Failed to retrieve context: {e}")
 
     try:
-        llm = get_llm(temperature=0.2)
+        llm = get_llm(agent_name="coder", temperature=0.2)
         
         prompt_content = (
             f"Original Problem:\n{problem}\n\n"
@@ -83,8 +87,13 @@ def run_coder(state: AgentState) -> AgentState:
 
         token_usage = response.response_metadata.get("token_usage", {})
         tokens_used = token_usage.get("total_tokens", len(code) // 3)
+        cost = tokens_used * 0.000005
+        
         total_tokens = state.get("total_tokens", 0) + tokens_used
-        total_cost = state.get("total_cost", 0.0) + (tokens_used * 0.000005)
+        total_cost = state.get("total_cost", 0.0) + cost
+        
+        agent_metrics = state.get("agent_metrics") or {}
+        agent_metrics["coder"] = {"tokens": tokens_used, "cost": cost}
 
         # Strip markdown code fences if the LLM wraps in them
         if code.startswith("```python") or code.startswith("```diff"):
@@ -96,7 +105,9 @@ def run_coder(state: AgentState) -> AgentState:
             "code": code,
             "total_tokens": total_tokens,
             "total_cost": total_cost,
-            "current_agent": "Coder"
+            "current_agent": "Coder",
+            "retrieved_context": retrieved_chunks,
+            "agent_metrics": agent_metrics
         }
         job_store.update(job_id, update_data)
 

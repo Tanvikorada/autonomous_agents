@@ -1,72 +1,71 @@
 """
-core/llm.py — LLM client factory.
-Returns the correct LangChain chat model based on config.
+core/llm.py — Model-Agnostic LLM client factory using litellm.
+Loads agent-specific models from models.yaml.
 """
 import logging
+import yaml
+import os
+from pathlib import Path
 from langchain_core.language_models.chat_models import BaseChatModel
+from langchain_community.chat_models import ChatLiteLLM
 from backend.config import settings
 
 logger = logging.getLogger(__name__)
 
+# Load models config once
+MODELS_YAML_PATH = Path(__file__).parent.parent / "models.yaml"
 
-def get_llm(temperature: float = 0.3) -> BaseChatModel:
+def _load_models_config():
+    if not MODELS_YAML_PATH.exists():
+        logger.warning(f"{MODELS_YAML_PATH} not found. Using default fallback models.")
+        return {}
+    with open(MODELS_YAML_PATH, "r") as f:
+        return yaml.safe_load(f) or {}
+
+MODELS_CONFIG = _load_models_config()
+
+def get_llm(agent_name: str = "coder", temperature: float = 0.3) -> BaseChatModel:
     """
-    Returns a LangChain-compatible chat model based on LLM_PROVIDER setting.
+    Returns a litellm-based LangChain chat model tailored for the specific agent.
     
     Args:
-        temperature: Sampling temperature (lower = more deterministic).
+        agent_name: The name of the agent (e.g., 'planner', 'coder', 'tester', 'reviewer').
+        temperature: Sampling temperature.
     
     Returns:
-        A configured ChatGroq or ChatOpenAI instance.
-    
-    Raises:
-        ValueError: If provider config is invalid or API key is missing.
+        A ChatLiteLLM instance with fallbacks configured.
     """
-    provider = settings.llm_provider
+    # Get config for this agent, fallback to a safe default if not found
+    agent_config = MODELS_CONFIG.get(agent_name, {})
+    primary_model_name = agent_config.get("primary", "groq/llama-3.3-70b-versatile")
+    fallback_model_names = agent_config.get("fallback", ["groq/llama-3.1-8b-instant"])
 
-    if provider == "groq":
-        if not settings.groq_api_key:
-            raise ValueError(
-                "GROQ_API_KEY is not set. "
-                "Add it to your .env file or set LLM_PROVIDER=openai."
+    # Ensure api keys are set in the environment because litellm relies on them
+    if settings.groq_api_key:
+        os.environ["GROQ_API_KEY"] = settings.groq_api_key
+    if settings.openai_api_key:
+        os.environ["OPENAI_API_KEY"] = settings.openai_api_key
+
+    logger.info(f"[{agent_name}] Initializing LLM primary={primary_model_name}")
+
+    primary_model = ChatLiteLLM(
+        model=primary_model_name,
+        temperature=temperature,
+        max_retries=3,
+        timeout=45,
+    )
+
+    fallbacks = []
+    for fb_name in fallback_model_names:
+        fallbacks.append(
+            ChatLiteLLM(
+                model=fb_name,
+                temperature=temperature,
+                max_retries=2,
+                timeout=45,
             )
-        from langchain_groq import ChatGroq
-        logger.info(f"Using Groq LLM: {settings.groq_model}")
-        
-        primary_model = ChatGroq(
-            api_key=settings.groq_api_key,
-            model_name=settings.groq_model,
-            temperature=temperature,
-            max_retries=3,
-            timeout=45,
-        )
-        
-        # Add a fallback to a smaller, faster model in case the versatile model is over capacity (503 error)
-        fallback_model = ChatGroq(
-            api_key=settings.groq_api_key,
-            model_name="llama-3.1-8b-instant",
-            temperature=temperature,
-            max_retries=3,
-            timeout=45,
-        )
-        
-        return primary_model.with_fallbacks([fallback_model])
-
-    elif provider == "openai":
-        if not settings.openai_api_key:
-            raise ValueError(
-                "OPENAI_API_KEY is not set. "
-                "Add it to your .env file."
-            )
-        from langchain_openai import ChatOpenAI
-        logger.info(f"Using OpenAI LLM: {settings.openai_model}")
-        return ChatOpenAI(
-            api_key=settings.openai_api_key,
-            model=settings.openai_model,
-            temperature=temperature,
-            max_retries=2,
-            timeout=45,
         )
 
-    else:
-        raise ValueError(f"Unknown LLM_PROVIDER: {provider!r}. Use 'groq' or 'openai'.")
+    if fallbacks:
+        return primary_model.with_fallbacks(fallbacks)
+    return primary_model

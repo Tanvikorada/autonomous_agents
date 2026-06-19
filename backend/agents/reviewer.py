@@ -41,7 +41,7 @@ def run_reviewer(state: AgentState) -> AgentState:
     job_store.update(job_id, {"status": "reviewing", "current_agent": "Reviewer"})
 
     try:
-        llm = get_llm(temperature=0.4)
+        llm = get_llm(agent_name="reviewer", temperature=0.4)
         messages = [
             SystemMessage(content=SYSTEM_PROMPT),
             HumanMessage(
@@ -59,8 +59,13 @@ def run_reviewer(state: AgentState) -> AgentState:
 
         token_usage = response.response_metadata.get("token_usage", {})
         tokens_used = token_usage.get("total_tokens", len(review_text) // 3)
+        cost = tokens_used * 0.000005
+        
         total_tokens = state.get("total_tokens", 0) + tokens_used
-        total_cost = state.get("total_cost", 0.0) + (tokens_used * 0.000005)
+        total_cost = state.get("total_cost", 0.0) + cost
+        
+        agent_metrics = state.get("agent_metrics") or {}
+        agent_metrics["reviewer"] = {"tokens": tokens_used, "cost": cost}
 
         if review_text.startswith("```json"):
             review_text = review_text.replace("```json", "").replace("```", "").strip()
@@ -87,6 +92,7 @@ def run_reviewer(state: AgentState) -> AgentState:
             "current_agent": None,
             "total_tokens": total_tokens,
             "total_cost": total_cost,
+            "agent_metrics": agent_metrics
         }
         job_store.update(job_id, update_data)
 
