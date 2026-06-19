@@ -121,6 +121,11 @@ def run_reviewer(state: AgentState) -> AgentState:
 
         return {**state, **update_data}
 
+    except Exception as e:
+        logger.error(f"[{job_id}] Reviewer Agent error: {e}")
+        job_store.update(job_id, {"status": "error", "error": str(e)})
+        return {**state, "status": "error", "error": str(e)}
+
 def _open_pr_for_job(job_id: str, repo_url: str, code: str):
     """
     Parses code blocks and pushes a new branch + PR to GitHub.
@@ -199,10 +204,3 @@ def _open_pr_for_job(job_id: str, repo_url: str, code: str):
             
     except Exception as e:
         logger.error(f"Failed to open PR: {e}")
-
-
-
-    except Exception as e:
-        logger.error(f"[{job_id}] Reviewer Agent error: {e}")
-        job_store.update(job_id, {"status": "error", "error": str(e)})
-        return {**state, "status": "error", "error": str(e)}
