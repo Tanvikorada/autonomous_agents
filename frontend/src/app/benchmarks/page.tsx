@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { FiArrowLeft, FiCheckCircle, FiXCircle, FiActivity } from 'react-icons/fi';
+import { ArrowLeft, CheckCircle, XCircle, Activity } from 'lucide-react';
 
 const mockData = [
   { id: "DAYOS-1", repo: "Tanvikorada/autonomous_agents", issue: "Add multi-language support to Tester agent", lang: "Python", status: "PASS", tokens: 8432, cost: "$0.042" },
@@ -30,7 +30,7 @@ export default function Benchmarks() {
         <header className="flex items-center justify-between">
           <div className="flex items-center gap-[24px]">
             <Link href="/" className="flex items-center justify-center w-[40px] h-[40px] rounded-full bg-[var(--color-surface-mist)] hover:bg-[var(--color-steel-gray)] hover:text-white transition-colors">
-              <FiArrowLeft size={20} />
+              <ArrowLeft size={20} />
             </Link>
             <div>
               <h1 className="font-suisseintlcond font-bold text-[40px] tracking-tight">DAYOS <span className="text-[var(--color-electric-yellow)] drop-shadow-sm">BENCHMARKS</span></h1>
@@ -59,7 +59,7 @@ export default function Benchmarks() {
         <div className="cc-panel overflow-hidden">
           <div className="p-[24px] border-b border-[var(--color-surface-mist)] flex justify-between items-center bg-[var(--color-pure-white)]">
             <h2 className="text-[20px] font-bold flex items-center gap-[12px]">
-              <FiActivity className="text-[var(--color-electric-yellow)]" />
+              <Activity className="text-[var(--color-electric-yellow)]" />
               Latest Test Runs
             </h2>
           </div>
@@ -92,11 +92,11 @@ export default function Benchmarks() {
                     <td className="p-[16px]">
                       {row.status === 'PASS' ? (
                         <span className="flex items-center gap-[6px] text-[#10b981] font-bold text-[14px] bg-[#d1ffca] px-[10px] py-[4px] rounded-[8px] w-fit">
-                          <FiCheckCircle /> PASS
+                          <CheckCircle size={16} /> PASS
                         </span>
                       ) : (
                         <span className="flex items-center gap-[6px] text-[#ef4444] font-bold text-[14px] bg-[#fee2e2] px-[10px] py-[4px] rounded-[8px] w-fit">
-                          <FiXCircle /> FAIL
+                          <XCircle size={16} /> FAIL
                         </span>
                       )}
                     </td>
