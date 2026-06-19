@@ -86,9 +86,10 @@ def run_tester(state: AgentState) -> AgentState:
             with open(os.path.join(tmpdir, "test_module.py"), "w") as f:
                 f.write(tests)
             
-            # run pytest
+            # run pytest via current python executable to avoid PATH issues
+            import sys
             result = subprocess.run(
-                ["pytest", "test_module.py", "-v"],
+                [sys.executable, "-m", "pytest", "test_module.py", "-v"],
                 cwd=tmpdir,
                 capture_output=True,
                 text=True
