@@ -2,6 +2,8 @@
 main.py — FastAPI application entry point.
 
 Run with:
+    uvicorn backend.main:app --reload --port 8000
+"""
 import logging
 import os
 import shutil
