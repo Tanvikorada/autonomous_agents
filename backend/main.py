@@ -2,13 +2,15 @@
 main.py — FastAPI application entry point.
 
 Run with:
-    uvicorn backend.main:app --reload --port 8000
-"""
 import logging
 import os
+import shutil
 
-# Explicitly set git path for Windows environments early to avoid GitPython initialization errors
-os.environ["GIT_PYTHON_GIT_EXECUTABLE"] = r"C:\Program Files\Git\cmd\git.exe"
+# Dynamically locate git to avoid GitPython initialization errors
+git_path = shutil.which("git")
+if git_path:
+    os.environ["GIT_PYTHON_GIT_EXECUTABLE"] = git_path
+os.environ["GIT_PYTHON_REFRESH"] = "quiet"
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
