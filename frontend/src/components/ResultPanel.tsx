@@ -164,7 +164,25 @@ export default function ResultPanel({ result, isLoading, currentAgent, status, o
                   </div>
                 </div>
               )}
-
+              {/* Actual Test Output */}
+              {result?.tests ? (
+                <div className="rounded-[16px] overflow-hidden border border-[var(--color-surface-mist)] shadow-sm flex-1">
+                  <SyntaxHighlighter
+                    language="python"
+                    style={oneLight}
+                    customStyle={{ margin: 0, padding: "24px", fontSize: "14px", fontFamily: "var(--font-suisse-intl-mono)", height: "100%" }}
+                    showLineNumbers
+                  >
+                    {result.tests}
+                  </SyntaxHighlighter>
+                </div>
+              ) : (
+                <div className="h-full flex flex-1 items-center justify-center text-[var(--color-steel-gray)] font-suisseintlmono text-[12px] uppercase min-h-[200px]">
+                  [ No test output yet ]
+                </div>
+              )}
+            </div>
+          )}
 
           {activeTab === "rag" && (
             <div className="flex flex-col h-full gap-4">
@@ -295,9 +313,9 @@ export default function ResultPanel({ result, isLoading, currentAgent, status, o
                     Total: ${result.total_cost?.toFixed(5)}
                   </span>
                 </div>
-              ) : result.total_tokens !== undefined && (
+              ) : result.total_tokens !== undefined ? (
                 <span>Tokens: {result.total_tokens.toLocaleString()} | Cost: ${result.total_cost?.toFixed(5)}</span>
-              )}
+              ) : null}
               {result.retries !== undefined && result.retries > 0 && (
                 <span className="text-red-500">Retries: {result.retries}</span>
               )}
