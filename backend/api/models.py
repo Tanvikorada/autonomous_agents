@@ -11,7 +11,7 @@ class RunRequest(BaseModel):
     """Body for POST /api/run"""
     problem: str = Field(
         ...,
-        min_length=10,
+        min_length=1,
         max_length=5000,
         description="The software problem or task description.",
         examples=["Build a Python REST API for a simple todo list with CRUD operations."],
