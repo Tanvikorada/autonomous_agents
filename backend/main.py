@@ -5,6 +5,11 @@ Run with:
     uvicorn backend.main:app --reload --port 8000
 """
 import logging
+import os
+
+# Explicitly set git path for Windows environments early to avoid GitPython initialization errors
+os.environ["GIT_PYTHON_GIT_EXECUTABLE"] = r"C:\Program Files\Git\cmd\git.exe"
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from backend.api.routes import router
